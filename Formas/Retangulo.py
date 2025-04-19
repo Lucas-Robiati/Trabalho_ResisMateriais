@@ -7,3 +7,23 @@ class Retangulo(Forma):
     super().__init__(origem, centroide, forma_virtual)
     self.base = base
     self.altura = altura
+    self.area = self.__c_area()
+
+  @property
+  def base(self) -> float:
+    return self.__base
+  
+  @base.setter
+  def base(self, base) -> None:
+    self.__base = base
+
+  @property
+  def altura(self) -> float:
+    return self.__altura
+
+  @altura.setter
+  def altura(self, altura) -> None:
+    self.__altura = altura  
+
+  def __c_area(self) -> float:
+    return self.base * self.altura
