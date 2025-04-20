@@ -17,7 +17,8 @@ class Application():
     def window(self):
         self.root.title("Calculadora de Momento de Inercia")
         self.root.configure(background='#5e5c64')
-        self.root.geometry("700x500")
+        self.root.geometry("950x520")
+        self.root.minsize(700, 500)
         self.root.resizable(True,True)
-
+        
 Application()
