@@ -15,6 +15,7 @@ class Triangulo(Forma):
     if(not self.__valido()):
       return -1
     super().__init__(origem, centroide, forma_virtual)
+    self.Ix, self.Iy = self.momento()
 
   @property
   def a(self) -> float:
@@ -70,3 +71,7 @@ class Triangulo(Forma):
     
     return True
   
+  def momento(self) -> float:
+    if(self.equilatero() or self.isoceles()):
+      return ((self.a * (self.altura * self.altura * self.altura))/ 12), ((self.altura * (self.a * self.a * self.a))/12)
+    return -1.0, -1.0
