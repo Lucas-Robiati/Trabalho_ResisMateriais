@@ -27,3 +27,6 @@ class Retangulo(Forma):
 
   def __c_area(self) -> float:
     return self.base * self.altura
+  
+  def momento(self) -> float:
+    return

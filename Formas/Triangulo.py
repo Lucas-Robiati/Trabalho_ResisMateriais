@@ -51,7 +51,7 @@ class Triangulo(Forma):
     if((self. a == self.b) and (self.a != self.c)):
       return True
     
-    if((self.a == self.c) and (self.a != b)):
+    if((self.a == self.c) and (self.a != self.b)):
       return True
     
     if((self.b == self.c) and (self.b != self.a)):
