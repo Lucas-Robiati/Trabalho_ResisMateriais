@@ -1,15 +1,23 @@
-import tkinter as tk
+#fazer botão tela cheia
+#self.root.attributes('-fullscreen', True)
+
+from tkinter import *
 
 from Formas import Retangulo
 from Formas import Ponto2D
 
+root = Tk()
 
-janela = tk.Tk()
-janela.title("Minha Janela Tkinter")
-janela.geometry("300x100+20+20")
+class Application():
+    def __init__(self):
+        self.root = root
+        self.window()
+        root.mainloop()
 
-msg = tk.Label(janela, text="test")
-msg.pack()
-janela.mainloop()
+    def window(self):
+        self.root.title("Calculadora de Momento de Inercia")
+        self.root.configure(background='#5e5c64')
+        self.root.geometry("700x500")
+        self.root.resizable(True,True)
 
-retangulo = Retangulo()
+Application()
