@@ -69,3 +69,4 @@ class Triangulo(Forma):
       return False
     
     return True
+  
