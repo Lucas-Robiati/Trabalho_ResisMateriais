@@ -11,12 +11,11 @@ from Formas import Ponto2D
 
 class Color(Enum):
     gray = "#5e5c64"
+    light_gray = "#868687"
     dark_blue = "#18304a"
 
-root = Tk()
-
 class Application():
-    def __init__(self):
+    def __init__(self, root:'Tk'):
         self.root = root
         self.window()
         self.window_frame()
@@ -30,8 +29,14 @@ class Application():
         self.root.resizable(True,True)
 
     def window_frame(self):
-        self.main_frame = Frame(self.root)
-        self.main_frame.place(relx=0.1, rely=0.1, relwidth=0.5, relheight=0.9)
-        self.main_frame.configure(background= Color.gray.value)
+        self.frame_1 = Frame(self.root, bd=4, bg=Color.gray.value,
+        highlightbackground= Color.light_gray.value, highlightthickness= 4)
+        self.frame_1.place(relx=0.015, rely=0.025, relwidth=0.45, relheight=0.95)
+        
+        self.frame_2 = Frame(self.root, bd=4, bg=Color.gray.value, 
+        highlightbackground= Color.light_gray.value, highlightthickness= 4)
+        self.frame_2.place(relx=0.485, rely=0.025, relwidth=0.5, relheight=0.95)
 
-Application()
+
+root = Tk()
+Application(root)
