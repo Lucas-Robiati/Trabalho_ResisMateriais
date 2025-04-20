@@ -8,6 +8,7 @@ class Retangulo(Forma):
     self.base = base
     self.altura = altura
     self.area = self.__c_area()
+    self.Ix, self.Iy = self.momento()
 
   @property
   def base(self) -> float:
@@ -29,4 +30,4 @@ class Retangulo(Forma):
     return self.base * self.altura
   
   def momento(self) -> float:
-    return
+    return (((self.base * (self.altura * self.altura * self.altura))/12)),((self.altura * (self.base * self.base * self.base))/12)
