@@ -74,4 +74,5 @@ class Triangulo(Forma):
   def momento(self) -> float:
     if(self.equilatero() or self.isoceles()):
       return ((self.a * (self.altura * self.altura * self.altura))/ 12), ((self.altura * (self.a * self.a * self.a))/12)
+    
     return -1.0, -1.0
