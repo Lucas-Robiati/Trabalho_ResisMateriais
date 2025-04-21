@@ -31,3 +31,15 @@ class Forma:
   @area.setter
   def area(self, area) -> None:
     self.__area = area
+
+  @property
+  def forma_virtual(self) -> float:
+    if(self.__forma_virtual):
+      return 1.0
+    else:
+      return -1.0
+    
+  @forma_virtual.setter
+  def forma_virtual(self, forma_virtual:bool) -> None:
+    self.__forma_virtual = forma_virtual
+    
