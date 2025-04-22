@@ -19,7 +19,7 @@ class Circulo(Forma):
     #self.update_runtime()
 
   def __c_area(self) -> float:
-    return 2 * 3.14 * self.raio
+    return 2 * 3.14 * self.raio * self.raio
 
   '''  
   def momento(self) -> float:

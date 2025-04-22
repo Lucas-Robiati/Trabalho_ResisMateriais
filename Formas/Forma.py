@@ -36,9 +36,9 @@ class Forma:
   @property
   def forma_virtual(self) -> float:
     if(self.__forma_virtual):
-      return 1.0
-    else:
       return -1.0
+    else:
+      return 1.0
     
   @forma_virtual.setter
   def forma_virtual(self, forma_virtual:bool) -> None:
