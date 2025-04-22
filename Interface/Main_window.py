@@ -181,3 +181,6 @@ class Application():
 
 root = Tk()
 Application(root)
+
+
+ret = Retangulo(1, 1)
