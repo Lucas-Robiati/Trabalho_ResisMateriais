@@ -6,6 +6,7 @@ class Circulo(Forma):
     super().__init__(origem, centroide, forma_virtual)
     self.raio = raio
     self.area = self.__c_area()
+    self.Qx, self.Qy = self.momento_estatico()
     self.Ix, self.Iy = self.momento()
 
   @property
@@ -15,10 +16,22 @@ class Circulo(Forma):
   @raio.setter
   def raio(self, raio) -> None:
     self.__raio = raio
+    self.update_runtime()
 
   def __c_area(self) -> float:
     return 2 * 3.14 * self.raio
   
   def momento(self) -> float:
-    return ((3.14 * (self.raio * self.raio * self.raio * self.raio))/4), ((3.14 * (self.raio * self.raio * self.raio * self.raio))/4)
+    ix = ((3.14 * (self.raio * self.raio * self.raio * self.raio))/4)
+    iy = ((3.14 * (self.raio * self.raio * self.raio * self.raio))/4)
+    return ix, iy
+  
+  def momento_estatico(self) -> float:
+    qx = self.centroide.y * self.area
+    qy = self.centroide.x * self.area
+    return qx, qy
     
+  def update_runtime(self):
+    self.area = self.__c_area()
+    self.Qx, self.Qy = self.momento_estatico()
+    self.Ix, self.Iy = self.momento()

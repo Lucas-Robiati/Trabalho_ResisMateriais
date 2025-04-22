@@ -15,6 +15,8 @@ class Triangulo(Forma):
     if(not self.__valido()):
       return -1
     super().__init__(origem, centroide, forma_virtual)
+    self.area = self.__c_area()
+    self.Qx, self.Qy = self.momento_estatico()
     self.Ix, self.Iy = self.momento()
 
   @property
@@ -23,7 +25,7 @@ class Triangulo(Forma):
 
   @a.setter
   def a(self, a:float) -> None:
-    self.__a = a  
+    self.__a = a 
 
   @property
   def b(self) -> float:
@@ -71,8 +73,25 @@ class Triangulo(Forma):
     
     return True
   
+  def __c_area(self):
+    return ((self.a * self.altura) / 2)
+  
   def momento(self) -> float:
     if(self.equilatero() or self.isoceles()):
       return ((self.a * (self.altura * self.altura * self.altura))/ 12), ((self.altura * (self.a * self.a * self.a))/12)
     
     return -1.0, -1.0
+  
+  def momento_estatico(self) -> float:
+    qx = self.centroide.y * self.area
+    qy = self.centroide.x * self.area
+    return qx, qy
+  
+  def update_runtime(self):
+    if(not self.__valido()):
+      return -1
+    
+    self.area = self.__c_area()
+    self.Qx, self.Qy = self.momento_estatico()
+    self.Ix, self.Iy = self.momento()
+
