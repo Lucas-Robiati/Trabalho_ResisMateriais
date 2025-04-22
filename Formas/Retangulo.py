@@ -18,7 +18,7 @@ class Retangulo(Forma):
   @base.setter
   def base(self, base) -> None:
     self.__base = base
-    self.update_runtime()
+    #self.update_runtime()
 
   @property
   def altura(self) -> float:
@@ -27,7 +27,7 @@ class Retangulo(Forma):
   @altura.setter
   def altura(self, altura) -> None:
     self.__altura = altura
-    self.update_runtime()  
+    #self.update_runtime()  
   
   def __c_area(self) -> float:
     return self.base * self.altura
