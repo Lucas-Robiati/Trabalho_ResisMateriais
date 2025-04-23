@@ -9,7 +9,7 @@ class Retangulo(Forma):
     self.altura = altura
     self.area = self.__c_area()
     #self.Qx, self.Qy = self.momento_estatico()
-    #self.Ix, self.Iy = self.momento()
+    self.Ix, self.Iy = self.__c_momento()
 
   @property
   def base(self) -> float:
@@ -32,12 +32,12 @@ class Retangulo(Forma):
   def __c_area(self) -> float:
     return self.base * self.altura
   
-  '''
-  def momento(self) -> float:
-    ix = (((self.base * (self.altura * self.altura * self.altura))/12))
+  
+  def __c_momento(self) -> float:
+    ix = ((self.base * (self.altura * self.altura * self.altura))/12)
     iy = ((self.altura * (self.base * self.base * self.base))/12)
     return ix,iy
-  
+  '''
   def momento_estatico(self) -> float:
     qx = self.centroide.y * self.area
     qy = self.centroide.x * self.area

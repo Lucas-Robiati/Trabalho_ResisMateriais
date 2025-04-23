@@ -76,6 +76,7 @@ class Triangulo(Forma):
   def __c_area(self):
     return ((self.a * self.altura) / 2)
   
+  '''
   def momento(self) -> float:
     if(self.equilatero() or self.isoceles()):
       return ((self.a * (self.altura * self.altura * self.altura))/ 12), ((self.altura * (self.a * self.a * self.a))/12)
@@ -94,4 +95,4 @@ class Triangulo(Forma):
     self.area = self.__c_area()
     self.Qx, self.Qy = self.momento_estatico()
     self.Ix, self.Iy = self.momento()
-
+  '''
