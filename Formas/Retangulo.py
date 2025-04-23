@@ -34,8 +34,8 @@ class Retangulo(Forma):
   
   
   def __c_momento(self) -> float:
-    ix = ((self.base * (self.altura * self.altura * self.altura))/12)
-    iy = ((self.altura * (self.base * self.base * self.base))/12)
+    ix = self.forma_virtual * ((self.base * (self.altura * self.altura * self.altura))/12) + (self.area * (self.centroide.y * self.centroide.y))
+    iy = self.forma_virtual * ((self.altura * (self.base * self.base * self.base))/12) + (self.area * (self.centroide.x * self.centroide.x))
     return ix,iy
   '''
   def momento_estatico(self) -> float:

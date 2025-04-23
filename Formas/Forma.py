@@ -23,7 +23,7 @@ class Forma:
   
   @centroide.setter
   def centroide(self, centroide:Ponto2D) -> None:
-    self.__centroide = centroide
+    self.__centroide = centroide.clone()
 
   @property
   def area(self) -> float:

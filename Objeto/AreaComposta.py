@@ -22,8 +22,8 @@ class AreaComposta(Forma):
     x = 0.0
     y = 0.0
     for forma in self.componentes:
-      x += forma.centroide.x * forma.area
-      y += forma.centroide.y * forma.area 
+      x += (forma.forma_virtual * (forma.centroide.x * forma.area))
+      y += (forma.forma_virtual * (forma.centroide.y * forma.area)) 
     x = x/(self.area)
     y = y/(self.area)
 
@@ -45,8 +45,8 @@ class AreaComposta(Forma):
     
     ix, iy = 0.0, 0.0
     for forma in self.componentes:
-      ix += forma.forma_virtual * forma.Ix + (forma.area *forma.centroide.y)
-      iy += forma.forma_virtual * forma.Iy + (forma.area *forma.centroide.y)
+      ix += forma.Ix
+      iy += forma.Iy
 
     return ix, iy
 
