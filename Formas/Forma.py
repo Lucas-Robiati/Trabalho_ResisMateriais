@@ -1,11 +1,12 @@
 from .Ponto2D import Ponto2D
 
 class Forma:
-  def __init__(self, origem:Ponto2D, centroide:Ponto2D, forma_virtual:bool, area:float = 0.0) -> None:
+  def __init__(self, nome:str, origem:Ponto2D, centroide:Ponto2D, forma_virtual:bool, area:float = 0.0) -> None:
     self.origem = origem
     self.centroide = centroide
     self.forma_virtual = forma_virtual
     self.area = area
+    self.nome = nome
     return
 
   @property
@@ -35,9 +36,9 @@ class Forma:
   @property
   def forma_virtual(self) -> float:
     if(self.__forma_virtual):
-      return 1.0
-    else:
       return -1.0
+    else:
+      return 1.0
     
   @forma_virtual.setter
   def forma_virtual(self, forma_virtual:bool) -> None:
