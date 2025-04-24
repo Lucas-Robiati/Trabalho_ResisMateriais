@@ -9,9 +9,9 @@ class AreaComposta(Forma):
     self.componentes = []
     self.area = 0.0
     self.centroide = Ponto2D()
-    # self.Qx, self.Qy = self.momento_estatico()
-    # self.centroide = self._c_centroide()
     self.Ix, self.Iy = 0.0, 0.0
+    self.Jo = 0
+    
     return
   
 
@@ -50,12 +50,16 @@ class AreaComposta(Forma):
 
     return ix, iy
 
+  def __c_momento_polar(self) -> None:
+    self.Jo = self.Ix + self.Iy
+    
   def append(self, outro) -> None:
     if(isinstance(outro, Circulo)):
       self.componentes.append(outro)
       self.__c_area()
       self.__c_centroide()
       self.Ix, self.Iy = self.__c_momento()
+      self.__c_momento_polar()
       return
     
     if(isinstance(outro, Retangulo)):
@@ -63,6 +67,7 @@ class AreaComposta(Forma):
       self.__c_area()
       self.__c_centroide()
       self.Ix, self.Iy = self.__c_momento()
+      self.__c_momento_polar()
       return
     
     if(isinstance(outro, Triangulo)):
@@ -70,6 +75,7 @@ class AreaComposta(Forma):
       self.__c_area()
       self.__c_centroide
       self.Ix, self.Iy = self.__c_momento()
+      self.__c_momento_polar()
       return
     
     return
@@ -80,5 +86,6 @@ class AreaComposta(Forma):
       self.__c_area()
       self.__c_centroide()
       self.Ix, self.Iy = self.__c_momento()
+      self.__c_momento_polar()
     return
   
