@@ -14,7 +14,7 @@ class Triangulo(Forma):
     self.altura = altura
     if(not self.__valido()):
       return -1
-    super().__init__(nome, origem, centroide, forma_virtual)
+    super().__init__(centroide, forma_virtual)
     self.area = self.__c_area()
     # self.Qx, self.Qy = self.momento_estatico()
     # self.Ix, self.Iy = self.momento()

@@ -6,12 +6,8 @@ from Formas import Triangulo
 
 class AreaComposta(Forma):
   def __init__(self):
-    self.componentes = []
-    self.area = 0.0
-    self.centroide = Ponto2D()
-    self.Ix, self.Iy = 0.0, 0.0
-    self.Jo = 0
-    
+    super().__init__()
+    self.componentes = []   
     return
   
 
@@ -50,34 +46,17 @@ class AreaComposta(Forma):
 
     return ix, iy
 
-  def __c_momento_polar(self) -> None:
-    self.Jo = self.Ix + self.Iy
+  # def __c_momento_polar(self) -> None:
+  #   self.Jo = self.Ix + self.Iy
     
   def append(self, outro) -> None:
-    if(isinstance(outro, Circulo)):
+    if((isinstance(outro, Circulo) or (isinstance(outro, Retangulo) or isinstance(outro, Triangulo))) ):
       self.componentes.append(outro)
       self.__c_area()
       self.__c_centroide()
       self.Ix, self.Iy = self.__c_momento()
-      self.__c_momento_polar()
-      return
-    
-    if(isinstance(outro, Retangulo)):
-      self.componentes.append(outro)
-      self.__c_area()
-      self.__c_centroide()
-      self.Ix, self.Iy = self.__c_momento()
-      self.__c_momento_polar()
-      return
-    
-    if(isinstance(outro, Triangulo)):
-      self.componentes.append(outro)
-      self.__c_area()
-      self.__c_centroide
-      self.Ix, self.Iy = self.__c_momento()
-      self.__c_momento_polar()
-      return
-    
+      self._c_momento_polar()
+      return 
     return
   
   def drop(self, outro) -> None:
@@ -86,6 +65,6 @@ class AreaComposta(Forma):
       self.__c_area()
       self.__c_centroide()
       self.Ix, self.Iy = self.__c_momento()
-      self.__c_momento_polar()
+      self._c_momento_polar()
     return
   

@@ -3,8 +3,8 @@ from .Ponto2D import Ponto2D
 
 
 class Retangulo(Forma):
-  def __init__(self, nome:str = "", base:float = 0.0, altura:float = 0.0, origem:Ponto2D = Ponto2D(), centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False):
-    super().__init__(nome, origem, centroide, forma_virtual)
+  def __init__(self, base:float = 0.0, altura:float = 0.0, centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False):
+    super().__init__(centroide, forma_virtual)
     self.base = base
     self.altura = altura
     self.area = self.__c_area()

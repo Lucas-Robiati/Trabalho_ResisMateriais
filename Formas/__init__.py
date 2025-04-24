@@ -3,3 +3,5 @@ from .Forma import Forma
 from .Retangulo import Retangulo
 from .Triangulo import Triangulo
 from .Circulo import Circulo
+from .SemiCirculo import SemiCirculo
+from .QuartoDeCirculo import QuartoDeCirculo
