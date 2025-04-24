@@ -3,7 +3,6 @@ from tkinter import *
 from enum import Enum
 
 import Formas
-import Formas
 
 class Color(Enum):
     gray = "#5e5c64"

@@ -6,6 +6,7 @@
 #self.bt_reset.place(relx=, rely=, relwidth=, relheight=)
 
 from modulos import *
+from placeHolder import EntPlaceHold
 
 class Application():
     def __init__(self, root:'Tk'):
@@ -162,10 +163,10 @@ class Application():
             )
         self.label_coordinates_center.place(relx=0.005, rely=0.13)
 
-        self.coordinate_center_x_entry = Entry(self.frame_insert)
+        self.coordinate_center_x_entry = EntPlaceHold(self.frame_insert, 'x:')
         self.coordinate_center_x_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
 
-        self.coordinate_center_y_entry = Entry(self.frame_insert)
+        self.coordinate_center_y_entry = EntPlaceHold(self.frame_insert, 'y:')
         self.coordinate_center_y_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
 
         #-----------dimensions------------
