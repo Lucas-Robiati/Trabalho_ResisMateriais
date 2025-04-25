@@ -1,4 +1,7 @@
-
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.patches import Rectangle, Circle, Wedge, Polygon
+import numpy as np
 from tkinter import *
 from enum import Enum
 

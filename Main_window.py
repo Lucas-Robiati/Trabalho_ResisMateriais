@@ -20,7 +20,13 @@ class Application():
         self.root.geometry("950x520")
         self.root.minsize(width=950, height=520)
         self.root.resizable(True,True)
+        root.protocol('WM_DELETE_WINDOW', self.destroy_window)  # Vincula o evento de fechamento
         self.window_frame()
+
+    def destroy_window(self):
+    # Função para tratar o fechamento da janela
+        plt.close(self.fig)  # Fecha a figura do Matplotlib
+        root.destroy()   # Destroi a janela do Tkinter
 
     def window_frame(self):
         self.frame_1 = Frame(
@@ -41,6 +47,8 @@ class Application():
             highlightthickness= 4
             )
         self.frame_2.place(relx=0.465, rely=0.12, relwidth=0.52, relheight=0.855)
+
+        self.widgets_frame2()
 
         self.frame_3 = Frame(
             self.root, 
@@ -67,7 +75,90 @@ class Application():
         self.bt_calc.place(relx=0.79, rely=0.92, relwidth=0.2, relheight=0.07)
     
     def widgets_frame2(self):
-        print("grafico")
+        xmin, xmax, ymin, ymax = -5, 5, -5, 5
+        ticks_frequency = 1
+        self.fig, self.ax = plt.subplots()
+        self.fig.patch.set_facecolor('#ffffff')
+
+        self.ax.set(xlim=(xmin-1, xmax+1), ylim=(ymin-1, ymax+1), aspect='equal')
+
+        self.ax.spines['bottom'].set_position('zero')
+        self.ax.spines['left'].set_position('zero')
+
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+
+        self.ax.set_xlabel('$x$', size=10, labelpad=-24, x=1.05)
+        self.ax.set_ylabel('$y$', size=10, labelpad=-21, y=1.02, rotation=0)
+        
+        plt.text(0.49, 0.49, r"$O$", ha='right', va='top',
+            transform=self.ax.transAxes,
+                horizontalalignment='center', fontsize=8)
+        
+        x_ticks = np.arange(xmin, xmax+1, ticks_frequency)
+        y_ticks = np.arange(ymin, ymax+1, ticks_frequency)
+        self.ax.set_xticks(x_ticks[x_ticks != 0])
+        self.ax.set_yticks(y_ticks[y_ticks != 0])
+        
+        # Alterar tamanho dos números dos eixos
+        self.ax.tick_params(axis='x', labelsize=8)
+        self.ax.tick_params(axis='y', labelsize=8)  # Tamanho 8
+
+        self.ax.grid(which='both', color='grey', linewidth=1, linestyle='-', alpha=0.2)
+
+        # Create Canvas
+        canvas = FigureCanvasTkAgg(self.fig, master=self.frame_2)  
+        canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+
+        retangulo = Rectangle(
+            xy=(-2, -2),       # Canto inferior esquerdo
+            width=4,           # Largura
+            height=4,          # Altura
+            edgecolor='black', # Borda
+            facecolor='blue',  # Preenchimento
+            zorder=1           # Ordem
+        )
+        plt.gca().add_patch(retangulo)
+
+        circulo = Circle(
+            xy=(0.5, 0.5),     # Centro do círculo
+            radius=0.4,        # Raio
+            edgecolor='black', # Cor da borda
+            facecolor='white', # Cor de preenchimento
+            zorder=2           # Ordem
+        )
+        plt.gca().add_patch(circulo)
+        
+        meio_circulo = Wedge(
+            center=(-0.5, 0.5), # Centro
+            r=0.4,              # Raio
+            theta1=180,         # Ângulo inicial (graus)
+            theta2=0,           # Ângulo final (graus)
+            edgecolor='black',  # Cor da borda
+            facecolor='white',  # Cor de preenchimento
+            zorder=2            # Ordem
+        )
+        plt.gca().add_patch(meio_circulo)
+
+        quarto_circulo = Wedge(
+            center=(-0.5, -0.5), # Centro
+            r=0.4,               # Raio
+            theta1=0,            # Ângulo inicial (graus)
+            theta2=90,           # Ângulo final (graus)
+            edgecolor='black',   # Cor da borda
+            facecolor='white',   # Cor de preenchimento
+            zorder=2             # Ordem
+        )
+        plt.gca().add_patch(quarto_circulo)
+
+        triangulo = Polygon(
+            xy=[(1, 1), (2, 2), (1, 2)],              # Vértices (x, y)
+            closed=True,                              # Fechar o polígono
+            edgecolor='black',                        # Cor da borda
+            facecolor='white',                        # Cor de preenchimento
+            zorder=2                                  # Ordem
+        )
+        plt.gca().add_patch(triangulo)
 
     def widgets_frame3(self):
         self.bt_reset = Button(
