@@ -1,3 +1,4 @@
+#https://www.youtube.com/watch?v=rtR5wHXPKZ4
 #fazer botão tela cheia
 #self.root.attributes('-fullscreen', True)
 
@@ -118,7 +119,8 @@ class Application():
             ["Quadrado", 2, 4, "adicionar"],
             ["Triangulo", 2.5, 3, "subtrai"] 
             ]
-
+        
+        global count
         count=0
         for record in data:
             #if count % 2 == 0:
@@ -282,6 +284,13 @@ class Application():
     
     def Destroy_Insert_window(self):
         self.insert.destroy()
+
+    def add_record(self):
+        global count
+        self.list_forms.insert(parent='', index='end', iid=count, 
+            text=self.geometric_form_entry.get(), values=(self.coordinate_x_entry.get(),self.coordinate_y_entry.get(),self.subare_entry.get()))
+        count += 1     
+
     
     def Insert_window(self):
         self.insert = Toplevel()
@@ -384,6 +393,7 @@ class Application():
             text="Inserir",
             font=('David', 10),
             bd= 0,
+            command= self.add_record,
             activebackground= Color.white.value,
             activeforeground= Color.black.value,
             bg= Color.gray.value,
