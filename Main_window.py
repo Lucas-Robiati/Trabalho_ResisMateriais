@@ -6,6 +6,7 @@
 #self.bt_reset.place(relx=, rely=, relwidth=, relheight=)
 
 from modulos import *
+from tkinter import ttk
 from placeHolder import EntPlaceHold
 
 class Application():
@@ -73,6 +74,75 @@ class Application():
             fg= Color.white.value
             )
         self.bt_calc.place(relx=0.79, rely=0.92, relwidth=0.2, relheight=0.07)
+
+        self.label_table = Label(
+            self.frame_1, 
+            text="__________Tabela de Figuras__________", 
+            bg= Color.gray.value,
+            fg= Color.white.value,
+            font= ('David', 10)
+            )
+        self.label_table.place(relx=0.25, rely=0.01, relwidth=0.5, relheight=0.25)
+
+        #======table==============
+        self.list_forms = ttk.Treeview(
+            self.frame_1,
+            height= 4,
+            columns=("col1","col2","col3","col4")
+            )
+        self.list_forms.place(relx=0.01, rely=0.15, relwidth=0.95, relheight=0.4)
+        
+        self.scroobar = Scrollbar(self.frame_1, orient='vertical')
+        self.list_forms.configure(yscroll=self.scroobar.set)
+        self.scroobar.place(relx=0.96, rely=0.15, relwidth=0.04, relheight=0.4)
+
+        self.list_forms.heading("#0", text="Forma")
+        self.list_forms.heading("#1", text="X")
+        self.list_forms.heading("#2", text="Y")
+        self.list_forms.heading("#3", text="Aréa virtual")
+
+        self.list_forms.column("#0", width=150, minwidth=150, anchor=CENTER)
+        self.list_forms.column("#1", width=55,  minwidth=55, anchor=CENTER)
+        self.list_forms.column("#2", width=55,  minwidth=55, anchor=CENTER)
+        self.list_forms.column("#3", width=130,  minwidth=130, anchor=CENTER)
+
+        #exemplo aceita interiros floats(2.5) variaveis (self.alguma_coisa) e strings
+        #self.list_forms.insert(
+        #    "", 
+        #    END, 
+        #    text="Triangulo", 
+        #    values=(2.5, 3,"subtrair")
+        #    ) 
+        #lista de objetos a ser passada
+        data = [ 
+            ["Quadrado", 2, 4, "adicionar"],
+            ["Triangulo", 2.5, 3, "subtrai"] 
+            ]
+
+        count=0
+        for record in data:
+            #if count % 2 == 0:
+            self.list_forms.insert(parent='', index='end', iid=count, 
+                text=record[0], values=(record[1],record[2],record[3])) 
+            count += 1
+        
+        #=========style==============
+        style_table = ttk.Style()#  Classe de configuração de estilo da tabela
+        style_table.theme_use("clam")#  Tema da tabela
+        style_table.configure(
+            "Treeview", 
+            background= Color.light_gray.value, 
+            foreground= Color.black.value,
+            fieldbackground= Color.gray.value,
+            font=("Arial", 10))
+        
+        
+        style_table.map("Treeview",
+           background=[('selected', Color.light_blue.value)],
+           foreground=[('selected', Color.white.value)])
+
+        #style_table.tag_configure('oddrow', background= Color.gray.value)
+        #style_table.tag_configure('evenrow', background= Color.light_gray.value)
     
     def widgets_frame2(self):
         xmin, xmax, ymin, ymax = -5, 5, -5, 5
@@ -254,10 +324,10 @@ class Application():
             )
         self.label_coordinates_center.place(relx=0.005, rely=0.13)
 
-        self.coordinate_center_x_entry = EntPlaceHold(self.frame_insert, 'x:')
+        self.coordinate_center_x_entry = EntPlaceHold(self.frame_insert, 'X:')
         self.coordinate_center_x_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
 
-        self.coordinate_center_y_entry = EntPlaceHold(self.frame_insert, 'y:')
+        self.coordinate_center_y_entry = EntPlaceHold(self.frame_insert, 'Y:')
         self.coordinate_center_y_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
 
         #-----------dimensions------------
@@ -295,17 +365,17 @@ class Application():
         #--------coordinates--------------
         self.label_coordinates = Label(
             self.frame_insert, 
-            text="Coordenada do centróide", 
+            text="Origem do sistema", 
             bg= Color.gray.value,
             fg= Color.white.value,
             font= ('David', 10)
             )
         self.label_coordinates.place(relx=0.005, rely=0.65)
 
-        self.coordinate_x_entry = Entry(self.frame_insert)
+        self.coordinate_x_entry = EntPlaceHold(self.frame_insert, 'X:')
         self.coordinate_x_entry.place(relx=0.005, rely=0.69, relwidth=0.95, relheight=0.05)
 
-        self.coordinate_y_entry = Entry(self.frame_insert)
+        self.coordinate_y_entry = EntPlaceHold(self.frame_insert, 'Y:')
         self.coordinate_y_entry.place(relx=0.005, rely=0.75, relwidth=0.95, relheight=0.05)
 
         #======Buttons===========
