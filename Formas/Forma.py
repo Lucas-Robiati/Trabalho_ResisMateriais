@@ -8,14 +8,6 @@ class Forma:
     self.Ix, self.Iy = 0.0, 0.0
     self.Jo = 0
     return
-
-  @property
-  def origem(self) -> Ponto2D:
-    return self.__origem.clone()  
-
-  @origem.setter
-  def origem(self, origem:Ponto2D) -> None:
-    self.__origem = origem.clone()
   
   @property
   def centroide (self) -> Ponto2D:

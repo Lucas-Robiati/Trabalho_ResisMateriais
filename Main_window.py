@@ -201,22 +201,38 @@ class Application():
         )
         plt.gca().add_patch(circulo)
         
+        """
+            situações de orientação meio_circulo
+            orientação 0: 0-180
+            orientação 1: 90-270
+            orientação 2: 180-0
+            orientacao 3: 270-90
+        """
+
         meio_circulo = Wedge(
             center=(-0.5, 0.5), # Centro
             r=0.4,              # Raio
-            theta1=180,         # Ângulo inicial (graus)
-            theta2=0,           # Ângulo final (graus)
+            theta1=0,         # Ângulo inicial (graus)
+            theta2=180,           # Ângulo final (graus)
             edgecolor='black',  # Cor da borda
             facecolor='white',  # Cor de preenchimento
             zorder=2            # Ordem
         )
         plt.gca().add_patch(meio_circulo)
 
+        """
+            situações de orientação meio_circulo
+            orientação 0: 0-90
+            orientação 1: 90-180
+            orientação 2: 180-270
+            orientacao 3: 270-0
+        """
+
         quarto_circulo = Wedge(
             center=(-0.5, -0.5), # Centro
             r=0.4,               # Raio
-            theta1=0,            # Ângulo inicial (graus)
-            theta2=90,           # Ângulo final (graus)
+            theta1=90,            # Ângulo inicial (graus)
+            theta2=180,           # Ângulo final (graus)
             edgecolor='black',   # Cor da borda
             facecolor='white',   # Cor de preenchimento
             zorder=2             # Ordem

@@ -3,11 +3,12 @@ from .Forma import Forma
 
 
 class QuartoDeCirculo(Forma):
-  def __init__(self, raio:float = 0.0, centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False):
+  def __init__(self, orientacao:int = 0,raio:float = 0.0, centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False):
     super().__init__(centroide, forma_virtual)
     self.raio = raio
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
+    self.orientacao = orientacao
 
   def __c_area(self) -> float:
     return ((3.14 * (self.raio * self.raio))/4)
