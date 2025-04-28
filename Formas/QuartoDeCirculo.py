@@ -8,6 +8,7 @@ class QuartoDeCirculo(Forma):
     self.raio = raio
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
+    self.__c_produto()
     self.orientacao = orientacao
 
   def __c_area(self) -> float:
@@ -17,3 +18,7 @@ class QuartoDeCirculo(Forma):
     ix = self.forma_virtual * (((3.14 * (self.raio * self.raio * self.raio * self.raio))/16) + (self.area * (self.centroide.y * self.centroide.y)))
     iy = self.forma_virtual * (((3.14 * (self.raio * self.raio * self.raio * self.raio))/16) + (self.area * (self.centroide.x * self.centroide.x)))
     return ix, iy
+  
+  def __c_produto(self):
+    self.Ixy = self.forma_virtual * ((0.001647 * (self.raio * self.raio * self.raio * self.raio)) + (self.area * self.centroide.x * self.centroide.y))
+    return

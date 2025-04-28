@@ -9,6 +9,7 @@ class Retangulo(Forma):
     self.altura = altura
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
+    self.__c_produto()
 
   @property
   def base(self) -> float:
@@ -36,3 +37,7 @@ class Retangulo(Forma):
     ix = self.forma_virtual * ((self.base * (self.altura * self.altura * self.altura))/12) + (self.area * (self.centroide.y * self.centroide.y))
     iy = self.forma_virtual * ((self.altura * (self.base * self.base * self.base))/12) + (self.area * (self.centroide.x * self.centroide.x))
     return ix,iy
+  
+  def __c_produto(self):
+    self.Ixy = self.forma_virtual * (self.area * self.centroide.x * self.centroide.y)
+    return

@@ -6,7 +6,8 @@ class Forma:
     self.forma_virtual = forma_virtual
     self.area = 0.0
     self.Ix, self.Iy = 0.0, 0.0
-    self.Jo = 0
+    self.Jo = 0.0
+    self.Ixy = 0.0
     return
   
   @property

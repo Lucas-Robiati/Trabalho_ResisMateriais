@@ -9,6 +9,7 @@ class SemiCirculo(Forma):
     self.raio = raio
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
+    self.__c_produto()
     self.orientacao = orientacao
 
   def __c_area(self) -> float:
@@ -26,5 +27,9 @@ class SemiCirculo(Forma):
       return 0.0, 0.0
     
     return ix, iy
+  
+  def __c_produto(self):
+    self.Ixy = self.forma_virtual * (self.area * self.centroide.x * self.centroide.y)
+    return
   
    

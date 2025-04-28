@@ -7,15 +7,16 @@ def modulo(valor:float) -> float:
   return valor
 
 class Triangulo(Forma):
-  def __init__(self, base:float, altura:float, lado2:float, lado3:float, nome:str = "", origem:Ponto2D = Ponto2D(), centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False):
-    self.a = base
-    self.b = lado2
-    self.c = lado3
-    self.altura = altura
-    if(not self.__valido()):
-      return -1
-    super().__init__(centroide, forma_virtual)
-    self.area = self.__c_area()
+  def __init__(self, a:float, b:float, c:float, origem:Ponto2D = Ponto2D(), centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False):
+    
+    
+
+
+    return
+    # if(not self.__valido()):
+      # return -1
+    # super().__init__(centroide, forma_virtual)
+    # self.area = self.__c_area()
     # self.Qx, self.Qy = self.momento_estatico()
     # self.Ix, self.Iy = self.momento()
 
