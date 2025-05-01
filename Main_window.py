@@ -12,7 +12,7 @@ from placeHolder import EntPlaceHold
 
 class Application():
     def __init__(self, root:'Tk'):
-        self.root = root
+        self.root = root #Define o bejeto Tk que será usado como janela principal
         self.window()
         root.mainloop()
 
@@ -93,19 +93,23 @@ class Application():
             )
         self.list_forms.place(relx=0.01, rely=0.15, relwidth=0.95, relheight=0.4)
         
-        self.scroobar = Scrollbar(self.frame_1, orient='vertical')
-        self.list_forms.configure(yscroll=self.scroobar.set)
-        self.scroobar.place(relx=0.96, rely=0.15, relwidth=0.04, relheight=0.4)
+        self.scroobar = Scrollbar(self.frame_1, orient='vertical')               # Define a svrool bar
+        self.list_forms.configure(yscroll=self.scroobar.set)                     # Eixo da scrool bar
+        self.scroobar.place(relx=0.96, rely=0.15, relwidth=0.04, relheight=0.4)  # Posição da scrool bar
 
-        self.list_forms.heading("#0", text="Forma")
-        self.list_forms.heading("#1", text="X")
-        self.list_forms.heading("#2", text="Y")
-        self.list_forms.heading("#3", text="Aréa virtual")
+        # Refencia a coluna e seta o texto
+        self.list_forms.heading("#0", text="Forma")         
+        self.list_forms.heading("#1", text="X")             
+        self.list_forms.heading("#2", text="Y")             
+        self.list_forms.heading("#3", text="Aréa virtual")  
 
-        self.list_forms.column("#0", width=150, minwidth=150, anchor=CENTER)
-        self.list_forms.column("#1", width=55,  minwidth=55, anchor=CENTER)
-        self.list_forms.column("#2", width=55,  minwidth=55, anchor=CENTER)
-        self.list_forms.column("#3", width=130,  minwidth=130, anchor=CENTER)
+        # Define tamanho da coluna e alinha o texto ao centro
+        self.list_forms.column("#0", width=150, anchor=CENTER)  
+        self.list_forms.column("#1", width=55, anchor=CENTER)   
+        self.list_forms.column("#2", width=55, anchor=CENTER)   
+        self.list_forms.column("#3", width=130, anchor=CENTER)  
+        
+        self.list_forms.bind('<Motion>', 'break')   #Impede o redimensionamento das colunas da tabela
 
         #exemplo aceita interiros floats(2.5) variaveis (self.alguma_coisa) e strings
         #self.list_forms.insert(
@@ -115,6 +119,7 @@ class Application():
         #    values=(2.5, 3,"subtrair")
         #    ) 
         #lista de objetos a ser passada
+        
         data = [ 
             ["Quadrado", 2, 4, "adicionar"],
             ["Triangulo", 2.5, 3, "subtrai"] 
@@ -304,10 +309,34 @@ class Application():
     def add_record(self):
         global count
         self.list_forms.insert(parent='', index='end', iid=count, 
-            text=self.geometric_form_entry.get(), values=(self.coordinate_x_entry.get(),self.coordinate_y_entry.get(),self.subare_entry.get()))
-        count += 1     
-
+            text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+        count += 1   
     
+    def Select_Form(self, event):
+        if(self.geometric_form_entry.get() == "Triangulo"):
+            
+            self.dimensions_a_entry.config(state="normal")
+            self.dimensions_b_entry.config(state="normal")
+            self.dimensions_c_entry.config(state="normal")
+            
+            self.dimensions_a_entry.insert(0, 'lado a')
+            self.dimensions_a_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
+
+            self.dimensions_b_entry.insert(0, 'lado b')
+            self.dimensions_b_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
+            
+            self.dimensions_c_entry.insert(0, 'lado c')
+            self.dimensions_c_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
+        else:
+            self.dimensions_a_entry.delete('0', 'end')
+            self.dimensions_b_entry.delete('0', 'end')
+            self.dimensions_c_entry.delete('0', 'end')
+
+            self.dimensions_a_entry.config(state="disabled")
+            self.dimensions_b_entry.config(state="disabled")
+            self.dimensions_c_entry.config(state="disabled")
+
+
     def Insert_window(self):
         self.insert = Toplevel()
         self.insert.title("Inserir Forma Geométrica")
@@ -336,8 +365,18 @@ class Application():
             )
         self.label_geometric_form.place(relx=0.005, rely=0.01)
 
-        self.geometric_form_entry = Entry(self.frame_insert)
+        self.geometric_form_entry = ttk.Combobox(
+            self.frame_insert,
+            state= "readonly", 
+            values=["...", "Triangulo", "Circunferencia", "Quarto de Circulo", "Semi Circulo", "Retangulo"]
+            )
+        self.geometric_form_entry.config(
+            foreground= Color.black.value, 
+            background= Color.light_gray.value,
+            )
         self.geometric_form_entry.place(relx=0.005, rely=0.045, relwidth=0.95, relheight=0.05)
+
+        self.geometric_form_entry.bind("<<ComboboxSelected>>", self.Select_Form)
 
         #--------centroid coordinates---------
         self.label_coordinates_center = Label(
@@ -349,10 +388,10 @@ class Application():
             )
         self.label_coordinates_center.place(relx=0.005, rely=0.13)
 
-        self.coordinate_center_x_entry = EntPlaceHold(self.frame_insert, 'X:')
+        self.coordinate_center_x_entry = EntPlaceHold(self.frame_insert, placeholder='X:')
         self.coordinate_center_x_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
 
-        self.coordinate_center_y_entry = EntPlaceHold(self.frame_insert, 'Y:')
+        self.coordinate_center_y_entry = EntPlaceHold(self.frame_insert, placeholder='Y:')
         self.coordinate_center_y_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
 
         #-----------dimensions------------
@@ -365,16 +404,34 @@ class Application():
             )
         self.label_dimensions.place(relx=0.005, rely=0.3)
 
-        self.dimensions_a_entry = Entry(self.frame_insert)
+        self.dimensions_a_entry = EntPlaceHold(self.frame_insert, placeholder='...')
+        self.dimensions_a_entry.config(state="disabled")
         self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
-
-        self.dimensions_b_entry = Entry(self.frame_insert)
+        
+        self.dimensions_b_entry = EntPlaceHold(self.frame_insert, placeholder='...')
+        self.dimensions_b_entry.config(state="disabled")
         self.dimensions_b_entry.place(relx=0.005, rely=0.4, relwidth=0.95, relheight=0.05)  
 
-        self.dimensions_c_entry = Entry(self.frame_insert)
+        self.dimensions_c_entry = EntPlaceHold(self.frame_insert, placeholder='...')
+        self.dimensions_c_entry.config(state="disabled")
         self.dimensions_c_entry.place(relx=0.005, rely=0.46, relwidth=0.95, relheight=0.05)
 
-            #-----------sub-are--------------
+        # Configuração dinamica dos Entry de Dimensões
+        if(self.geometric_form_entry.get() == "Triangulo"):
+            str0 = "lado a"
+            self.dimensions_a_entry.config(state="normal")
+            self.dimensions_b_entry.config(state="normal")
+            self.dimensions_c_entry.config(state="normal")
+
+        #if(self.geometric_form_entry.get() == "Circunferencia"):
+
+        #if(self.geometric_form_entry.get() == "Quarto de Circulo"):
+
+        #if(self.geometric_form_entry.get() == "Semi Circulo"):
+
+        #if(self.geometric_form_entry.get() == "Retangulo"):    
+        
+        #-----------sub-are--------------
         self.label_subare = Label(
             self.frame_insert, 
             text="Subárea adicionada", 
@@ -384,7 +441,12 @@ class Application():
             )
         self.label_subare.place(relx=0.005, rely=0.535)
 
-        self.subare_entry = Entry(self.frame_insert)
+        self.subare_entry = ttk.Combobox(
+            self.frame_insert, 
+            state="readonly", 
+            values=["...", "Subtrair", "Adicionar"]
+            )
+        self.subare_entry.config(foreground= Color.black.value, background= Color.light_gray.value)
         self.subare_entry.place(relx=0.005, rely=0.575, relwidth=0.95, relheight=0.05)
 
         #--------coordinates--------------
@@ -397,10 +459,10 @@ class Application():
             )
         self.label_coordinates.place(relx=0.005, rely=0.65)
 
-        self.coordinate_x_entry = EntPlaceHold(self.frame_insert, 'X:')
+        self.coordinate_x_entry = EntPlaceHold(self.frame_insert, placeholder='X:')
         self.coordinate_x_entry.place(relx=0.005, rely=0.69, relwidth=0.95, relheight=0.05)
 
-        self.coordinate_y_entry = EntPlaceHold(self.frame_insert, 'Y:')
+        self.coordinate_y_entry = EntPlaceHold(self.frame_insert, placeholder='Y:')
         self.coordinate_y_entry.place(relx=0.005, rely=0.75, relwidth=0.95, relheight=0.05)
 
         #======Buttons===========
@@ -429,7 +491,6 @@ class Application():
             fg= Color.white.value
             )
         self.bt_quit.place(relx=0.55, rely=0.9, relwidth=0.25, relheight=0.08)
-
 
 root = Tk()
 Application(root)
