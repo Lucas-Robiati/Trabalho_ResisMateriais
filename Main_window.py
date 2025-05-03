@@ -319,18 +319,64 @@ class Application():
             self.dimensions_b_entry.config(state="normal")
             self.dimensions_c_entry.config(state="normal")
             
+            self.dimensions_a_entry.delete('0', 'end')
             self.dimensions_a_entry.insert(0, 'lado a')
             self.dimensions_a_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
 
+            self.dimensions_b_entry.delete('0', 'end')
             self.dimensions_b_entry.insert(0, 'lado b')
-            self.dimensions_b_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
+            self.dimensions_b_entry.bind("<FocusIn>", lambda args: self.dimensions_b_entry.delete('0', 'end'))
             
+            self.dimensions_c_entry.delete('0', 'end')
             self.dimensions_c_entry.insert(0, 'lado c')
-            self.dimensions_c_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
-        else:
+            self.dimensions_c_entry.bind("<FocusIn>", lambda args: self.dimensions_c_entry.delete('0', 'end'))
+        
+        if( (self.geometric_form_entry.get() == "Circunferencia") or 
+            (self.geometric_form_entry.get() == "Semi Circulo") or
+            (self.geometric_form_entry.get() == "Quarto de Circulo") ):
+            
+            self.dimensions_a_entry.config(state="normal")
+            self.dimensions_b_entry.config(state="normal")
+            self.dimensions_c_entry.config(state="normal")
+            
+            self.dimensions_a_entry.delete('0', 'end')
+            self.dimensions_a_entry.insert(0, 'raio')
+            self.dimensions_a_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
+
+            self.dimensions_b_entry.delete('0', 'end')
+            self.dimensions_b_entry.insert(0, '...')
+            self.dimensions_b_entry.config(state="disabled")
+            
+            self.dimensions_c_entry.delete('0', 'end')
+            self.dimensions_c_entry.insert(0, '....')
+            self.dimensions_c_entry.config(state="disabled")
+
+        if(self.geometric_form_entry.get() == "Retangulo"): 
+
+            self.dimensions_a_entry.config(state="normal")
+            self.dimensions_b_entry.config(state="normal")
+            self.dimensions_c_entry.config(state="normal")
+            
+            self.dimensions_a_entry.delete('0', 'end')
+            self.dimensions_a_entry.insert(0, 'base')
+            self.dimensions_a_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
+
+            self.dimensions_b_entry.delete('0', 'end')
+            self.dimensions_b_entry.insert(0, 'altura')
+            self.dimensions_b_entry.bind("<FocusIn>", lambda args: self.dimensions_b_entry.delete('0', 'end'))
+            
+            self.dimensions_c_entry.delete('0', 'end')
+            self.dimensions_c_entry.insert(0, '....')
+            self.dimensions_c_entry.config(state="disabled") 
+        
+        if(self.geometric_form_entry.get() == "..."):
             self.dimensions_a_entry.delete('0', 'end')
             self.dimensions_b_entry.delete('0', 'end')
             self.dimensions_c_entry.delete('0', 'end')
+            
+            self.dimensions_a_entry.insert('0', '...')
+            self.dimensions_b_entry.insert('0', '...')
+            self.dimensions_c_entry.insert('0', '...')
 
             self.dimensions_a_entry.config(state="disabled")
             self.dimensions_b_entry.config(state="disabled")
@@ -416,21 +462,6 @@ class Application():
         self.dimensions_c_entry.config(state="disabled")
         self.dimensions_c_entry.place(relx=0.005, rely=0.46, relwidth=0.95, relheight=0.05)
 
-        # Configuração dinamica dos Entry de Dimensões
-        if(self.geometric_form_entry.get() == "Triangulo"):
-            str0 = "lado a"
-            self.dimensions_a_entry.config(state="normal")
-            self.dimensions_b_entry.config(state="normal")
-            self.dimensions_c_entry.config(state="normal")
-
-        #if(self.geometric_form_entry.get() == "Circunferencia"):
-
-        #if(self.geometric_form_entry.get() == "Quarto de Circulo"):
-
-        #if(self.geometric_form_entry.get() == "Semi Circulo"):
-
-        #if(self.geometric_form_entry.get() == "Retangulo"):    
-        
         #-----------sub-are--------------
         self.label_subare = Label(
             self.frame_insert, 
