@@ -10,6 +10,7 @@ from modulos import *
 from tkinter import ttk
 from placeHolder import EntPlaceHold
 
+
 class Application():
     def __init__(self, root:'Tk'):
         self.root = root #Define o bejeto Tk que será usado como janela principal
@@ -38,7 +39,7 @@ class Application():
             highlightthickness= 4
             )
         self.frame_1.place(relx=0.015, rely=0.025, relwidth=0.45, relheight=0.95)
-        
+
         self.widgets_frame1()
 
         self.frame_2 = Frame(
@@ -64,6 +65,10 @@ class Application():
         self.widgets_frame3()
 
     def widgets_frame1(self):
+        
+        global count
+        count = 0
+
         self.bt_calc = Button(
             self.frame_1, 
             text="Calcular",
@@ -84,7 +89,7 @@ class Application():
             font= ('David', 10)
             )
         self.label_table.place(relx=0.25, rely=0.01, relwidth=0.5, relheight=0.25)
-
+        
         #======table==============
         self.list_forms = ttk.Treeview(
             self.frame_1,
@@ -92,7 +97,7 @@ class Application():
             columns=("col1","col2","col3","col4")
             )
         self.list_forms.place(relx=0.01, rely=0.15, relwidth=0.95, relheight=0.4)
-        
+
         self.scroobar = Scrollbar(self.frame_1, orient='vertical')               # Define a svrool bar
         self.list_forms.configure(yscroll=self.scroobar.set)                     # Eixo da scrool bar
         self.scroobar.place(relx=0.96, rely=0.15, relwidth=0.04, relheight=0.4)  # Posição da scrool bar
@@ -104,12 +109,18 @@ class Application():
         self.list_forms.heading("#3", text="Aréa virtual")  
 
         # Define tamanho da coluna e alinha o texto ao centro
-        self.list_forms.column("#0", width=150, anchor=CENTER)  
-        self.list_forms.column("#1", width=55, anchor=CENTER)   
-        self.list_forms.column("#2", width=55, anchor=CENTER)   
-        self.list_forms.column("#3", width=130, anchor=CENTER)  
+        self.list_forms.column("#0", width=150, anchor=CENTER, stretch=True)  
+        self.list_forms.column("#1", width=55, anchor=CENTER, stretch=True)   
+        self.list_forms.column("#2", width=55, anchor=CENTER, stretch=True)   
+        self.list_forms.column("#3", width=130, anchor=CENTER, stretch=True)
+
+        #self.list_forms.columnconfigure(0, weight=3)  
+        #self.list_forms.columnconfigure(1, weight=1)   
+        #self.list_forms.columnconfigure(2, weight=1)   
+        #self.list_forms.columnconfigure(3, weight=5) 
+        #self.frame_1.bind("<Configure>", lambda e: self.list_forms.update_idletasks())
         
-        self.list_forms.bind('<Motion>', 'break')   #Impede o redimensionamento das colunas da tabela
+        self.list_forms.bind('<Motion>', 'break')   #Impede o redimensionamento das colunas da tabela        
 
         #exemplo aceita interiros floats(2.5) variaveis (self.alguma_coisa) e strings
         #self.list_forms.insert(
@@ -118,21 +129,7 @@ class Application():
         #    text="Triangulo", 
         #    values=(2.5, 3,"subtrair")
         #    ) 
-        #lista de objetos a ser passada
-        
-        data = [ 
-            ["Quadrado", 2, 4, "adicionar"],
-            ["Triangulo", 2.5, 3, "subtrai"] 
-            ]
-        
-        global count
-        count=0
-        for record in data:
-            #if count % 2 == 0:
-            self.list_forms.insert(parent='', index='end', iid=count, 
-                text=record[0], values=(record[1],record[2],record[3])) 
-            count += 1
-        
+        #lista de objetos a ser passada     
         #=========style==============
         style_table = ttk.Style()#  Classe de configuração de estilo da tabela
         style_table.theme_use("clam")#  Tema da tabela
@@ -142,8 +139,7 @@ class Application():
             foreground= Color.black.value,
             fieldbackground= Color.gray.value,
             font=("Arial", 10))
-        
-        
+          
         style_table.map("Treeview",
            background=[('selected', Color.light_blue.value)],
            foreground=[('selected', Color.white.value)])
@@ -302,7 +298,7 @@ class Application():
             fg= Color.white.value
             )
         self.bt_atualize.place(relx=0.26, rely=0.15, relwidth=0.12, relheight=0.8)
-    
+
     def Destroy_Insert_window(self):
         self.insert.destroy()
 
@@ -311,7 +307,7 @@ class Application():
         self.list_forms.insert(parent='', index='end', iid=count, 
             text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
         count += 1   
-    
+
     def Select_Form(self, event):
         if(self.geometric_form_entry.get() == "Triangulo"):
             
