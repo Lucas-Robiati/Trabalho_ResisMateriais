@@ -10,8 +10,29 @@ from modulos import *
 from tkinter import ttk
 from placeHolder import EntPlaceHold
 
+class Validate:
+    def validate_float(self, text):
 
-class Application():
+        value = 0
+
+        if ((text == "lado a") or
+            (text == "lado b") or
+            (text == "lado c") or
+            (text == "raio") or
+            (text == "base") or
+            (text == "altura") or
+            (text == "X:") or
+            (text == "Y:") or
+            (text == "...")): return True 
+
+        if ((text == "") or (text == "-")): return True
+        try:
+            value == float(text)
+        except ValueError:
+            return False
+        return (0 <= value) or (0 >= value)
+
+class Application(Validate):
     def __init__(self, root:'Tk'):
         self.root = root #Define o bejeto Tk que será usado como janela principal
         self.window()
@@ -24,6 +45,7 @@ class Application():
         self.root.minsize(width=950, height=520)
         self.root.resizable(True,True)
         root.protocol('WM_DELETE_WINDOW', self.destroy_window)  # Vincula o evento de fechamento
+        self.Validate_entry()
         self.window_frame()
 
     def destroy_window(self):
@@ -378,6 +400,8 @@ class Application():
             self.dimensions_b_entry.config(state="disabled")
             self.dimensions_c_entry.config(state="disabled")
 
+    def Validate_entry(self):
+        self.val = (self.root.register(self.validate_float), '%P')
 
     def Insert_window(self):
         self.insert = Toplevel()
@@ -431,9 +455,11 @@ class Application():
         self.label_coordinates_center.place(relx=0.005, rely=0.13)
 
         self.coordinate_center_x_entry = EntPlaceHold(self.frame_insert, placeholder='X:')
+        self.coordinate_center_x_entry.configure(validate= "key", validatecommand=self.val)
         self.coordinate_center_x_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
 
         self.coordinate_center_y_entry = EntPlaceHold(self.frame_insert, placeholder='Y:')
+        self.coordinate_center_y_entry.configure(validate= "key", validatecommand=self.val)
         self.coordinate_center_y_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
 
         #-----------dimensions------------
@@ -447,15 +473,15 @@ class Application():
         self.label_dimensions.place(relx=0.005, rely=0.3)
 
         self.dimensions_a_entry = EntPlaceHold(self.frame_insert, placeholder='...')
-        self.dimensions_a_entry.config(state="disabled")
+        self.dimensions_a_entry.config(state="disabled", validate= "key", validatecommand=self.val)
         self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
         
         self.dimensions_b_entry = EntPlaceHold(self.frame_insert, placeholder='...')
-        self.dimensions_b_entry.config(state="disabled")
+        self.dimensions_b_entry.config(state="disabled", validate= "key", validatecommand=self.val)
         self.dimensions_b_entry.place(relx=0.005, rely=0.4, relwidth=0.95, relheight=0.05)  
 
         self.dimensions_c_entry = EntPlaceHold(self.frame_insert, placeholder='...')
-        self.dimensions_c_entry.config(state="disabled")
+        self.dimensions_c_entry.config(state="disabled", validate= "key", validatecommand=self.val)
         self.dimensions_c_entry.place(relx=0.005, rely=0.46, relwidth=0.95, relheight=0.05)
 
         #-----------sub-are--------------
@@ -487,9 +513,11 @@ class Application():
         self.label_coordinates.place(relx=0.005, rely=0.65)
 
         self.coordinate_x_entry = EntPlaceHold(self.frame_insert, placeholder='X:')
+        self.coordinate_x_entry.configure(validate= "key", validatecommand=self.val)
         self.coordinate_x_entry.place(relx=0.005, rely=0.69, relwidth=0.95, relheight=0.05)
 
         self.coordinate_y_entry = EntPlaceHold(self.frame_insert, placeholder='Y:')
+        self.coordinate_y_entry.configure(validate= "key", validatecommand=self.val)
         self.coordinate_y_entry.place(relx=0.005, rely=0.75, relwidth=0.95, relheight=0.05)
 
         #======Buttons===========
