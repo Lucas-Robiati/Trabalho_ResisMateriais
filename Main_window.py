@@ -221,7 +221,7 @@ class Application():
         plt.gca().add_patch(meio_circulo)
 
         """
-            situações de orientação meio_circulo
+            situações de orientação quarto de circulo
             orientação 0: 0-90
             orientação 1: 90-180
             orientação 2: 180-270

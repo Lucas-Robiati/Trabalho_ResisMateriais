@@ -6,12 +6,23 @@ def modulo(valor:float) -> float:
     return valor * (-1.0)
   return valor
 
+
+"""
+triangulo retangulo
+vertice a -> ponto2d
+vertice b -> ponto2d
+vertice c -> ponto2d
+
+"""
+
 class Triangulo(Forma):
   def __init__(self, a:float, b:float, c:float, origem:Ponto2D = Ponto2D(), centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False):
     
     
-
-
+    # |\  
+    # | \
+    # |  \
+    # |___\
     return
     # if(not self.__valido()):
       # return -1
