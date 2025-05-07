@@ -25,7 +25,8 @@ class Triangulo(Forma):
     self.altura = 0.0
     self.orientação = 0
 
-    #super().__init__(centroide, forma_virtual)
+    super().__init__(self.__c_centroide(), forma_virtual)
+
     self.area = self.__c_area()
     self.Qx, self.Qy = self.momento_estatico()
     self.Ix, self.Iy = self.momento()
@@ -47,7 +48,7 @@ class Triangulo(Forma):
 
   @property
   def Pb(self) -> float:
-    return self.__Pb
+    return self.__Pben
 
   @Pb.setter
   def Pb(self, Pb:float) -> None:
@@ -195,26 +196,27 @@ class Triangulo(Forma):
       return True
   '''
 
-  def __c_area(self):
-    return ((self.a * self.altura) / 2)
+  def __c_area(self) -> float:
+    return ((self.base * self.altura) / 2)
   
-  '''
-  def momento(self) -> float:
-    if(self.equilatero() or self.isoceles()):
-      return ((self.a * (self.altura * self.altura * self.altura))/ 12), ((self.altura * (self.a * self.a * self.a))/12)
+  def __c_centroide(self) -> Ponto2D:
+    return Ponto2D(((self.Pa.x + self.Pb.x + self.Pc.x) / 3), ((self.Pa.y + self.Pb.y + self.Pc.y) / 3))
+  
+  
+  def __c_momento(self) -> float:
+    ix = self.forma_virtual * ((self.base * (self.altura * self.altura * self.altura))/36) + (self.area * (self.centroide.y * self.centroide.y))
+    iy = self.forma_virtual * ((self.altura * (self.base * self.base * self.base))/36) + (self.area * (self.centroide.x * self.centroide.x))
+    return ix,iy
+  
+  def __c_produto(self):
+    self.Ixy = self.forma_virtual * (+- (((self.base ** 2) * (self.altura ** 2))/72)) * (self.area * self.centroide.x * self.centroide.y)
+    return
+  
+  # def update_runtime(self):
+  #   if(not self.__valido()):
+  #     return -1
     
-    return -1.0, -1.0
+  #   self.area = self.__c_area()
+  #   self.Qx, self.Qy = self.momento_estatico()
+  #   self.Ix, self.Iy = self.momento()
   
-  def momento_estatico(self) -> float:
-    qx = self.centroide.y * self.area
-    qy = self.centroide.x * self.area
-    return qx, qy
-  
-  def update_runtime(self):
-    if(not self.__valido()):
-      return -1
-    
-    self.area = self.__c_area()
-    self.Qx, self.Qy = self.momento_estatico()
-    self.Ix, self.Iy = self.momento()
-  '''
