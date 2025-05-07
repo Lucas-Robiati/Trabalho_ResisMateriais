@@ -170,12 +170,11 @@ class Application(Validate):
         #style_table.tag_configure('evenrow', background= Color.light_gray.value)
     
     def widgets_frame2(self):
-        xmin, xmax, ymin, ymax = -5, 5, -5, 5
-        ticks_frequency = 1
+        self.xmin, self.xmax, self.ymin, self.ymax = -5, 5, -5, 5
+        self.ticks_frequency = 1
+
         self.fig, self.ax = plt.subplots()
         self.fig.patch.set_facecolor('#ffffff')
-
-        self.ax.set(xlim=(xmin-1, xmax+1), ylim=(ymin-1, ymax+1), aspect='equal')
 
         self.ax.spines['bottom'].set_position('zero')
         self.ax.spines['left'].set_position('zero')
@@ -190,11 +189,8 @@ class Application(Validate):
             transform=self.ax.transAxes,
                 horizontalalignment='center', fontsize=8)
         
-        x_ticks = np.arange(xmin, xmax+1, ticks_frequency)
-        y_ticks = np.arange(ymin, ymax+1, ticks_frequency)
-        self.ax.set_xticks(x_ticks[x_ticks != 0])
-        self.ax.set_yticks(y_ticks[y_ticks != 0])
-        
+        self.Auto_Resize_Matplotlib()
+
         # Alterar tamanho dos números dos eixos
         self.ax.tick_params(axis='x', labelsize=8)
         self.ax.tick_params(axis='y', labelsize=8)  # Tamanho 8
@@ -323,6 +319,15 @@ class Application(Validate):
 
     def Destroy_Insert_window(self):
         self.insert.destroy()
+  
+    def Auto_Resize_Matplotlib(self):
+        self.ax.set(xlim=(self.xmin-1, self.xmax+1), ylim=(self.ymin-1, self.ymax+1), aspect='equal')
+        
+        self.x_ticks = np.arange(self.xmin, self.xmax+1, self.ticks_frequency)
+        self.y_ticks = np.arange(self.ymin, self.ymax+1, self.ticks_frequency)
+        
+        self.ax.set_xticks(self.x_ticks[self.x_ticks != 0])
+        self.ax.set_yticks(self.y_ticks[self.y_ticks != 0])
 
     def add_record(self):
         global count
