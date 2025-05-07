@@ -17,6 +17,7 @@ class QuartoDeCirculo(Forma):
     super().__init__(self.__c_centroide(), forma_virtual)
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
+    self.Jo = self._c_momento_polar()
     self.Ixy = self.__c_produto()
     return None
 
@@ -56,4 +57,10 @@ class QuartoDeCirculo(Forma):
     return ix, iy
   
   def __c_produto(self):
-    return (self.forma_virtual * ((0.001647 * (self.raio ** 4)) + (self.area * self.centroide.x * self.centroide.y)))
+    if((self.orientacao == 0) or (self.orientacao == 2)):
+      sinal_produto_inercia_proprio = -1
+    
+    if((self.orientacao == 1) or (self.orientacao == 3)):
+      sinal_produto_inercia_proprio = 1
+    
+    return (self.forma_virtual * (sinal_produto_inercia_proprio * ((0.001647 * (self.raio ** 4))) + (self.area * self.centroide.x * self.centroide.y)))

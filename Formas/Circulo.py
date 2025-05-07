@@ -3,10 +3,11 @@ from .Ponto2D import Ponto2D
 
 class Circulo(Forma):
   def __init__(self, raio:float = 0.0, centroide:Ponto2D = Ponto2D(), origem_sistema:Ponto2D = Ponto2D(0, 0), forma_virtual:bool = False):
-    super().__init__(centroide, origem_sistema, forma_virtual)
     self.raio = raio
+    super().__init__(centroide, origem_sistema, forma_virtual)
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
+    self.Jo = self._c_momento_polar()
     self.Ixy = self.__c_produto()
     return None
 

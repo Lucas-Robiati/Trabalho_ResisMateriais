@@ -4,11 +4,12 @@ from .Ponto2D import Ponto2D
 
 class Retangulo(Forma):
   def __init__(self, base:float = 0.0, altura:float = 0.0, centroide:Ponto2D = Ponto2D(), origem_sistema:Ponto2D = Ponto2D(), forma_virtual:bool = False) -> None:
-    super().__init__(centroide, forma_virtual)
     self.base = base
     self.altura = altura
+    super().__init__(centroide, forma_virtual)
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
+    self.Jo = self._c_momento_polar()
     self.Ixy = self.__c_produto()
     return None
 

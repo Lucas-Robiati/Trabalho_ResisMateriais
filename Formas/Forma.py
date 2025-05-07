@@ -17,14 +17,6 @@ class Forma:
   @centroide.setter
   def centroide(self, centroide:Ponto2D) -> None:
     self.__centroide = centroide.clone()
-
-  @property
-  def area(self) -> float:
-    return self.__area
-  
-  @area.setter
-  def area(self, area) -> None:
-    self.__area = area
     return None
 
   @property
@@ -33,12 +25,47 @@ class Forma:
       return -1.0
     else:
       return 1.0
-    
+  
   @forma_virtual.setter
   def forma_virtual(self, forma_virtual:bool) -> None:
     self.__forma_virtual = forma_virtual
     return None
 
+  @property
+  def area(self) -> float:
+    return self.__area
+  
+  @area.setter
+  def area(self, area:float) -> None:
+    self.__area = area
+    return None
+  
+  @property
+  def Ix(self) -> float:
+    return self.__Ix
+  
+  @Ix.setter
+  def Ix(self, Ix:float) -> None:
+    self.__Ix = Ix
+    return None  
+  
+  @property
+  def Iy(self) -> float:
+    return self.__Iy
+  
+  @Iy.setter
+  def Iy(self, Iy:float) -> None:
+    self.__Iy = Iy
+    return None
+
+  @property
+  def Ixy(self) -> float:
+    return self.__Ixy
+  
+  @Ixy.setter
+  def Ixy(self, Ixy:float) -> None:
+    self.__Ixy = Ixy
+    return None  
+
   def _c_momento_polar(self) -> float:
-    self.Jo = self.Ix + self.Iy
-    return self.Jo
+    return (self.Ix + self.Iy)

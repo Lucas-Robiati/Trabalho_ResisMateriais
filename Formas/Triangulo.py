@@ -18,6 +18,7 @@ class Triangulo(Forma):
     super().__init__(self.__c_centroide(), forma_virtual)
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
+    self.Jo = self._c_momento_polar()
     self.Ixy = self.__c_produto()
     return None
 
