@@ -324,7 +324,7 @@ class Application(Validate):
 
     def add_record(self):
         
-        entry_validate = 0
+        entry_validate = 1
         
         if(self.subare_entry.get()): 
             try:
