@@ -91,15 +91,19 @@ print(f"momento polar {Ac.Jo}")
 """
 
 
-
-ret = Retangulo(5, 2, Ponto2D(0, 0))
+trig = Triangulo(Ponto2D(0,0), Ponto2D(4,0), Ponto2D(0,3), forma_virtual=False)
+trig2 = Triangulo(Ponto2D(0,0), Ponto2D(-4,0), Ponto2D(0,3), forma_virtual=False)
+#ret = Retangulo(5, 2, Ponto2D(0, 0))
 # ret2 = Retangulo(50, 30, Ponto2D(15, 25))
 
 
 ac = AreaComposta()
-ac.append(ret)
+ac.append(trig)
+ac.append(trig2)
 # ac.append(ret2)
 
-print(ac.Ix)
-print(ac.Iy)
-print(ac.Ixy)
+print("Orientação:", trig.orientação)
+print("Centroide:", ac.centroide.x, ac.centroide.y)
+print("Momen. Inercia x:", ac.Ix)
+print("Momen. Inercia y:", ac.Iy)
+print("Prod. Inercia:", ac.Ixy)

@@ -14,29 +14,25 @@ class Triangulo(Forma):
     self.Pa = a
     self.Pb = b
     self.Pc = c
-
-    if(not self.__valido()):
-      return -1
-    
     self.catx = 0.0
     self.caty = 0.0
     self.tang = 0.0
     self.base = 0.0
     self.altura = 0.0
     self.orientação = 0
-
-    super().__init__(self.__c_centroide(), forma_virtual)
-
-    self.area = self.__c_area()
-    self.Qx, self.Qy = self.momento_estatico()
-    self.Ix, self.Iy = self.momento()
     #self.semiperimetro = 0.0
 
-    self.__runtime() 
+    self.__c_orientacao_e_catetos() 
+
+    if(not self.__valido()):
+      return -1
+
+    super().__init__(self.__c_centroide(), forma_virtual)
+    self.area = self.__c_area()
+    self.Ix, self.Iy = self.__c_momento()
+    self.__c_produto()
 
     return
-
-
 
   @property
   def Pa(self) -> float:
@@ -48,7 +44,7 @@ class Triangulo(Forma):
 
   @property
   def Pb(self) -> float:
-    return self.__Pben
+    return self.__Pb
 
   @Pb.setter
   def Pb(self, Pb:float) -> None:
@@ -63,28 +59,28 @@ class Triangulo(Forma):
     self.__Pc = Pc
   
   def __valido(self) -> bool:  
-    if(not (self.a < abs(self.c + self.b))):
+    if(not (self.catx < abs(self.caty + self.tang))):
       return False
     
-    if(not (self.b < abs(self.a + self.c))):
+    if(not (self.caty < abs(self.catx + self.tang))):
       return False
     
-    if(not (self.c < abs(self.a + self.b))):
+    if(not (self.tang < abs(self.catx + self.caty))):
       return False
     
     return True
 
   # Migrar para ponto2D faria mais sentido por se tratar da distancia entre dois
   # pontos no plano
-  def __distancia_p2p(p1:Ponto2D, p2:Ponto2D) -> float:
-    medida = ((((p2.x - p1.x)*(p2.x - p1.x))+((p2.y - p1.y)(p2.y - p1.y))) ** 0.5)
+  def __distancia_p2p(self, p1:Ponto2D, p2:Ponto2D) -> float:
+    medida = ((((p2.x - p1.x)*(p2.x - p1.x))+((p2.y - p1.y)*(p2.y - p1.y))) ** 0.5)
     return medida
   
-  def __runtime(self) -> None:
-    if(self.Pa.x == self.Pb.x):
+  def __c_orientacao_e_catetos(self) -> None:
+    if(self.Pa.y == self.Pb.y):
       self.catx = self.__distancia_p2p(self.Pa, self.Pb)
       
-      if(self.Pa.y == self.Pc.y):
+      if(self.Pa.x == self.Pc.x):
         self.caty = self.__distancia_p2p(self.Pa, self.Pc)
         self.tang = self.__distancia_p2p(self.Pb, self.Pc)
         if(self.Pc.x < self.Pb.x):
@@ -97,8 +93,8 @@ class Triangulo(Forma):
             self.orientação = 1
           if(self.Pc.y < self.Pb.y):
             self.orientação = 2
-
-      if(self.Pb.y == self.Pc.y):
+      
+      if(self.Pb.x == self.Pc.x):
         self.caty = self.__distancia_p2p(self.Pb, self.Pc)
         self.tang = self.__distancia_p2p(self.Pa, self.Pc)
         if(self.Pc.x < self.Pa.x):
@@ -112,9 +108,10 @@ class Triangulo(Forma):
           if(self.Pc.y < self.Pa.y):
             self.orientação = 2
 
-    if(self.Pb.x == self.Pc.x):
+    if(self.Pb.y == self.Pc.y):
       self.catx = self.__distancia_p2p(self.Pb, self.Pc)
-      if(self.Pb.y == self.Pa.y):
+      
+      if(self.Pb.x == self.Pa.x):
         self.caty = self.__distancia_p2p(self.Pb, self.Pa)
         self.tang = self.__distancia_p2p(self.Pc, self.Pa)
         if(self.Pa.x < self.Pc.x):
@@ -128,7 +125,7 @@ class Triangulo(Forma):
           if(self.Pa.y < self.Pc.y):
             self.orientação = 2
 
-      if(self.Pc.y == self.Pa.y):
+      if(self.Pc.x == self.Pa.x):
         self.caty = self.__distancia_p2p(self.Pc, self.Pa)
         self.tang = self.__distancia_p2p(self.Pb, self.Pa)
         if(self.Pa.x < self.Pb.x):
@@ -142,9 +139,10 @@ class Triangulo(Forma):
           if(self.Pa.y < self.Pb.y):
             self.orientação = 2
 
-    if(self.Pc.x == self.Pa.x):
+    if(self.Pc.y == self.Pa.y):
       self.catx = self.__distancia_p2p(self.Pc, self.Pa)
-      if(self.Pa.y == self.Pb.y):
+      
+      if(self.Pa.x == self.Pb.x):
         self.caty = self.__distancia_p2p(self.Pa, self.Pb)
         self.tang = self.__distancia_p2p(self.Pc, self.Pb)
         if(self.Pb.x < self.Pc.x):
@@ -158,7 +156,7 @@ class Triangulo(Forma):
           if(self.Pb.y < self.Pc.y):
             self.orientação = 2
 
-      if(self.Pc.y == self.Pb.y):
+      if(self.Pc.x == self.Pb.x):
         self.caty = self.__distancia_p2p(self.Pc, self.Pb)
         self.tang = self.__distancia_p2p(self.Pa, self.Pb)
         if(self.Pb.x < self.Pa.x):
@@ -177,24 +175,6 @@ class Triangulo(Forma):
     #self.__c_semiperimetro()
     
     return
-  
-  '''
-  def equilatero(self) -> bool:
-    return (self.a == self.b) and (self.a == self.c)
-  
-  def escaleno(self) -> bool:
-    return (self.a == self.b) and (self.a != self.c)
-  
-  def isoceles(self) -> bool:
-    if((self. a == self.b) and (self.a != self.c)):
-      return True
-    
-    if((self.a == self.c) and (self.a != self.b)):
-      return True
-    
-    if((self.b == self.c) and (self.b != self.a)):
-      return True
-  '''
 
   def __c_area(self) -> float:
     return ((self.base * self.altura) / 2)
@@ -209,14 +189,10 @@ class Triangulo(Forma):
     return ix,iy
   
   def __c_produto(self):
-    self.Ixy = self.forma_virtual * (+- (((self.base ** 2) * (self.altura ** 2))/72)) * (self.area * self.centroide.x * self.centroide.y)
+    sinal_produto_inercia_proprio = 1
+    if((self.orientação % 1) == 0):
+      sinal_produto_inercia_proprio *= -1
+      
+    self.Ixy = self.forma_virtual * (sinal_produto_inercia_proprio * (((self.base ** 2) * (self.altura ** 2))/72)) * (self.area * self.centroide.x * self.centroide.y)
     return
-  
-  # def update_runtime(self):
-  #   if(not self.__valido()):
-  #     return -1
-    
-  #   self.area = self.__c_area()
-  #   self.Qx, self.Qy = self.momento_estatico()
-  #   self.Ix, self.Iy = self.momento()
   
