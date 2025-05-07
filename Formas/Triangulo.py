@@ -20,55 +20,59 @@ class Triangulo(Forma):
     self.Pa = a
     self.Pb = b
     self.Pc = c
+
+    if(not self.__valido()):
+      return -1
+    
+    self.catx = 0.0
+    self.caty = 0.0
+    self.tang = 0.0
     self.base = 0.0
-    self.cat = 0.0
-    self.cat2 = 0.0
     self.altura = 0.0
-    self.semiperimetro = 0.0
+    self.orientação = 0
+
+    #super().__init__(centroide, forma_virtual)
+    self.area = self.__c_area()
+    self.Qx, self.Qy = self.momento_estatico()
+    self.Ix, self.Iy = self.momento()
+    #self.semiperimetro = 0.0
 
     self.__runtime() 
 
-
-    # |\  
-    # | \
-    # |  \
-    # |___\
     return
-    # if(not self.__valido()):
-      # return -1
-    # super().__init__(centroide, forma_virtual)
-    # self.area = self.__c_area()
-    # self.Qx, self.Qy = self.momento_estatico()
-    # self.Ix, self.Iy = self.momento()
+
+
 
   @property
-  def a(self) -> float:
-    return self.__a
+  def Pa(self) -> float:
+    return self.__Pa
 
-  @a.setter
-  def a(self, a:float) -> None:
-    self.__a = a 
-
-  @property
-  def b(self) -> float:
-    return self.__b
-
-  @b.setter
-  def b(self, b:float) -> None:
-    self.__b = b
+  @Pa.setter
+  def Pa(self, Pa:float) -> None:
+    self.__Pa = Pa 
 
   @property
-  def c(self) -> float:
-    return self.__c
+  def Pb(self) -> float:
+    return self.__Pb
 
-  @c.setter
-  def c(self, c:float) -> None:
-    self.__c = c
+  @Pb.setter
+  def Pb(self, Pb:float) -> None:
+    self.__Pb = Pb
 
+  @property
+  def Pc(self) -> float:
+    return self.__Pc
+
+  @Pc.setter
+  def Pc(self, Pc:float) -> None:
+    self.__Pc = Pc
+  
+  """
   def __c_semiperimetro(self) -> None:
     semiperimetro = ((self.base + self.cat + self.cat2) / 2)
     return 
-  
+  """
+
   # Migrar para ponto2D faria mais sentido por se tratar da distancia entre dois
   # pontos no plano
   def __distancia_p2p(p1:Ponto2D, p2:Ponto2D) -> float:
@@ -76,11 +80,100 @@ class Triangulo(Forma):
     return medida
   
   def __runtime(self) -> None:
-    self.base = self.__distancia_p2p(self.Pa, self.Pb)
-    self.cat = self.__distancia_p2p(self.Pb, self.Pc)
-    self.cat2 = self.__distancia_p2p(self.Pa, self.Pc)
+    if(self.Pa.x == self.Pb.x):
+      self.catx = self.__distancia_p2p(self.Pa, self.Pb)
+      
+      if(self.Pa.y == self.Pc.y):
+        self.caty = self.__distancia_p2p(self.Pa, self.Pc)
+        self.tang = self.__distancia_p2p(self.Pb, self.Pc)
+        if(self.Pc.x < self.Pb.x):
+          if(self.Pc.y > self.Pb.y):
+            self.orientação = 0
+          if(self.Pc.y < self.Pb.y):
+            self.orientação = 3
+        if(self.Pc.x > self.Pb.x):
+          if(self.Pc.y > self.Pb.y):
+            self.orientação = 1
+          if(self.Pc.y < self.Pb.y):
+            self.orientação = 2
 
-    self.__c_semiperimetro()
+      if(self.Pb.y == self.Pc.y):
+        self.caty = self.__distancia_p2p(self.Pb, self.Pc)
+        self.tang = self.__distancia_p2p(self.Pa, self.Pc)
+        if(self.Pc.x < self.Pa.x):
+          if(self.Pc.y > self.Pa.y):
+            self.orientação = 0
+          if(self.Pc.y < self.Pa.y):
+            self.orientação = 3
+        if(self.Pc.x > self.Pa.x):
+          if(self.Pc.y > self.Pa.y):
+            self.orientação = 1
+          if(self.Pc.y < self.Pa.y):
+            self.orientação = 2
+
+    if(self.Pb.x == self.Pc.x):
+      self.catx = self.__distancia_p2p(self.Pb, self.Pc)
+      if(self.Pb.y == self.Pa.y):
+        self.caty = self.__distancia_p2p(self.Pb, self.Pa)
+        self.tang = self.__distancia_p2p(self.Pc, self.Pa)
+        if(self.Pa.x < self.Pc.x):
+          if(self.Pa.y > self.Pc.y):
+            self.orientação = 0
+          if(self.Pa.y < self.Pc.y):
+            self.orientação = 3
+        if(self.Pa.x > self.Pc.x):
+          if(self.Pa.y > self.Pc.y):
+            self.orientação = 1
+          if(self.Pa.y < self.Pc.y):
+            self.orientação = 2
+
+      if(self.Pc.y == self.Pa.y):
+        self.caty = self.__distancia_p2p(self.Pc, self.Pa)
+        self.tang = self.__distancia_p2p(self.Pb, self.Pa)
+        if(self.Pa.x < self.Pb.x):
+          if(self.Pa.y > self.Pb.y):
+            self.orientação = 0
+          if(self.Pa.y < self.Pb.y):
+            self.orientação = 3
+        if(self.Pa.x > self.Pb.x):
+          if(self.Pa.y > self.Pb.y):
+            self.orientação = 1
+          if(self.Pa.y < self.Pb.y):
+            self.orientação = 2
+
+    if(self.Pc.x == self.Pa.x):
+      self.catx = self.__distancia_p2p(self.Pc, self.Pa)
+      if(self.Pa.y == self.Pb.y):
+        self.caty = self.__distancia_p2p(self.Pa, self.Pb)
+        self.tang = self.__distancia_p2p(self.Pc, self.Pb)
+        if(self.Pb.x < self.Pc.x):
+          if(self.Pb.y > self.Pc.y):
+            self.orientação = 0
+          if(self.Pb.y < self.Pc.y):
+            self.orientação = 3
+        if(self.Pb.x > self.Pc.x):
+          if(self.Pb.y > self.Pc.y):
+            self.orientação = 1
+          if(self.Pb.y < self.Pc.y):
+            self.orientação = 2
+
+      if(self.Pc.y == self.Pb.y):
+        self.caty = self.__distancia_p2p(self.Pc, self.Pb)
+        self.tang = self.__distancia_p2p(self.Pa, self.Pb)
+        if(self.Pb.x < self.Pa.x):
+          if(self.Pb.y > self.Pa.y):
+            self.orientação = 0
+          if(self.Pb.y < self.Pa.y):
+            self.orientação = 3
+        if(self.Pb.x > self.Pa.x):
+          if(self.Pb.y > self.Pa.y):
+            self.orientação = 1
+          if(self.Pb.y < self.Pa.y):
+            self.orientação = 2
+  
+    self.base = self.catx
+    self.altura = self.caty
+    #self.__c_semiperimetro()
     
     return
   
