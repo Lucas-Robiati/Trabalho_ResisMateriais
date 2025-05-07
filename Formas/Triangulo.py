@@ -1,12 +1,6 @@
 from .Forma import Forma
 from .Ponto2D import Ponto2D
 
-def modulo(valor:float) -> float:
-  if(valor < 0.0):
-    return valor * (-1.0)
-  return valor
-
-
 """
 triangulo retangulo
 vertice a -> ponto2d
@@ -67,11 +61,17 @@ class Triangulo(Forma):
   def Pc(self, Pc:float) -> None:
     self.__Pc = Pc
   
-  """
-  def __c_semiperimetro(self) -> None:
-    semiperimetro = ((self.base + self.cat + self.cat2) / 2)
-    return 
-  """
+  def __valido(self) -> bool:  
+    if(not (self.a < abs(self.c + self.b))):
+      return False
+    
+    if(not (self.b < abs(self.a + self.c))):
+      return False
+    
+    if(not (self.c < abs(self.a + self.b))):
+      return False
+    
+    return True
 
   # Migrar para ponto2D faria mais sentido por se tratar da distancia entre dois
   # pontos no plano
@@ -177,7 +177,7 @@ class Triangulo(Forma):
     
     return
   
-  """
+  '''
   def equilatero(self) -> bool:
     return (self.a == self.b) and (self.a == self.c)
   
@@ -193,20 +193,8 @@ class Triangulo(Forma):
     
     if((self.b == self.c) and (self.b != self.a)):
       return True
+  '''
 
-  def __valido(self) -> bool:
-    
-    if(not (self.a < modulo(self.c + self.b))):
-      return False
-    
-    if(not (self.b < modulo(self.a + self.c))):
-      return False
-    
-    if(not (self.c < modulo(self.a + self.b))):
-      return False
-    
-    return True
-  """
   def __c_area(self):
     return ((self.a * self.altura) / 2)
   
