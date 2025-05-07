@@ -2,12 +2,13 @@ from .Forma import Forma
 from .Ponto2D import Ponto2D
 
 class Circulo(Forma):
-  def __init__(self, raio:float = 0.0, centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False):
-    super().__init__(centroide, forma_virtual)
+  def __init__(self, raio:float = 0.0, centroide:Ponto2D = Ponto2D(), origem_sistema:Ponto2D = Ponto2D(0, 0), forma_virtual:bool = False):
+    super().__init__(centroide, origem_sistema, forma_virtual)
     self.raio = raio
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
-    self.__c_produto()
+    self.Ixy = self.__c_produto()
+    return None
 
   @property
   def raio(self) -> float:
@@ -16,17 +17,16 @@ class Circulo(Forma):
   @raio.setter
   def raio(self, raio) -> None:
     self.__raio = raio
-
+    return None
 
   def __c_area(self) -> float:
-    return 3.14 * (self.raio * self.raio)
+    return (3.14 * (self.raio * self.raio))
 
-  
   def __c_momento(self) -> float:
-    ix = self.forma_virtual * (((3.14 * (self.raio * self.raio * self.raio * self.raio))/4) + (self.area * (self.centroide.y * self.centroide.y)))
-    iy = self.forma_virtual * (((3.14 * (self.raio * self.raio * self.raio * self.raio))/4) + (self.area * (self.centroide.x * self.centroide.x)))
+    ix = self.forma_virtual * (((3.14 * (self.raio ** 4)) / 4) + (self.area * (self.centroide.y ** 2)))
+    iy = self.forma_virtual * (((3.14 * (self.raio ** 4)) / 4) + (self.area * (self.centroide.x ** 2)))
     return ix, iy
   
-  def __c_produto(self):
-    self.Ixy = self.forma_virtual * (self.area * self.centroide.x * self.centroide.y)
+  def __c_produto(self) -> float:
+    return (self.forma_virtual * (self.area * self.centroide.x * self.centroide.y))
  

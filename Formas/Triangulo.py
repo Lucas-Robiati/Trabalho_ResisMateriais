@@ -1,38 +1,25 @@
 from .Forma import Forma
 from .Ponto2D import Ponto2D
 
-"""
-triangulo retangulo
-vertice a -> ponto2d
-vertice b -> ponto2d
-vertice c -> ponto2d
-
-"""
-
 class Triangulo(Forma):
-  def __init__(self, a:Ponto2D, b:Ponto2D, c:Ponto2D, forma_virtual:bool = False):
-    self.Pa = a
-    self.Pb = b
-    self.Pc = c
+  def __init__(self, Pa:Ponto2D, Pb:Ponto2D, Pc:Ponto2D, origem_sistema:Ponto2D = Ponto2D(), forma_virtual:bool = False) -> None:
+    self.Pa = Pa
+    self.Pb = Pb
+    self.Pc = Pc
     self.catx = 0.0
     self.caty = 0.0
     self.tang = 0.0
     self.base = 0.0
     self.altura = 0.0
     self.orientação = 0
-    #self.semiperimetro = 0.0
-
     self.__c_orientacao_e_catetos() 
-
     if(not self.__valido()):
       return -1
-
     super().__init__(self.__c_centroide(), forma_virtual)
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_momento()
-    self.__c_produto()
-
-    return
+    self.Ixy = self.__c_produto()
+    return None
 
   @property
   def Pa(self) -> float:
@@ -40,7 +27,8 @@ class Triangulo(Forma):
 
   @Pa.setter
   def Pa(self, Pa:float) -> None:
-    self.__Pa = Pa 
+    self.__Pa = Pa
+    return None
 
   @property
   def Pb(self) -> float:
@@ -49,6 +37,7 @@ class Triangulo(Forma):
   @Pb.setter
   def Pb(self, Pb:float) -> None:
     self.__Pb = Pb
+    return None
 
   @property
   def Pc(self) -> float:
@@ -57,6 +46,7 @@ class Triangulo(Forma):
   @Pc.setter
   def Pc(self, Pc:float) -> None:
     self.__Pc = Pc
+    return None
   
   def __valido(self) -> bool:  
     if(not (self.catx < abs(self.caty + self.tang))):
@@ -67,22 +57,16 @@ class Triangulo(Forma):
     
     if(not (self.tang < abs(self.catx + self.caty))):
       return False
-    
-    return True
 
-  # Migrar para ponto2D faria mais sentido por se tratar da distancia entre dois
-  # pontos no plano
-  def __distancia_p2p(self, p1:Ponto2D, p2:Ponto2D) -> float:
-    medida = ((((p2.x - p1.x)*(p2.x - p1.x))+((p2.y - p1.y)*(p2.y - p1.y))) ** 0.5)
-    return medida
+    return True
   
   def __c_orientacao_e_catetos(self) -> None:
     if(self.Pa.y == self.Pb.y):
-      self.catx = self.__distancia_p2p(self.Pa, self.Pb)
+      self.catx = self.Pa.distancia_euclidiana(self.Pb)
       
       if(self.Pa.x == self.Pc.x):
-        self.caty = self.__distancia_p2p(self.Pa, self.Pc)
-        self.tang = self.__distancia_p2p(self.Pb, self.Pc)
+        self.caty = self.Pa.distancia_euclidiana(self.Pc)
+        self.tang = self.Pb.distancia_euclidiana(self.Pc)
         if(self.Pc.x < self.Pb.x):
           if(self.Pc.y > self.Pb.y):
             self.orientação = 0
@@ -95,8 +79,8 @@ class Triangulo(Forma):
             self.orientação = 2
       
       if(self.Pb.x == self.Pc.x):
-        self.caty = self.__distancia_p2p(self.Pb, self.Pc)
-        self.tang = self.__distancia_p2p(self.Pa, self.Pc)
+        self.caty = self.Pb.distancia_euclidiana(self.Pc)
+        self.tang = self.Pa.distancia_euclidiana(self.Pc)
         if(self.Pc.x < self.Pa.x):
           if(self.Pc.y > self.Pa.y):
             self.orientação = 0
@@ -109,11 +93,11 @@ class Triangulo(Forma):
             self.orientação = 2
 
     if(self.Pb.y == self.Pc.y):
-      self.catx = self.__distancia_p2p(self.Pb, self.Pc)
+      self.catx = self.Pb.distancia_euclidiana(self.Pc)
       
       if(self.Pb.x == self.Pa.x):
-        self.caty = self.__distancia_p2p(self.Pb, self.Pa)
-        self.tang = self.__distancia_p2p(self.Pc, self.Pa)
+        self.caty = self.Pb.distancia_euclidiana(self.Pa)
+        self.tang = self.Pc.distancia_euclidiana(self.Pa)
         if(self.Pa.x < self.Pc.x):
           if(self.Pa.y > self.Pc.y):
             self.orientação = 0
@@ -126,8 +110,8 @@ class Triangulo(Forma):
             self.orientação = 2
 
       if(self.Pc.x == self.Pa.x):
-        self.caty = self.__distancia_p2p(self.Pc, self.Pa)
-        self.tang = self.__distancia_p2p(self.Pb, self.Pa)
+        self.caty = self.Pc.distancia_euclidiana(self.Pa)
+        self.tang = self.Pb.distancia_euclidiana(self.Pa)
         if(self.Pa.x < self.Pb.x):
           if(self.Pa.y > self.Pb.y):
             self.orientação = 0
@@ -140,11 +124,11 @@ class Triangulo(Forma):
             self.orientação = 2
 
     if(self.Pc.y == self.Pa.y):
-      self.catx = self.__distancia_p2p(self.Pc, self.Pa)
+      self.catx = self.Pc.distancia_euclidiana(self.Pa)
       
       if(self.Pa.x == self.Pb.x):
-        self.caty = self.__distancia_p2p(self.Pa, self.Pb)
-        self.tang = self.__distancia_p2p(self.Pc, self.Pb)
+        self.caty = self.Pa.distancia_euclidiana(self.Pb)
+        self.tang = self.Pc.distancia_euclidiana(self.Pb)
         if(self.Pb.x < self.Pc.x):
           if(self.Pb.y > self.Pc.y):
             self.orientação = 0
@@ -157,8 +141,8 @@ class Triangulo(Forma):
             self.orientação = 2
 
       if(self.Pc.x == self.Pb.x):
-        self.caty = self.__distancia_p2p(self.Pc, self.Pb)
-        self.tang = self.__distancia_p2p(self.Pa, self.Pb)
+        self.caty = self.Pc.distancia_euclidiana(self.Pb)
+        self.tang = self.Pa.distancia_euclidiana(self.Pb)
         if(self.Pb.x < self.Pa.x):
           if(self.Pb.y > self.Pa.y):
             self.orientação = 0
@@ -172,9 +156,7 @@ class Triangulo(Forma):
   
     self.base = self.catx
     self.altura = self.caty
-    #self.__c_semiperimetro()
-    
-    return
+    return None
 
   def __c_area(self) -> float:
     return ((self.base * self.altura) / 2)
@@ -182,17 +164,16 @@ class Triangulo(Forma):
   def __c_centroide(self) -> Ponto2D:
     return Ponto2D(((self.Pa.x + self.Pb.x + self.Pc.x) / 3), ((self.Pa.y + self.Pb.y + self.Pc.y) / 3))
   
-  
   def __c_momento(self) -> float:
-    ix = self.forma_virtual * ((self.base * (self.altura * self.altura * self.altura))/36) + (self.area * (self.centroide.y * self.centroide.y))
-    iy = self.forma_virtual * ((self.altura * (self.base * self.base * self.base))/36) + (self.area * (self.centroide.x * self.centroide.x))
+    ix = self.forma_virtual * ((self.base * (self.altura ** 3)) / 36) + (self.area * (self.centroide.y ** 2))
+    iy = self.forma_virtual * ((self.altura * (self.base ** 3)) / 36) + (self.area * (self.centroide.x ** 2))
     return ix,iy
   
-  def __c_produto(self):
-    sinal_produto_inercia_proprio = 1
-    if((self.orientação % 1) == 0):
-      sinal_produto_inercia_proprio *= -1
-      
-    self.Ixy = self.forma_virtual * (sinal_produto_inercia_proprio * (((self.base ** 2) * (self.altura ** 2))/72)) * (self.area * self.centroide.x * self.centroide.y)
-    return
-  
+  def __c_produto(self) -> float:
+    if((self.orientacao == 0) or (self.orientacao == 2)):
+      sinal_produto_inercia_proprio = -1
+    
+    if((self.orientacao == 1) or (self.orientacao == 3)):
+      sinal_produto_inercia_proprio = 1
+    
+    return (self.forma_virtual * (sinal_produto_inercia_proprio * (((self.base ** 2) * (self.altura ** 2)) / 72)) * (self.area * self.centroide.x * self.centroide.y))

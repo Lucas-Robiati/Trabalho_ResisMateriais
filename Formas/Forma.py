@@ -1,14 +1,14 @@
 from .Ponto2D import Ponto2D
 
 class Forma:
-  def __init__(self, centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False) -> None:
+  def __init__(self, centroide:Ponto2D = Ponto2D(), origem_sistema:Ponto2D = Ponto2D(0, 0), forma_virtual:bool = False) -> None:
     self.centroide = centroide
     self.forma_virtual = forma_virtual
     self.area = 0.0
     self.Ix, self.Iy = 0.0, 0.0
     self.Jo = 0.0
     self.Ixy = 0.0
-    return
+    return None
   
   @property
   def centroide (self) -> Ponto2D:
@@ -25,6 +25,7 @@ class Forma:
   @area.setter
   def area(self, area) -> None:
     self.__area = area
+    return None
 
   @property
   def forma_virtual(self) -> float:
@@ -36,6 +37,7 @@ class Forma:
   @forma_virtual.setter
   def forma_virtual(self, forma_virtual:bool) -> None:
     self.__forma_virtual = forma_virtual
+    return None
 
   def _c_momento_polar(self) -> float:
     self.Jo = self.Ix + self.Iy
