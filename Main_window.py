@@ -1,13 +1,6 @@
-#https://www.youtube.com/watch?v=rtR5wHXPKZ4
-#fazer botão tela cheia
-#self.root.attributes('-fullscreen', True)
-
-#criar botão de reste, ainda não sei onde
-#self.bt_reset = Button(self.frame_1, text="Reset")
-#self.bt_reset.place(relx=, rely=, relwidth=, relheight=)
-
 from modulos import *
 from tkinter import ttk
+from tkinter import messagebox
 from placeHolder import EntPlaceHold
 
 class Validate:
@@ -325,6 +318,26 @@ class Application(Validate):
         self.insert.destroy()
 
     def add_record(self):
+        
+        entry_validate = 0
+
+        try:
+            if(self.subare_entry.get() != None):
+                entry_validate = float(self.coordinate_center_x_entry.get())
+                entry_validate = float(self.coordinate_center_y_entry.get())
+                entry_validate = float(self.coordinate_x_entry.get())
+                entry_validate = float(self.coordinate_y_entry.get())
+                entry_validate = float(self.dimensions_a_entry.get())
+                if(self.geometric_form_entry.get() == "Triangulo" or self.geometric_form_entry.get() == "Retangulo"):
+                    entry_validate = float(self.dimensions_b_entry.get())
+                    if(self.geometric_form_entry.get() == "Triangulo"):
+                        entry_validate = float(self.dimensions_c_entry.get())
+
+        except ValueError:
+            msg = "Campo não premchido ou invalido"
+            messagebox.showerror("Error", msg, parent=self.insert)
+            return
+
         global count
         self.list_forms.insert(parent='', index='end', iid=count, 
             text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
@@ -332,11 +345,11 @@ class Application(Validate):
 
     def Select_Form(self, event):
         if(self.geometric_form_entry.get() == "Triangulo"):
-            
-            self.dimensions_a_entry.config(state="normal")
-            self.dimensions_b_entry.config(state="normal")
-            self.dimensions_c_entry.config(state="normal")
-            
+                        
+            self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
+            self.dimensions_b_entry.place(relx=0.005, rely=0.4, relwidth=0.95, relheight=0.05)
+            self.dimensions_c_entry.place(relx=0.005, rely=0.46, relwidth=0.95, relheight=0.05)
+
             self.dimensions_a_entry.delete('0', 'end')
             self.dimensions_a_entry.insert(0, 'lado a')
             self.dimensions_a_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
@@ -353,27 +366,22 @@ class Application(Validate):
             (self.geometric_form_entry.get() == "Semi Circulo") or
             (self.geometric_form_entry.get() == "Quarto de Circulo") ):
             
-            self.dimensions_a_entry.config(state="normal")
-            self.dimensions_b_entry.config(state="normal")
-            self.dimensions_c_entry.config(state="normal")
+            self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
             
             self.dimensions_a_entry.delete('0', 'end')
             self.dimensions_a_entry.insert(0, 'raio')
             self.dimensions_a_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
 
             self.dimensions_b_entry.delete('0', 'end')
-            self.dimensions_b_entry.insert(0, '...')
-            self.dimensions_b_entry.config(state="disabled")
+            self.dimensions_b_entry.place_forget()
             
             self.dimensions_c_entry.delete('0', 'end')
-            self.dimensions_c_entry.insert(0, '....')
-            self.dimensions_c_entry.config(state="disabled")
+            self.dimensions_c_entry.place_forget()
 
         if(self.geometric_form_entry.get() == "Retangulo"): 
 
-            self.dimensions_a_entry.config(state="normal")
-            self.dimensions_b_entry.config(state="normal")
-            self.dimensions_c_entry.config(state="normal")
+            self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
+            self.dimensions_b_entry.place(relx=0.005, rely=0.4, relwidth=0.95, relheight=0.05)
             
             self.dimensions_a_entry.delete('0', 'end')
             self.dimensions_a_entry.insert(0, 'base')
@@ -384,21 +392,9 @@ class Application(Validate):
             self.dimensions_b_entry.bind("<FocusIn>", lambda args: self.dimensions_b_entry.delete('0', 'end'))
             
             self.dimensions_c_entry.delete('0', 'end')
-            self.dimensions_c_entry.insert(0, '....')
-            self.dimensions_c_entry.config(state="disabled") 
+            self.dimensions_c_entry.place_forget()
+ 
         
-        if(self.geometric_form_entry.get() == "..."):
-            self.dimensions_a_entry.delete('0', 'end')
-            self.dimensions_b_entry.delete('0', 'end')
-            self.dimensions_c_entry.delete('0', 'end')
-            
-            self.dimensions_a_entry.insert('0', '...')
-            self.dimensions_b_entry.insert('0', '...')
-            self.dimensions_c_entry.insert('0', '...')
-
-            self.dimensions_a_entry.config(state="disabled")
-            self.dimensions_b_entry.config(state="disabled")
-            self.dimensions_c_entry.config(state="disabled")
 
     def Validate_entry(self):
         self.val = (self.root.register(self.validate_float), '%P')
@@ -434,7 +430,7 @@ class Application(Validate):
         self.geometric_form_entry = ttk.Combobox(
             self.frame_insert,
             state= "readonly", 
-            values=["...", "Triangulo", "Circunferencia", "Quarto de Circulo", "Semi Circulo", "Retangulo"]
+            values=["Triangulo", "Circunferencia", "Quarto de Circulo", "Semi Circulo", "Retangulo"]
             )
         self.geometric_form_entry.config(
             foreground= Color.black.value, 
@@ -443,6 +439,7 @@ class Application(Validate):
         self.geometric_form_entry.place(relx=0.005, rely=0.045, relwidth=0.95, relheight=0.05)
 
         self.geometric_form_entry.bind("<<ComboboxSelected>>", self.Select_Form)
+        self.geometric_form_entry.set("Triangulo")
 
         #--------centroid coordinates---------
         self.label_coordinates_center = Label(
@@ -472,16 +469,16 @@ class Application(Validate):
             )
         self.label_dimensions.place(relx=0.005, rely=0.3)
 
-        self.dimensions_a_entry = EntPlaceHold(self.frame_insert, placeholder='...')
-        self.dimensions_a_entry.config(state="disabled", validate= "key", validatecommand=self.val)
+        self.dimensions_a_entry = EntPlaceHold(self.frame_insert, placeholder='lado a')
+        self.dimensions_a_entry.config(state="normal", validate= "key", validatecommand=self.val)
         self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
-        
-        self.dimensions_b_entry = EntPlaceHold(self.frame_insert, placeholder='...')
-        self.dimensions_b_entry.config(state="disabled", validate= "key", validatecommand=self.val)
-        self.dimensions_b_entry.place(relx=0.005, rely=0.4, relwidth=0.95, relheight=0.05)  
 
-        self.dimensions_c_entry = EntPlaceHold(self.frame_insert, placeholder='...')
-        self.dimensions_c_entry.config(state="disabled", validate= "key", validatecommand=self.val)
+        self.dimensions_b_entry = EntPlaceHold(self.frame_insert, placeholder='lado b')
+        self.dimensions_b_entry.config(state="normal", validate= "key", validatecommand=self.val)
+        self.dimensions_b_entry.place(relx=0.005, rely=0.4, relwidth=0.95, relheight=0.05)
+
+        self.dimensions_c_entry = EntPlaceHold(self.frame_insert, placeholder='lado c')
+        self.dimensions_c_entry.config(state="normal", validate= "key", validatecommand=self.val)
         self.dimensions_c_entry.place(relx=0.005, rely=0.46, relwidth=0.95, relheight=0.05)
 
         #-----------sub-are--------------
@@ -497,7 +494,7 @@ class Application(Validate):
         self.subare_entry = ttk.Combobox(
             self.frame_insert, 
             state="readonly", 
-            values=["...", "Subtrair", "Adicionar"]
+            values=["Subtrair", "Adicionar"]
             )
         self.subare_entry.config(foreground= Color.black.value, background= Color.light_gray.value)
         self.subare_entry.place(relx=0.005, rely=0.575, relwidth=0.95, relheight=0.05)
