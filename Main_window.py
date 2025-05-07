@@ -325,9 +325,10 @@ class Application(Validate):
     def add_record(self):
         
         entry_validate = 0
+        
+        if(self.subare_entry.get()): 
+            try:
 
-        try:
-            if(self.subare_entry.get() != None):
                 entry_validate = float(self.coordinate_center_x_entry.get())
                 entry_validate = float(self.coordinate_center_y_entry.get())
                 entry_validate = float(self.coordinate_x_entry.get())
@@ -338,7 +339,11 @@ class Application(Validate):
                     if(self.geometric_form_entry.get() == "Triangulo"):
                         entry_validate = float(self.dimensions_c_entry.get())
 
-        except ValueError:
+            except ValueError:
+                msg = "Campo não premchido ou invalido"
+                messagebox.showerror("Error", msg, parent=self.insert)
+                return
+        else:
             msg = "Campo não premchido ou invalido"
             messagebox.showerror("Error", msg, parent=self.insert)
             return
