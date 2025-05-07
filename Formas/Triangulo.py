@@ -6,12 +6,33 @@ def modulo(valor:float) -> float:
     return valor * (-1.0)
   return valor
 
+
+"""
+triangulo retangulo
+vertice a -> ponto2d
+vertice b -> ponto2d
+vertice c -> ponto2d
+
+"""
+
 class Triangulo(Forma):
-  def __init__(self, a:float, b:float, c:float, origem:Ponto2D = Ponto2D(), centroide:Ponto2D = Ponto2D(), forma_virtual:bool = False):
-    
-    
+  def __init__(self, a:Ponto2D, b:Ponto2D, c:Ponto2D, forma_virtual:bool = False):
+    self.Pa = a
+    self.Pb = b
+    self.Pc = c
+    self.base = 0.0
+    self.cat = 0.0
+    self.cat2 = 0.0
+    self.altura = 0.0
+    self.semiperimetro = 0.0
+
+    self.__runtime() 
 
 
+    # |\  
+    # | \
+    # |  \
+    # |___\
     return
     # if(not self.__valido()):
       # return -1
@@ -44,7 +65,26 @@ class Triangulo(Forma):
   def c(self, c:float) -> None:
     self.__c = c
 
+  def __c_semiperimetro(self) -> None:
+    semiperimetro = ((self.base + self.cat + self.cat2) / 2)
+    return 
+  
+  # Migrar para ponto2D faria mais sentido por se tratar da distancia entre dois
+  # pontos no plano
+  def __distancia_p2p(p1:Ponto2D, p2:Ponto2D) -> float:
+    medida = ((((p2.x - p1.x)*(p2.x - p1.x))+((p2.y - p1.y)(p2.y - p1.y))) ** 0.5)
+    return medida
+  
+  def __runtime(self) -> None:
+    self.base = self.__distancia_p2p(self.Pa, self.Pb)
+    self.cat = self.__distancia_p2p(self.Pb, self.Pc)
+    self.cat2 = self.__distancia_p2p(self.Pa, self.Pc)
 
+    self.__c_semiperimetro()
+    
+    return
+  
+  """
   def equilatero(self) -> bool:
     return (self.a == self.b) and (self.a == self.c)
   
@@ -73,7 +113,7 @@ class Triangulo(Forma):
       return False
     
     return True
-  
+  """
   def __c_area(self):
     return ((self.a * self.altura) / 2)
   

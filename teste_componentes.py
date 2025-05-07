@@ -73,7 +73,7 @@ print(Ac.centroide.y)
 print(Ac.Ix)
 print(Ac.Iy)
 """
-
+"""
 
 Ac = AreaComposta()
 Ac.append(Circulo(25,Ponto2D(50,75),True))
@@ -88,3 +88,18 @@ print(f"centroide geral y {Ac.centroide.y}")
 print(f"momento geral x {Ac.Ix}")
 print(f"momento geral y {Ac.Iy}")
 print(f"momento polar {Ac.Jo}")
+"""
+
+
+
+ret = Retangulo(5, 2, Ponto2D(0, 0))
+# ret2 = Retangulo(50, 30, Ponto2D(15, 25))
+
+
+ac = AreaComposta()
+ac.append(ret)
+# ac.append(ret2)
+
+print(ac.Ix)
+print(ac.Iy)
+print(ac.Ixy)

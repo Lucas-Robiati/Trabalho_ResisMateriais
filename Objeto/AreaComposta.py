@@ -46,8 +46,18 @@ class AreaComposta(Forma):
 
     return ix, iy
 
-  # def __c_momento_polar(self) -> None:
-  #   self.Jo = self.Ix + self.Iy
+  def __c_produto_inercia(self) -> float:
+    if not self.componentes:
+      return 0.0, 0.0
+    
+    ixy = 0.0
+    for forma in self.componentes:
+      ixy += forma.Ixy
+
+    return ixy
+  
+  def __c_momento_polar(self) -> None:
+    self.Jo = self.Ix + self.Iy
     
   def append(self, outro) -> None:
     if((isinstance(outro, Circulo) or (isinstance(outro, Retangulo) or isinstance(outro, Triangulo))) ):
@@ -55,6 +65,7 @@ class AreaComposta(Forma):
       self.__c_area()
       self.__c_centroide()
       self.Ix, self.Iy = self.__c_momento()
+      self.Ixy = self.__c_produto_inercia()
       self._c_momento_polar()
       return 
     return
@@ -65,6 +76,7 @@ class AreaComposta(Forma):
       self.__c_area()
       self.__c_centroide()
       self.Ix, self.Iy = self.__c_momento()
+      self.Ixy = self.__c_produto_inercia()
       self._c_momento_polar()
     return
   
