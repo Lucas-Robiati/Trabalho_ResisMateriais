@@ -13,8 +13,6 @@ class ICTriangle(ICForm):
     self.height = 0.0
     self.orientation = 0
     self.__c_orientation_and_cathetus() 
-    if(not self.__valido()):
-      return -1
     super().__init__(self.__c_centroid(), virtual_form)
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_moment_of_inertia()
@@ -49,15 +47,15 @@ class ICTriangle(ICForm):
     self.__Pc = Pc
     return None
   
-  def __valido(self) -> bool:  
+  def valido(self) -> bool:  
     if(not (self.catx < abs(self.caty + self.tang))):
-      return False
+      return -1
     
     if(not (self.caty < abs(self.catx + self.tang))):
-      return False
+      return -1
     
     if(not (self.tang < abs(self.catx + self.caty))):
-      return False
+      return -1
 
     return True
   

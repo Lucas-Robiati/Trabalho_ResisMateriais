@@ -32,7 +32,8 @@ class Validate:
 class Application(Validate):
     def __init__(self, root:'Tk'):
         self.root = root    #Define o bejeto Tk que será usado como janela principal
-        self.list_shapes = AreaComposta()
+        self.list_shapes =  ICCompositeFigure()
+        self.system_origin = ICPoint2D() 
         self.window()       #Cria a janela principal sub janelas e widgets
         root.mainloop()
 
@@ -219,7 +220,7 @@ class Application(Validate):
         )
         plt.gca().add_patch(retangulo)
 
-        circulo = Circle(
+        circulo =  Circle(
             xy=(0.5, 0.5),     # Centro do círculo
             radius=0.4,        # Raio
             edgecolor='black', # Cor da borda
@@ -346,8 +347,8 @@ class Application(Validate):
             aux = 1
             msg = "A origem do sistema foi definida em (0,0), pois não foi passado como parametro"
             messagebox.showinfo("Info", msg, parent=self.insert)
-            return 1
-        else:
+            
+        if(aux == 0):
             try:
                 entry_validate = float(self.coordinate_x_entry.get())
                 entry_validate = float(self.coordinate_y_entry.get())
@@ -356,6 +357,12 @@ class Application(Validate):
                     msg = "Origem do sistema está incompleta"
                     messagebox.showwarning("Error", msg, parent=self.insert)
                     return -1
+            
+            self.coordinate_x_entry.configure(state='disabled')
+            self.coordinate_y_entry.configure(state='disabled')
+            self.system_origin.x = float(self.coordinate_x_entry.get())
+            self.system_origin.y = float(self.coordinate_y_entry.get())
+        return 1
 
     def add_record(self):
 
@@ -366,13 +373,21 @@ class Application(Validate):
 
         if(self.subare_entry.get()): 
             try:
-                entry_validate = float(self.coordinate_center_x_entry.get())
-                entry_validate = float(self.coordinate_center_y_entry.get())
-                entry_validate = float(self.dimensions_a_px_entry.get())
-                if(self.geometric_form_entry.get() == "Triangulo" or self.geometric_form_entry.get() == "Retangulo"):
+                if(self.geometric_form_entry.get() == "Triangulo"):
+                    entry_validate = float(self.dimensions_a_px_entry.get())
                     entry_validate = float(self.dimensions_b_px_entry.get())
-                    if(self.geometric_form_entry.get() == "Triangulo"):
-                        entry_validate = float(self.dimensions_c_px_entry.get())
+                    entry_validate = float(self.dimensions_c_px_entry.get())
+                    entry_validate = float(self.dimensions_a_py_entry.get())
+                    entry_validate = float(self.dimensions_b_py_entry.get())
+                    entry_validate = float(self.dimensions_c_py_entry.get())
+                
+                else:
+                    entry_validate = float(self.coordinate_center_x_entry.get())
+                    entry_validate = float(self.coordinate_center_y_entry.get())
+                    entry_validate = float(self.dimensions_a_px_entry.get())
+                    if(self.geometric_form_entry.get() == "Retangulo"):
+                        entry_validate = float(self.dimensions_b_px_entry.get())
+                        
 
             except ValueError:
                 msg = "Campo não preenchido ou invalido"
@@ -395,11 +410,20 @@ class Application(Validate):
         global count
 
         if(self.geometric_form_entry.get() == "Triangulo"):
-            #new_form = Triangulo(Ponto2D(0,0), Ponto2D(4,0), Ponto2D(0,3), forma_virtual=False)
-            pass
+            new_form = ICTriangle(Pa=ICPoint2D(float(self.dimensions_a_px_entry.get()),float(self.dimensions_a_py_entry.get())), Pb=ICPoint2D(float(self.dimensions_b_px_entry.get()),float(self.dimensions_b_py_entry.get())), Pc=ICPoint2D(float(self.dimensions_c_px_entry.get()),float(self.dimensions_c_py_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare()) 
+            print(new_form)
+            if(new_form.valido() == -1):
+                msg = "Triangulo Invalido: os pontos não formam um triangulo"
+                messagebox.showerror("Error", msg, parent=self.insert)
+                return
+            self.list_shapes.append(new_form)
+
+            self.treeview_list.insert(parent='', index='end', iid=count, 
+                text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+            count += 1
 
         if(self.geometric_form_entry.get() == "Circunferencia"):
-            new_form = Circulo(float(self.dimensions_a_px_entry.get()), Ponto2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), self.verify_subare())
+            new_form =  ICCircle(radius=float(self.dimensions_a_px_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
             self.list_shapes.append(new_form)
             
             self.treeview_list.insert(parent='', index='end', iid=count, 
@@ -407,19 +431,29 @@ class Application(Validate):
             count += 1
             
         if(self.geometric_form_entry.get() == "Semi Circulo"):
-            #new_form = SemiCirculo(raio=float(self.dimensions_a_px_entry), origem=Ponto2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), forma_virtual=self.verify_subare())
-            #self.list_shapes.append(new_form)
-            #
-            #self.treeview_list.insert(parent='', index='end', iid=count, 
-            #    text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
-            #count += 1
-            pass
+            new_form = ICSemicircle(radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+            self.list_shapes.append(new_form)
+            
+            self.treeview_list.insert(parent='', index='end', iid=count, 
+                text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+            count += 1
 
         if(self.geometric_form_entry.get() == "Quarto de Circulo"):
-            pass
-        if(self.geometric_form_entry.get() == "Retangulo"):
-            pass
+            new_form = ICQuadrant(radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+            self.list_shapes.append(new_form)
+            
+            self.treeview_list.insert(parent='', index='end', iid=count, 
+                text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+            count += 1
 
+        if(self.geometric_form_entry.get() == "Retangulo"):
+            new_form = ICRectangle(length=float(self.dimensions_a_px_entry.get()), height=float(self.dimensions_b_px_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+            self.list_shapes.append(new_form)
+            
+            self.treeview_list.insert(parent='', index='end', iid=count, 
+                text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+            count += 1
+            
     def Select_Form(self, event):
         if(self.geometric_form_entry.get() == "Triangulo"):
 
@@ -459,9 +493,7 @@ class Application(Validate):
             self.coordinate_center_x_entry.place_forget()
             self.coordinate_center_y_entry.place_forget()
 
-        if( (self.geometric_form_entry.get() == "Circunferencia") or 
-            (self.geometric_form_entry.get() == "Semi Circulo") or
-            (self.geometric_form_entry.get() == "Quarto de Circulo") ):
+        if( (self.geometric_form_entry.get() == "Circunferencia")):
             
             self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
             
@@ -479,7 +511,33 @@ class Application(Validate):
             self.dimensions_b_py_entry.place_forget()
             self.dimensions_c_py_entry.place_forget()
             
+            self.label_coordinates_center.config(text="Coordenada do centróide")
             self.label_coordinates_center.place(relx=0.005, rely=0.5)
+            self.coordinate_center_x_entry.place(relx=0.005, rely=0.545, relwidth=0.95, relheight=0.05)
+            self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
+
+        if((self.geometric_form_entry.get() == "Semi Circulo")or
+            (self.geometric_form_entry.get() == "Quarto de Circulo")):
+            
+            self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
+            
+            self.dimensions_a_px_entry.delete('0', 'end')
+            self.dimensions_a_px_entry.insert(0, 'raio')
+            self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
+
+            self.dimensions_b_px_entry.delete('0', 'end')
+            self.dimensions_b_px_entry.place_forget()
+            
+            self.dimensions_c_px_entry.delete('0', 'end')
+            self.dimensions_c_px_entry.place_forget()
+
+            self.dimensions_a_py_entry.place_forget()
+            self.dimensions_b_py_entry.place_forget()
+            self.dimensions_c_py_entry.place_forget()
+            
+            self.label_coordinates_center.config(text="Origem")
+            self.label_coordinates_center.place(relx=0.005, rely=0.5)
+            
             self.coordinate_center_x_entry.place(relx=0.005, rely=0.545, relwidth=0.95, relheight=0.05)
             self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
 
@@ -503,6 +561,7 @@ class Application(Validate):
             self.dimensions_b_py_entry.place_forget()
             self.dimensions_c_py_entry.place_forget()
             
+            self.label_coordinates_center.config(text="Coordenada do centróide")
             self.label_coordinates_center.place(relx=0.005, rely=0.5)
             self.coordinate_center_x_entry.place(relx=0.005, rely=0.545, relwidth=0.95, relheight=0.05)
             self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
