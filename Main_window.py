@@ -375,14 +375,12 @@ class Application(Validate):
             self.treeview_list.insert(parent='', index='end', iid=count, 
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
-
-<<<<<<< HEAD
+    
     def remove_item(self):
         select = self.treeview_list.selection()
         for item in select:
             self.treeview_list.delete(item)
             test = self.list_shapes.drop(item)
-=======
 
     def add_figure_matplotlib(self) -> None:
         if(self.verify_subare()):
@@ -463,7 +461,6 @@ class Application(Validate):
         plt.gca().add_patch(figure)
         plt.draw()
         return None
->>>>>>> main
 
     def Select_Form(self, event):
         if(self.geometric_form_entry.get() == "Triangulo"):
