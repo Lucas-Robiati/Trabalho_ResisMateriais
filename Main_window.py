@@ -5,7 +5,6 @@ from placeHolder import EntPlaceHold
 
 class Validate:
     def validate_float(self, text):
-
         value = 0
 
         if ((text == "ponto Ax") or
@@ -38,7 +37,7 @@ class Application(Validate):
         root.mainloop()
 
     def window(self):
-        self.root.title("Calculadora de Momento de Inercia")
+        self.root.title("InerCalc")
         self.root.configure(background= Color.dark_blue.value)
         self.root.geometry("950x520")
         self.root.minsize(width=950, height=520)
