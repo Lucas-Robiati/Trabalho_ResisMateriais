@@ -405,9 +405,15 @@ class Application(Validate):
     def remove_item(self):
         select = self.treeview_list.selection()[0]
         if(select):
-            item = self.treeview_list.index(select)
+            index = self.treeview_list.index(select)
             self.treeview_list.delete(select)
-            test = self.list_shapes.drop(item)
+            print(self.composite_figure.components[index])
+            figure = self.dict_shapes[self.composite_figure.components[index]]
+            figure.remove()
+            self.dict_shapes.pop(self.composite_figure.components[index])            
+            self.composite_figure.drop(index)
+
+            plt.draw()
 
     def add_figure_matplotlib(self) -> None:
         if(self.verify_subare()):
