@@ -156,15 +156,6 @@ class Application(Validate):
         
         self.treeview_list.bind('<Motion>', 'break')   #Impede o redimensionamento das colunas da tabela        
 
-        #exemplo aceita interiros floats(2.5) variaveis (self.alguma_coisa) e strings
-        #self.treeview_list.insert(
-        #    "", 
-        #    END, 
-        #    text="Triangulo", 
-        #    values=(2.5, 3,"subtrair")
-        #    ) 
-        #lista de objetos a ser passada 
-
         #=========style==============
         style_table = ttk.Style()#  Classe de configuração de estilo da tabela
         style_table.theme_use("clam")#  Tema da tabela
@@ -308,6 +299,7 @@ class Application(Validate):
             text="Remover Forma",
             font=('David', 10),
             bd= 0,
+            command=self.remove_item,
             activebackground= Color.white.value,
             activeforeground= Color.black.value,
             bg= Color.gray.value,
@@ -454,7 +446,13 @@ class Application(Validate):
             self.treeview_list.insert(parent='', index='end', iid=count, 
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
-            
+
+    def remove_item(self):
+        select = self.treeview_list.selection()
+        for item in select:
+            self.treeview_list.delete(item)
+            test = self.list_shapes.drop(item)
+
     def Select_Form(self, event):
         if(self.geometric_form_entry.get() == "Triangulo"):
 
