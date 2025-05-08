@@ -5,8 +5,15 @@ import numpy as np
 from tkinter import *
 from enum import Enum
 
-import Formas
-import Objeto
+from Objeto import AreaComposta
+
+from Formas import Ponto2D
+from Formas import Circulo
+from Formas import SemiCirculo
+from Formas import QuartoDeCirculo
+from Formas import Retangulo
+from Formas import Triangulo
+
 
 class Color(Enum):
     gray = "#5e5c64"

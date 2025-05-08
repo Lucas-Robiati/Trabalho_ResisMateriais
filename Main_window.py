@@ -8,14 +8,19 @@ class Validate:
 
         value = 0
 
-        if ((text == "lado a") or
-            (text == "lado b") or
-            (text == "lado c") or
+        if ((text == "ponto Ax") or
+            (text == "ponto Bx") or
+            (text == "ponto Cx") or
+            (text == "ponto Ay") or
+            (text == "ponto By") or
+            (text == "ponto Cy") or
             (text == "raio") or
             (text == "base") or
             (text == "altura") or
             (text == "X:") or
             (text == "Y:") or
+            (text == "X: 0") or
+            (text == "Y: 0") or
             (text == "...")): return True 
 
         if ((text == "") or (text == "-")): return True
@@ -27,8 +32,9 @@ class Validate:
 
 class Application(Validate):
     def __init__(self, root:'Tk'):
-        self.root = root #Define o bejeto Tk que será usado como janela principal
-        self.window()
+        self.root = root    #Define o bejeto Tk que será usado como janela principal
+        self.list_shapes = AreaComposta()
+        self.window()       #Cria a janela principal sub janelas e widgets
         root.mainloop()
 
     def window(self):
@@ -37,7 +43,8 @@ class Application(Validate):
         self.root.geometry("950x520")
         self.root.minsize(width=950, height=520)
         self.root.resizable(True,True)
-        root.protocol('WM_DELETE_WINDOW', self.destroy_window)  # Vincula o evento de fechamento
+        self.root.bind("<Configure>", self.On_resize)
+        self.root.protocol('WM_DELETE_WINDOW', self.destroy_window)  # Vincula o evento de fechamento
         self.Validate_entry()
         self.window_frame()
 
@@ -81,8 +88,25 @@ class Application(Validate):
 
     def widgets_frame1(self):
         
-        global count
+        global count,aux
         count = 0
+        aux = 0
+
+        #--------coordinates--------------
+        self.label_coordinates = Label(
+            self.frame_1, 
+            text="Origem do sistema:", 
+            bg= Color.gray.value,
+            fg= Color.white.value,
+            font= ('David', 11)
+            )
+        self.label_coordinates.place(relx=0.005, rely=0.59)
+
+        self.coordinate_x_entry = EntPlaceHold(self.frame_1, placeholder='X: 0')
+        self.coordinate_x_entry.configure(validate= "key", validatecommand=self.val)
+
+        self.coordinate_y_entry = EntPlaceHold(self.frame_1, placeholder='Y: 0')
+        self.coordinate_y_entry.configure(validate= "key", validatecommand=self.val)
 
         self.bt_calc = Button(
             self.frame_1, 
@@ -106,45 +130,40 @@ class Application(Validate):
         self.label_table.place(relx=0.25, rely=0.01, relwidth=0.5, relheight=0.25)
         
         #======table==============
-        self.list_forms = ttk.Treeview(
+        self.treeview_list = ttk.Treeview(
             self.frame_1,
             height= 4,
             columns=("col1","col2","col3","col4")
             )
-        self.list_forms.place(relx=0.01, rely=0.15, relwidth=0.95, relheight=0.4)
+        self.treeview_list.place(relx=0.01, rely=0.15, relwidth=0.95, relheight=0.4)
 
         self.scroobar = Scrollbar(self.frame_1, orient='vertical')               # Define a svrool bar
-        self.list_forms.configure(yscroll=self.scroobar.set)                     # Eixo da scrool bar
+        self.treeview_list.configure(yscroll=self.scroobar.set)                     # Eixo da scrool bar
         self.scroobar.place(relx=0.96, rely=0.15, relwidth=0.04, relheight=0.4)  # Posição da scrool bar
 
         # Refencia a coluna e seta o texto
-        self.list_forms.heading("#0", text="Forma")         
-        self.list_forms.heading("#1", text="X")             
-        self.list_forms.heading("#2", text="Y")             
-        self.list_forms.heading("#3", text="Aréa virtual")  
+        self.treeview_list.heading("#0", text="Forma")         
+        self.treeview_list.heading("#1", text="X")             
+        self.treeview_list.heading("#2", text="Y")             
+        self.treeview_list.heading("#3", text="Área virtual")  
 
         # Define tamanho da coluna e alinha o texto ao centro
-        self.list_forms.column("#0", width=150, anchor=CENTER, stretch=True)  
-        self.list_forms.column("#1", width=55, anchor=CENTER, stretch=True)   
-        self.list_forms.column("#2", width=55, anchor=CENTER, stretch=True)   
-        self.list_forms.column("#3", width=130, anchor=CENTER, stretch=True)
-
-        #self.list_forms.columnconfigure(0, weight=3)  
-        #self.list_forms.columnconfigure(1, weight=1)   
-        #self.list_forms.columnconfigure(2, weight=1)   
-        #self.list_forms.columnconfigure(3, weight=5) 
-        #self.frame_1.bind("<Configure>", lambda e: self.list_forms.update_idletasks())
+        self.treeview_list.column("#0", width=150, anchor=CENTER, stretch=True)  
+        self.treeview_list.column("#1", width=55, anchor=CENTER, stretch=True)   
+        self.treeview_list.column("#2", width=55, anchor=CENTER, stretch=True)   
+        self.treeview_list.column("#3", width=130, anchor=CENTER, stretch=True)
         
-        self.list_forms.bind('<Motion>', 'break')   #Impede o redimensionamento das colunas da tabela        
+        self.treeview_list.bind('<Motion>', 'break')   #Impede o redimensionamento das colunas da tabela        
 
         #exemplo aceita interiros floats(2.5) variaveis (self.alguma_coisa) e strings
-        #self.list_forms.insert(
+        #self.treeview_list.insert(
         #    "", 
         #    END, 
         #    text="Triangulo", 
         #    values=(2.5, 3,"subtrair")
         #    ) 
-        #lista de objetos a ser passada     
+        #lista de objetos a ser passada 
+
         #=========style==============
         style_table = ttk.Style()#  Classe de configuração de estilo da tabela
         style_table.theme_use("clam")#  Tema da tabela
@@ -158,9 +177,6 @@ class Application(Validate):
         style_table.map("Treeview",
            background=[('selected', Color.light_blue.value)],
            foreground=[('selected', Color.white.value)])
-
-        #style_table.tag_configure('oddrow', background= Color.gray.value)
-        #style_table.tag_configure('evenrow', background= Color.light_gray.value)
     
     def widgets_frame2(self):
         self.xmin, self.xmax, self.ymin, self.ymax = -5, 5, -5, 5
@@ -322,92 +338,187 @@ class Application(Validate):
         self.ax.set_xticks(self.x_ticks[self.x_ticks != 0])
         self.ax.set_yticks(self.y_ticks[self.y_ticks != 0])
 
-    def add_record(self):
-        
-        entry_validate = 1
-        
-        if(self.subare_entry.get()): 
+    def valid_source_plan(self):
+        global aux
+        if((self.coordinate_x_entry.get() == 'X: 0') and (self.coordinate_y_entry.get() == 'Y: 0') and (aux == 0)):
+            # definir na horigem
+            self.coordinate_x_entry.configure(state='disabled')
+            self.coordinate_y_entry.configure(state='disabled')
+            aux = 1
+            msg = "A origem do sistema foi definida em (0,0), pois não foi passado como parametro"
+            messagebox.showinfo("Info", msg, parent=self.insert)
+            return 1
+        else:
             try:
-
-                entry_validate = float(self.coordinate_center_x_entry.get())
-                entry_validate = float(self.coordinate_center_y_entry.get())
                 entry_validate = float(self.coordinate_x_entry.get())
                 entry_validate = float(self.coordinate_y_entry.get())
-                entry_validate = float(self.dimensions_a_entry.get())
+            except ValueError:
+                if(aux == 0):
+                    msg = "Origem do sistema está incompleta"
+                    messagebox.showwarning("Error", msg, parent=self.insert)
+                    return -1
+
+    def add_record(self):
+
+        entry_validate = 0
+
+        if(self.valid_source_plan() == -1):
+            return
+
+        if(self.subare_entry.get()): 
+            try:
+                entry_validate = float(self.coordinate_center_x_entry.get())
+                entry_validate = float(self.coordinate_center_y_entry.get())
+                entry_validate = float(self.dimensions_a_px_entry.get())
                 if(self.geometric_form_entry.get() == "Triangulo" or self.geometric_form_entry.get() == "Retangulo"):
-                    entry_validate = float(self.dimensions_b_entry.get())
+                    entry_validate = float(self.dimensions_b_px_entry.get())
                     if(self.geometric_form_entry.get() == "Triangulo"):
-                        entry_validate = float(self.dimensions_c_entry.get())
+                        entry_validate = float(self.dimensions_c_px_entry.get())
 
             except ValueError:
-                msg = "Campo não premchido ou invalido"
+                msg = "Campo não preenchido ou invalido"
                 messagebox.showerror("Error", msg, parent=self.insert)
                 return
         else:
-            msg = "Campo não premchido ou invalido"
+            msg = "Campo não preenchido ou invalido"
             messagebox.showerror("Error", msg, parent=self.insert)
             return
 
+        self.add_object()
+
+
+    def verify_subare(self):
+        if(self.subare_entry.get() == "Subtrair"):
+            return True
+        return False
+
+    def add_object(self):
         global count
-        self.list_forms.insert(parent='', index='end', iid=count, 
-            text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
-        count += 1   
+
+        if(self.geometric_form_entry.get() == "Triangulo"):
+            #new_form = Triangulo(Ponto2D(0,0), Ponto2D(4,0), Ponto2D(0,3), forma_virtual=False)
+            pass
+
+        if(self.geometric_form_entry.get() == "Circunferencia"):
+            new_form = Circulo(float(self.dimensions_a_px_entry.get()), Ponto2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), self.verify_subare())
+            self.list_shapes.append(new_form)
+            
+            self.treeview_list.insert(parent='', index='end', iid=count, 
+                text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+            count += 1
+            
+        if(self.geometric_form_entry.get() == "Semi Circulo"):
+            #new_form = SemiCirculo(raio=float(self.dimensions_a_px_entry), origem=Ponto2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), forma_virtual=self.verify_subare())
+            #self.list_shapes.append(new_form)
+            #
+            #self.treeview_list.insert(parent='', index='end', iid=count, 
+            #    text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+            #count += 1
+            pass
+
+        if(self.geometric_form_entry.get() == "Quarto de Circulo"):
+            pass
+        if(self.geometric_form_entry.get() == "Retangulo"):
+            pass
 
     def Select_Form(self, event):
         if(self.geometric_form_entry.get() == "Triangulo"):
-                        
-            self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
-            self.dimensions_b_entry.place(relx=0.005, rely=0.4, relwidth=0.95, relheight=0.05)
-            self.dimensions_c_entry.place(relx=0.005, rely=0.46, relwidth=0.95, relheight=0.05)
 
-            self.dimensions_a_entry.delete('0', 'end')
-            self.dimensions_a_entry.insert(0, 'lado a')
-            self.dimensions_a_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
+            self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.45, relheight=0.05)
+            self.dimensions_b_px_entry.place(relx=0.005, rely=0.23, relwidth=0.45, relheight=0.05)
+            self.dimensions_c_px_entry.place(relx=0.005, rely=0.295, relwidth=0.45, relheight=0.05)
 
-            self.dimensions_b_entry.delete('0', 'end')
-            self.dimensions_b_entry.insert(0, 'lado b')
-            self.dimensions_b_entry.bind("<FocusIn>", lambda args: self.dimensions_b_entry.delete('0', 'end'))
+            self.dimensions_a_py_entry.place(relx=0.48, rely=0.17, relwidth=0.5, relheight=0.05)
+            self.dimensions_b_py_entry.place(relx=0.48, rely=0.23, relwidth=0.5, relheight=0.05)
+            self.dimensions_c_py_entry.place(relx=0.48, rely=0.295, relwidth=0.5, relheight=0.05)
+
+            self.dimensions_a_px_entry.delete('0', 'end')
+            self.dimensions_a_px_entry.insert(0, 'ponto Ax')
+            self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
+
+            self.dimensions_b_px_entry.delete('0', 'end')
+            self.dimensions_b_px_entry.insert(0, 'ponto Bx')
+            self.dimensions_b_px_entry.bind("<FocusIn>", lambda args: self.dimensions_b_px_entry.delete('0', 'end'))
             
-            self.dimensions_c_entry.delete('0', 'end')
-            self.dimensions_c_entry.insert(0, 'lado c')
-            self.dimensions_c_entry.bind("<FocusIn>", lambda args: self.dimensions_c_entry.delete('0', 'end'))
-        
+            self.dimensions_c_px_entry.delete('0', 'end')
+            self.dimensions_c_px_entry.insert(0, 'ponto Cx')
+            self.dimensions_c_px_entry.bind("<FocusIn>", lambda args: self.dimensions_c_px_entry.delete('0', 'end'))
+
+            #self.dimensions_a_py_entry.delete('0', 'end')
+            #self.dimensions_a_py_entry.insert(0, 'ponto Ay')
+            self.dimensions_a_py_entry.bind("<FocusIn>", lambda args: self.dimensions_a_py_entry.delete('0', 'end'))
+
+            #self.dimensions_b_py_entry.delete('0', 'end')
+            #self.dimensions_b_py_entry.insert(0, 'ponto By')
+            self.dimensions_b_py_entry.bind("<FocusIn>", lambda args: self.dimensions_b_py_entry.delete('0', 'end'))
+            
+            #self.dimensions_c_py_entry.delete('0', 'end')
+            #self.dimensions_c_py_entry.insert(0, 'ponto Cy')
+            self.dimensions_c_py_entry.bind("<FocusIn>", lambda args: self.dimensions_c_py_entry.delete('0', 'end'))
+
+            self.label_coordinates_center.place_forget()
+            self.coordinate_center_x_entry.place_forget()
+            self.coordinate_center_y_entry.place_forget()
+
         if( (self.geometric_form_entry.get() == "Circunferencia") or 
             (self.geometric_form_entry.get() == "Semi Circulo") or
             (self.geometric_form_entry.get() == "Quarto de Circulo") ):
             
-            self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
+            self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
             
-            self.dimensions_a_entry.delete('0', 'end')
-            self.dimensions_a_entry.insert(0, 'raio')
-            self.dimensions_a_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
+            self.dimensions_a_px_entry.delete('0', 'end')
+            self.dimensions_a_px_entry.insert(0, 'raio')
+            self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
 
-            self.dimensions_b_entry.delete('0', 'end')
-            self.dimensions_b_entry.place_forget()
+            self.dimensions_b_px_entry.delete('0', 'end')
+            self.dimensions_b_px_entry.place_forget()
             
-            self.dimensions_c_entry.delete('0', 'end')
-            self.dimensions_c_entry.place_forget()
+            self.dimensions_c_px_entry.delete('0', 'end')
+            self.dimensions_c_px_entry.place_forget()
+
+            self.dimensions_a_py_entry.place_forget()
+            self.dimensions_b_py_entry.place_forget()
+            self.dimensions_c_py_entry.place_forget()
+            
+            self.label_coordinates_center.place(relx=0.005, rely=0.5)
+            self.coordinate_center_x_entry.place(relx=0.005, rely=0.545, relwidth=0.95, relheight=0.05)
+            self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
 
         if(self.geometric_form_entry.get() == "Retangulo"): 
 
-            self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
-            self.dimensions_b_entry.place(relx=0.005, rely=0.4, relwidth=0.95, relheight=0.05)
+            self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
+            self.dimensions_b_px_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
             
-            self.dimensions_a_entry.delete('0', 'end')
-            self.dimensions_a_entry.insert(0, 'base')
-            self.dimensions_a_entry.bind("<FocusIn>", lambda args: self.dimensions_a_entry.delete('0', 'end'))
+            self.dimensions_a_px_entry.delete('0', 'end')
+            self.dimensions_a_px_entry.insert(0, 'base')
+            self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
 
-            self.dimensions_b_entry.delete('0', 'end')
-            self.dimensions_b_entry.insert(0, 'altura')
-            self.dimensions_b_entry.bind("<FocusIn>", lambda args: self.dimensions_b_entry.delete('0', 'end'))
+            self.dimensions_b_px_entry.delete('0', 'end')
+            self.dimensions_b_px_entry.insert(0, 'altura')
+            self.dimensions_b_px_entry.bind("<FocusIn>", lambda args: self.dimensions_b_px_entry.delete('0', 'end'))
             
-            self.dimensions_c_entry.delete('0', 'end')
-            self.dimensions_c_entry.place_forget()
- 
+            self.dimensions_c_px_entry.delete('0', 'end')
+            self.dimensions_c_px_entry.place_forget()
+
+            self.dimensions_a_py_entry.place_forget()
+            self.dimensions_b_py_entry.place_forget()
+            self.dimensions_c_py_entry.place_forget()
+            
+            self.label_coordinates_center.place(relx=0.005, rely=0.5)
+            self.coordinate_center_x_entry.place(relx=0.005, rely=0.545, relwidth=0.95, relheight=0.05)
+            self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
         
-
     def Validate_entry(self):
         self.val = (self.root.register(self.validate_float), '%P')
+
+    def On_resize(self, event):
+    
+        if (event.width <= 950 and event.height <= 520):
+            self.coordinate_x_entry.place(relx=0.33, rely=0.58, relwidth=0.25, relheight=0.05)
+            self.coordinate_y_entry.place(relx=0.6, rely=0.58, relwidth=0.25, relheight=0.05)
+        else:
+            self.coordinate_x_entry.place(relx=0.23, rely=0.58, relwidth=0.3, relheight=0.04)
+            self.coordinate_y_entry.place(relx=0.55, rely=0.58, relwidth=0.3, relheight=0.04)
 
     def Insert_window(self):
         self.insert = Toplevel()
@@ -451,24 +562,6 @@ class Application(Validate):
         self.geometric_form_entry.bind("<<ComboboxSelected>>", self.Select_Form)
         self.geometric_form_entry.set("Triangulo")
 
-        #--------centroid coordinates---------
-        self.label_coordinates_center = Label(
-            self.frame_insert, 
-            text="Coordenada do centróide", 
-            bg= Color.gray.value,
-            fg= Color.white.value,
-            font= ('David', 10)
-            )
-        self.label_coordinates_center.place(relx=0.005, rely=0.13)
-
-        self.coordinate_center_x_entry = EntPlaceHold(self.frame_insert, placeholder='X:')
-        self.coordinate_center_x_entry.configure(validate= "key", validatecommand=self.val)
-        self.coordinate_center_x_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
-
-        self.coordinate_center_y_entry = EntPlaceHold(self.frame_insert, placeholder='Y:')
-        self.coordinate_center_y_entry.configure(validate= "key", validatecommand=self.val)
-        self.coordinate_center_y_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
-
         #-----------dimensions------------
         self.label_dimensions = Label(
             self.frame_insert, 
@@ -477,19 +570,51 @@ class Application(Validate):
             fg= Color.white.value,
             font= ('David', 10)
             )
-        self.label_dimensions.place(relx=0.005, rely=0.3)
+        self.label_dimensions.place(relx=0.005, rely=0.13)
+        
+        #---Entry eixo x dos pontos do triangulo------
+        self.dimensions_a_px_entry = EntPlaceHold(self.frame_insert, placeholder='ponto Ax')
+        self.dimensions_a_px_entry.config(state="normal", validate= "key", validatecommand=self.val)
+        self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.45, relheight=0.05)
 
-        self.dimensions_a_entry = EntPlaceHold(self.frame_insert, placeholder='lado a')
-        self.dimensions_a_entry.config(state="normal", validate= "key", validatecommand=self.val)
-        self.dimensions_a_entry.place(relx=0.005, rely=0.34, relwidth=0.95, relheight=0.05)
+        self.dimensions_b_px_entry = EntPlaceHold(self.frame_insert, placeholder='ponto Bx')
+        self.dimensions_b_px_entry.config(state="normal", validate= "key", validatecommand=self.val)
+        self.dimensions_b_px_entry.place(relx=0.005, rely=0.23, relwidth=0.45, relheight=0.05)
 
-        self.dimensions_b_entry = EntPlaceHold(self.frame_insert, placeholder='lado b')
-        self.dimensions_b_entry.config(state="normal", validate= "key", validatecommand=self.val)
-        self.dimensions_b_entry.place(relx=0.005, rely=0.4, relwidth=0.95, relheight=0.05)
+        self.dimensions_c_px_entry = EntPlaceHold(self.frame_insert, placeholder='ponto Cx')
+        self.dimensions_c_px_entry.config(state="normal", validate= "key", validatecommand=self.val)
+        self.dimensions_c_px_entry.place(relx=0.005, rely=0.295, relwidth=0.45, relheight=0.05)
+        
+        #---Entry eixo y dos pontos do triangulo------
+        self.dimensions_a_py_entry = EntPlaceHold(self.frame_insert, placeholder='ponto Ay')
+        self.dimensions_a_py_entry.config(state="normal", validate= "key", validatecommand=self.val)
+        self.dimensions_a_py_entry.place(relx=0.48, rely=0.17, relwidth=0.5, relheight=0.05)
 
-        self.dimensions_c_entry = EntPlaceHold(self.frame_insert, placeholder='lado c')
-        self.dimensions_c_entry.config(state="normal", validate= "key", validatecommand=self.val)
-        self.dimensions_c_entry.place(relx=0.005, rely=0.46, relwidth=0.95, relheight=0.05)
+        self.dimensions_b_py_entry = EntPlaceHold(self.frame_insert, placeholder='ponto By')
+        self.dimensions_b_py_entry.config(state="normal", validate= "key", validatecommand=self.val)
+        self.dimensions_b_py_entry.place(relx=0.48, rely=0.23, relwidth=0.5, relheight=0.05)
+
+        self.dimensions_c_py_entry = EntPlaceHold(self.frame_insert, placeholder='ponto Cy')
+        self.dimensions_c_py_entry.config(state="normal", validate= "key", validatecommand=self.val)
+        self.dimensions_c_py_entry.place(relx=0.48, rely=0.295, relwidth=0.5, relheight=0.05)
+
+        #--------centroid coordinates---------
+        self.label_coordinates_center = Label(
+            self.frame_insert, 
+            text="Coordenada do centróide", 
+            bg= Color.gray.value,
+            fg= Color.white.value,
+            font= ('David', 10)
+            )
+        self.label_coordinates_center.place_forget()
+
+        self.coordinate_center_x_entry = EntPlaceHold(self.frame_insert, placeholder='X:')
+        self.coordinate_center_x_entry.configure(validate= "key", validatecommand=self.val)
+        self.coordinate_center_x_entry.place_forget()
+
+        self.coordinate_center_y_entry = EntPlaceHold(self.frame_insert, placeholder='Y:')
+        self.coordinate_center_y_entry.configure(validate= "key", validatecommand=self.val)
+        self.coordinate_center_y_entry.place_forget()
 
         #-----------sub-are--------------
         self.label_subare = Label(
@@ -499,7 +624,7 @@ class Application(Validate):
             fg= Color.white.value,
             font= ('David', 10)
             )
-        self.label_subare.place(relx=0.005, rely=0.535)
+        self.label_subare.place(relx=0.005, rely=0.38)
 
         self.subare_entry = ttk.Combobox(
             self.frame_insert, 
@@ -507,25 +632,7 @@ class Application(Validate):
             values=["Subtrair", "Adicionar"]
             )
         self.subare_entry.config(foreground= Color.black.value, background= Color.light_gray.value)
-        self.subare_entry.place(relx=0.005, rely=0.575, relwidth=0.95, relheight=0.05)
-
-        #--------coordinates--------------
-        self.label_coordinates = Label(
-            self.frame_insert, 
-            text="Origem do sistema", 
-            bg= Color.gray.value,
-            fg= Color.white.value,
-            font= ('David', 10)
-            )
-        self.label_coordinates.place(relx=0.005, rely=0.65)
-
-        self.coordinate_x_entry = EntPlaceHold(self.frame_insert, placeholder='X:')
-        self.coordinate_x_entry.configure(validate= "key", validatecommand=self.val)
-        self.coordinate_x_entry.place(relx=0.005, rely=0.69, relwidth=0.95, relheight=0.05)
-
-        self.coordinate_y_entry = EntPlaceHold(self.frame_insert, placeholder='Y:')
-        self.coordinate_y_entry.configure(validate= "key", validatecommand=self.val)
-        self.coordinate_y_entry.place(relx=0.005, rely=0.75, relwidth=0.95, relheight=0.05)
+        self.subare_entry.place(relx=0.005, rely=0.42, relwidth=0.95, relheight=0.05)
 
         #======Buttons===========
         self.bt_acept = Button(
