@@ -417,6 +417,11 @@ class Application(Validate):
                 msg = "Triangulo Invalido: os pontos não formam um triangulo"
                 messagebox.showerror("Error", msg, parent=self.insert)
                 return
+            self.list_shapes.append(new_form)
+
+            self.treeview_list.insert(parent='', index='end', iid=count, 
+                text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+            count += 1
 
         if(self.geometric_form_entry.get() == "Circunferencia"):
             new_form =  ICCircle(radius=float(self.dimensions_a_px_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
@@ -443,8 +448,13 @@ class Application(Validate):
             count += 1
 
         if(self.geometric_form_entry.get() == "Retangulo"):
-            pass
-
+            new_form = ICRectangle(length=float(self.dimensions_a_px_entry.get()), height=float(self.dimensions_b_px_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+            self.list_shapes.append(new_form)
+            
+            self.treeview_list.insert(parent='', index='end', iid=count, 
+                text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+            count += 1
+            
     def Select_Form(self, event):
         if(self.geometric_form_entry.get() == "Triangulo"):
 
