@@ -32,7 +32,8 @@ class Validate:
 class Application(Validate):
     def __init__(self, root:'Tk'):
         self.root = root    #Define o bejeto Tk que será usado como janela principal
-        self.list_shapes =  ICCompositeFigure()
+        self.composite_figure =  ICCompositeFigure()
+        self.dict_shapes = {}
         self.system_origin = ICPoint2D() 
         self.window()       #Cria a janela principal sub janelas e widgets
         root.mainloop()
@@ -321,8 +322,12 @@ class Application(Validate):
             messagebox.showerror("Error", msg, parent=self.insert)
             return
 
-        self.add_object()
-        self.add_figure_matplotlib()
+        figureCF = self.add_object()
+        figureMPL = self.add_figure_matplotlib()
+
+        self.dict_shapes |= {figureCF: figureMPL}
+        print(self.dict_shapes)
+        return None
 
     def verify_subare(self):
         if(self.subare_entry.get() == "Subtrair"):
@@ -338,49 +343,60 @@ class Application(Validate):
                 msg = "Triangulo Invalido: os pontos não formam um triangulo"
                 messagebox.showerror("Error", msg, parent=self.insert)
                 return
-            self.list_shapes.append(new_form)
+            self.composite_figure.append(new_form)
 
             self.treeview_list.insert(parent='', index='end', iid=count, 
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
+            return new_form
 
         if(self.geometric_form_entry.get() == "Circunferencia"):
             new_form =  ICCircle(radius=float(self.dimensions_a_px_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
-            self.list_shapes.append(new_form)
+            self.composite_figure.append(new_form)
             
             self.treeview_list.insert(parent='', index='end', iid=count, 
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
+            return new_form
             
         if(self.geometric_form_entry.get() == "Semicirculo"):
             new_form = ICSemicircle(radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
-            self.list_shapes.append(new_form)
-            
+            self.composite_figure.append(new_form)
+
             self.treeview_list.insert(parent='', index='end', iid=count, 
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
+            return new_form
 
         if(self.geometric_form_entry.get() == "Quadrante"):
             new_form = ICQuadrant(radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
-            self.list_shapes.append(new_form)
+            self.composite_figure.append(new_form)
             
             self.treeview_list.insert(parent='', index='end', iid=count, 
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
+            return new_form
 
         if(self.geometric_form_entry.get() == "Retangulo"):
             new_form = ICRectangle(width=float(self.dimensions_a_px_entry.get()), height=float(self.dimensions_b_px_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
-            self.list_shapes.append(new_form)
+            self.composite_figure.append(new_form)
             
             self.treeview_list.insert(parent='', index='end', iid=count, 
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
+            return new_form
     
     def remove_item(self):
         select = self.treeview_list.selection()
         for item in select:
             self.treeview_list.delete(item)
-            test = self.list_shapes.drop(item)
+            figure = self.dict_shapes[self.composite_figure[item]]
+            figure.drop
+            self.dict_shapes.pop(item)
+            self.composite_figure.drop(item)
+            
+            plt.draw()
+        return None
 
     def add_figure_matplotlib(self) -> None:
         if(self.verify_subare()):
@@ -450,7 +466,8 @@ class Application(Validate):
 
         if(self.geometric_form_entry.get() == "Retangulo"):
             figure = Rectangle(
-                xy=(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())),       # Canto inferior esquerdo
+                xy=((float(self.coordinate_center_x_entry.get()) - (float(self.dimensions_a_px_entry.get()) / 2)),
+                    (float(self.coordinate_center_y_entry.get()) - (float(self.dimensions_b_px_entry.get()) / 2))),       # Canto inferior esquerdo
                 width=float(self.dimensions_a_px_entry.get()),           # Largura
                 height=float(self.dimensions_b_px_entry.get()),          # Altura
                 edgecolor=edgeclr, # Borda
@@ -460,7 +477,7 @@ class Application(Validate):
 
         plt.gca().add_patch(figure)
         plt.draw()
-        return None
+        return figure
 
     def Select_Form(self, event):
         if(self.geometric_form_entry.get() == "Triangulo"):
