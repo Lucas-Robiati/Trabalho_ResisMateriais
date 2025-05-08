@@ -3,8 +3,8 @@ from .ICPoint2D import ICPoint2D
 
 
 class ICRectangle(ICForm):
-  def __init__(self, length:float = 0.0, height:float = 0.0, centroid:ICPoint2D = ICPoint2D(), system_origin:ICPoint2D = ICPoint2D(), virtual_form:bool = False) -> None:
-    self.length = length
+  def __init__(self, width:float = 0.0, height:float = 0.0, centroid:ICPoint2D = ICPoint2D(), system_origin:ICPoint2D = ICPoint2D(), virtual_form:bool = False) -> None:
+    self.width = width
     self.height = height
     super().__init__(centroid, virtual_form)
     self.area = self.__c_area()
@@ -14,12 +14,12 @@ class ICRectangle(ICForm):
     return None
 
   @property
-  def length(self) -> float:
-    return self.__length
+  def width(self) -> float:
+    return self.__width
   
-  @length.setter
-  def length(self, length) -> None:
-    self.__length = length
+  @width.setter
+  def width(self, width) -> None:
+    self.__width = width
     return None
     
   @property
@@ -32,11 +32,11 @@ class ICRectangle(ICForm):
     return None
   
   def __c_area(self) -> float:
-    return self.length * self.height
+    return self.width * self.height
   
   def __c_moment_of_inertia(self) -> float:
-    ix = self.virtual_form * ((self.length * (self.height ** 3)) / 12) + (self.area * (self.centroid.y ** 2))
-    iy = self.virtual_form * ((self.height * (self.length ** 3)) / 12) + (self.area * (self.centroid.x ** 2))
+    ix = self.virtual_form * ((self.width * (self.height ** 3)) / 12) + (self.area * (self.centroid.y ** 2))
+    iy = self.virtual_form * ((self.height * (self.width ** 3)) / 12) + (self.area * (self.centroid.x ** 2))
     return ix,iy
   
   def __c_product_of_inertia(self) -> float:
