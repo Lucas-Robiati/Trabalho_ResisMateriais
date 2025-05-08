@@ -5,7 +5,6 @@ from placeHolder import EntPlaceHold
 
 class Validate:
     def validate_float(self, text):
-
         value = 0
 
         if ((text == "ponto Ax") or
@@ -39,7 +38,7 @@ class Application(Validate):
         root.mainloop()
 
     def window(self):
-        self.root.title("Calculadora de Momento de Inercia")
+        self.root.title("InerCalc")
         self.root.configure(background= Color.dark_blue.value)
         self.root.geometry("950x520")
         self.root.minsize(width=950, height=520)
@@ -191,7 +190,7 @@ class Application(Validate):
                 horizontalalignment='center', fontsize=8)
         
         self.Auto_Resize_Matplotlib()
-
+        
         # Alterar tamanho dos números dos eixos
         self.ax.tick_params(axis='x', labelsize=8)
         self.ax.tick_params(axis='y', labelsize=8)  # Tamanho 8
@@ -201,72 +200,6 @@ class Application(Validate):
         # Create Canvas
         canvas = FigureCanvasTkAgg(self.fig, master=self.frame_2)  
         canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
-
-        retangulo = Rectangle(
-            xy=(-2, -2),       # Canto inferior esquerdo
-            width=4,           # Largura
-            height=4,          # Altura
-            edgecolor='black', # Borda
-            facecolor='blue',  # Preenchimento
-            zorder=1           # Ordem
-        )
-        plt.gca().add_patch(retangulo)
-
-        circulo =  Circle(
-            xy=(0.5, 0.5),     # Centro do círculo
-            radius=0.4,        # Raio
-            edgecolor='black', # Cor da borda
-            facecolor='white', # Cor de preenchimento
-            zorder=2           # Ordem
-        )
-        plt.gca().add_patch(circulo)
-        
-        """
-            situações de orientação meio_circulo
-            orientação 0: 0-180
-            orientação 1: 90-270
-            orientação 2: 180-0
-            orientacao 3: 270-90
-        """
-
-        meio_circulo = Wedge(
-            center=(-0.5, 0.5), # Centro
-            r=0.4,              # Raio
-            theta1=0,         # Ângulo inicial (graus)
-            theta2=180,           # Ângulo final (graus)
-            edgecolor='black',  # Cor da borda
-            facecolor='white',  # Cor de preenchimento
-            zorder=2            # Ordem
-        )
-        plt.gca().add_patch(meio_circulo)
-
-        """
-            situações de orientação quarto de circulo
-            orientação 0: 0-90
-            orientação 1: 90-180
-            orientação 2: 180-270
-            orientacao 3: 270-0
-        """
-
-        quarto_circulo = Wedge(
-            center=(-0.5, -0.5), # Centro
-            r=0.4,               # Raio
-            theta1=90,            # Ângulo inicial (graus)
-            theta2=180,           # Ângulo final (graus)
-            edgecolor='black',   # Cor da borda
-            facecolor='white',   # Cor de preenchimento
-            zorder=2             # Ordem
-        )
-        plt.gca().add_patch(quarto_circulo)
-
-        triangulo = Polygon(
-            xy=[(1, 1), (2, 2), (1, 2)],              # Vértices (x, y)
-            closed=True,                              # Fechar o polígono
-            edgecolor='black',                        # Cor da borda
-            facecolor='white',                        # Cor de preenchimento
-            zorder=2                                  # Ordem
-        )
-        plt.gca().add_patch(triangulo)
 
     def widgets_frame3(self):
         self.bt_reset = Button(
@@ -358,9 +291,7 @@ class Application(Validate):
         return 1
 
     def add_record(self):
-
         entry_validate = 0
-
         if(self.valid_source_plan() == -1):
             return
 
@@ -381,7 +312,6 @@ class Application(Validate):
                     if(self.geometric_form_entry.get() == "Retangulo"):
                         entry_validate = float(self.dimensions_b_px_entry.get())
                         
-
             except ValueError:
                 msg = "Campo não preenchido ou invalido"
                 messagebox.showerror("Error", msg, parent=self.insert)
@@ -392,7 +322,7 @@ class Application(Validate):
             return
 
         self.add_object()
-
+        self.add_figure_matplotlib()
 
     def verify_subare(self):
         if(self.subare_entry.get() == "Subtrair"):
@@ -404,7 +334,6 @@ class Application(Validate):
 
         if(self.geometric_form_entry.get() == "Triangulo"):
             new_form = ICTriangle(Pa=ICPoint2D(float(self.dimensions_a_px_entry.get()),float(self.dimensions_a_py_entry.get())), Pb=ICPoint2D(float(self.dimensions_b_px_entry.get()),float(self.dimensions_b_py_entry.get())), Pc=ICPoint2D(float(self.dimensions_c_px_entry.get()),float(self.dimensions_c_py_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare()) 
-            print(new_form)
             if(new_form.valido() == -1):
                 msg = "Triangulo Invalido: os pontos não formam um triangulo"
                 messagebox.showerror("Error", msg, parent=self.insert)
@@ -423,7 +352,7 @@ class Application(Validate):
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
             
-        if(self.geometric_form_entry.get() == "Semi Circulo"):
+        if(self.geometric_form_entry.get() == "Semicirculo"):
             new_form = ICSemicircle(radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
             self.list_shapes.append(new_form)
             
@@ -431,7 +360,7 @@ class Application(Validate):
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
 
-        if(self.geometric_form_entry.get() == "Quarto de Circulo"):
+        if(self.geometric_form_entry.get() == "Quadrante"):
             new_form = ICQuadrant(radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
             self.list_shapes.append(new_form)
             
@@ -440,18 +369,101 @@ class Application(Validate):
             count += 1
 
         if(self.geometric_form_entry.get() == "Retangulo"):
-            new_form = ICRectangle(length=float(self.dimensions_a_px_entry.get()), height=float(self.dimensions_b_px_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+            new_form = ICRectangle(width=float(self.dimensions_a_px_entry.get()), height=float(self.dimensions_b_px_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
             self.list_shapes.append(new_form)
             
             self.treeview_list.insert(parent='', index='end', iid=count, 
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
 
+<<<<<<< HEAD
     def remove_item(self):
         select = self.treeview_list.selection()
         for item in select:
             self.treeview_list.delete(item)
             test = self.list_shapes.drop(item)
+=======
+
+    def add_figure_matplotlib(self) -> None:
+        if(self.verify_subare()):
+            subarea = 2     # Subtrair (Fica a frente)
+            edgeclr='black' # Cor da borda
+            faceclr='white' # Cor de preenchimento
+        else:
+            subarea = 1     # Adicionar (Fica atras)
+            edgeclr='black' # Borda
+            faceclr='blue'  # Preenchimento
+
+        if(self.geometric_form_entry.get() == "Triangulo"):
+            figure = Polygon(
+                xy=[(float(self.dimensions_a_px_entry.get()),float(self.dimensions_a_py_entry.get())),  # Ponto A Vértices (x, y)
+                    (float(self.dimensions_b_px_entry.get()),float(self.dimensions_b_py_entry.get())),  # Ponto B Vértices (x, y)
+                    (float(self.dimensions_c_px_entry.get()),float(self.dimensions_c_py_entry.get()))], # Ponto C Vértices (x, y)
+                closed=True,                              # Fechar o polígono
+                edgecolor=edgeclr,                        # Cor da borda
+                facecolor=faceclr,                        # Cor de preenchimento
+                zorder=subarea                            # Ordem
+            )
+
+        if(self.geometric_form_entry.get() == "Circunferencia"):
+            figure = Circle(
+                xy=(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())),     # Centro do círculo
+                radius=float(self.dimensions_a_px_entry.get()),        # Raio
+                edgecolor=edgeclr, # Cor da borda
+                facecolor=faceclr, # Cor de preenchimento
+                zorder=subarea           # Ordem
+            )
+
+        if(self.geometric_form_entry.get() == "Semicirculo"):
+            figure = Wedge(
+                center=(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), # Centro
+                r=float(self.dimensions_a_px_entry.get()),              # Raio
+                theta1=0,         # Ângulo inicial (graus)
+                theta2=180,           # Ângulo final (graus)
+                edgecolor=edgeclr,  # Cor da borda
+                facecolor=faceclr,  # Cor de preenchimento
+                zorder=subarea            # Ordem
+            )
+            """
+                situações de orientação meio_circulo
+                orientação 0: 0-180
+                orientação 1: 90-270
+                orientação 2: 180-0
+                orientacao 3: 270-90
+            """
+        
+        if(self.geometric_form_entry.get() == "Quadrante"):
+            figure = Wedge(
+                center=(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), # Centro
+                r=float(self.dimensions_a_px_entry.get()),               # Raio
+                theta1=90,            # Ângulo inicial (graus)
+                theta2=180,           # Ângulo final (graus)
+                edgecolor=edgeclr,   # Cor da borda
+                facecolor=faceclr,   # Cor de preenchimento
+                zorder=subarea             # Ordem
+            )
+            """
+                situações de orientação quarto de circulo
+                orientação 0: 0-90
+                orientação 1: 90-180
+                orientação 2: 180-270
+                orientacao 3: 270-0
+            """
+
+        if(self.geometric_form_entry.get() == "Retangulo"):
+            figure = Rectangle(
+                xy=(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())),       # Canto inferior esquerdo
+                width=float(self.dimensions_a_px_entry.get()),           # Largura
+                height=float(self.dimensions_b_px_entry.get()),          # Altura
+                edgecolor=edgeclr, # Borda
+                facecolor=faceclr,  # Preenchimento
+                zorder=subarea           # Ordem
+            )
+
+        plt.gca().add_patch(figure)
+        plt.draw()
+        return None
+>>>>>>> main
 
     def Select_Form(self, event):
         if(self.geometric_form_entry.get() == "Triangulo"):
@@ -515,8 +527,8 @@ class Application(Validate):
             self.coordinate_center_x_entry.place(relx=0.005, rely=0.545, relwidth=0.95, relheight=0.05)
             self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
 
-        if((self.geometric_form_entry.get() == "Semi Circulo")or
-            (self.geometric_form_entry.get() == "Quarto de Circulo")):
+        if((self.geometric_form_entry.get() == "Semicirculo")or
+            (self.geometric_form_entry.get() == "Quadrante")):
             
             self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
             
@@ -608,7 +620,7 @@ class Application(Validate):
         self.geometric_form_entry = ttk.Combobox(
             self.frame_insert,
             state= "readonly", 
-            values=["Triangulo", "Circunferencia", "Quarto de Circulo", "Semi Circulo", "Retangulo"]
+            values=["Triangulo", "Circunferencia", "Quadrante", "Semicirculo", "Retangulo"]
             )
         self.geometric_form_entry.config(
             foreground= Color.black.value, 
