@@ -1,9 +1,9 @@
-from .Ponto2D import Ponto2D
+from .ICPoint2D import ICPoint2D
 
-class Forma:
-  def __init__(self, centroide:Ponto2D = Ponto2D(), origem_sistema:Ponto2D = Ponto2D(0, 0), forma_virtual:bool = False) -> None:
-    self.centroide = centroide
-    self.forma_virtual = forma_virtual
+class ICForm:
+  def __init__(self, centroid:ICPoint2D = ICPoint2D(), system_origin:ICPoint2D = ICPoint2D(0, 0), virtual_form:bool = False) -> None:
+    self.centroid = centroid
+    self.virtual_form = virtual_form
     self.area = 0.0
     self.Ix, self.Iy = 0.0, 0.0
     self.Jo = 0.0
@@ -11,24 +11,24 @@ class Forma:
     return None
   
   @property
-  def centroide (self) -> Ponto2D:
-    return self.__centroide.clone()
+  def centroid(self) -> ICPoint2D:
+    return self.__centroid.clone()
   
-  @centroide.setter
-  def centroide(self, centroide:Ponto2D) -> None:
-    self.__centroide = centroide.clone()
+  @centroid.setter
+  def centroid(self, centroid:ICPoint2D) -> None:
+    self.__centroid = centroid.clone()
     return None
 
   @property
-  def forma_virtual(self) -> float:
-    if(self.__forma_virtual):
+  def virtual_form(self) -> float:
+    if(self.__virtual_form):
       return -1.0
     else:
       return 1.0
   
-  @forma_virtual.setter
-  def forma_virtual(self, forma_virtual:bool) -> None:
-    self.__forma_virtual = forma_virtual
+  @virtual_form.setter
+  def virtual_form(self, virtual_form:bool) -> None:
+    self.__virtual_form = virtual_form
     return None
 
   @property
@@ -67,5 +67,5 @@ class Forma:
     self.__Ixy = Ixy
     return None  
 
-  def _c_momento_polar(self) -> float:
+  def _c_polar_moment(self) -> float:
     return (self.Ix + self.Iy)

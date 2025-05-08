@@ -1,4 +1,4 @@
-class Ponto2D:
+class ICPoint2D:
   def __init__(self, x:float = 0.0, y:float = 0.0) -> None:
     self.x = x
     self.y = y
@@ -22,8 +22,8 @@ class Ponto2D:
     self.__y = y
     return None
 
-  def clone(self) -> 'Ponto2D':
-    return Ponto2D(self.x, self.y)
+  def clone(self) -> 'ICPoint2D':
+    return ICPoint2D(self.x, self.y)
   
-  def distancia_euclidiana(self, ponto:'Ponto2D') -> float:
-    return ((((ponto.x - self.x) ** 2)+((ponto.y - self.y) ** 2)) ** 0.5)
+  def euclidean_distance(self, point:'ICPoint2D') -> float:
+    return ((((point.x - self.x) ** 2)+((point.y - self.y) ** 2)) ** 0.5)

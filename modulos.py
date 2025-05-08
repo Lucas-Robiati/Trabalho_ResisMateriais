@@ -5,8 +5,8 @@ import numpy as np
 from tkinter import *
 from enum import Enum
 
-import Formas
-import Objeto
+import Forms
+import Object
 
 class Color(Enum):
     gray = "#5e5c64"
