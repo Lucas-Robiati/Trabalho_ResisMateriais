@@ -5,8 +5,15 @@ import numpy as np
 from tkinter import *
 from enum import Enum
 
-import Forms
-import Object
+from Object import ICCompositeFigure
+
+from Forms import ICPoint2D
+from Forms import ICCircle
+from Forms import ICSemicircle
+from Forms import ICQuadrant
+from Forms import ICRectangle
+from Forms import ICTriangle
+
 
 class Color(Enum):
     gray = "#5e5c64"
