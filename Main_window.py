@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from placeHolder import EntPlaceHold
 
+# Classe base para validar as entradas, restringe e trata entradas
 class Validate:
     def validate_float(self, text):
         value = 0
@@ -22,37 +23,38 @@ class Validate:
             (text == "Y: 0") or
             (text == "...")): return True 
 
-        if ((text == "") or (text == "-")): return True
+        if ((text == "") or (text == "-")): return True # Passou na validação
         try:
             value == float(text)
         except ValueError:
-            return False
-        return (0 <= value) or (0 >= value)
+            return False                                # Não passou na validação
+        return (0 <= value) or (0 >= value)             # Retorna o valor valido
 
 class Application(Validate):
     def __init__(self, root:'Tk'):
-        self.root = root    #Define o bejeto Tk que será usado como janela principal
-        self.list_shapes =  ICCompositeFigure()
-        self.system_origin = ICPoint2D() 
-        self.window()       #Cria a janela principal sub janelas e widgets
-        root.mainloop()
+        self.root = root                            # Define o bejeto Tk que será usado como janela principal
+        self.list_shapes =  ICCompositeFigure()     # Lista de Obejetos
+        self.system_origin = ICPoint2D()            # Variavel que define a origem do sistema
+        self.window()                               # Cria a janela principal sub janelas e widgets
+        root.mainloop()                             # Loop da janela
 
     def window(self):
-        self.root.title("InerCalc")
-        self.root.configure(background= Color.dark_blue.value)
-        self.root.geometry("950x520")
-        self.root.minsize(width=950, height=520)
-        self.root.resizable(True,True)
-        self.root.bind("<Configure>", self.On_resize)
+        self.root.title("InerCalc")                                  # Nome do software
+        self.root.configure(background= Color.dark_blue.value)       # Background da janela principal
+        self.root.geometry("950x520")                                # Geometria da janela 
+        self.root.minsize(width=950, height=520)                     # Tamanho minimo da janela 
+        self.root.resizable(True,True)                               # Software pode redimensionar 
+        self.root.bind("<Configure>", self.On_resize)                # Sinal para acionar a função de redimencionamento
         self.root.protocol('WM_DELETE_WINDOW', self.destroy_window)  # Vincula o evento de fechamento
-        self.Validate_entry()
-        self.window_frame()
+        self.Validate_entry()                                        # Chamada do validador dos entry
+        self.window_frame()                                          # Cria os frames que conterão os widgets
 
     def destroy_window(self):
     # Função para tratar o fechamento da janela
-        plt.close(self.fig)  # Fecha a figura do Matplotlib
-        root.destroy()   # Destroi a janela do Tkinter
+        plt.close(self.fig)   # Fecha a figura do Matplotlib
+        root.destroy()        # Destroi a janela do Tkinter
 
+    # Cria os frames dentro da janela principal
     def window_frame(self):
         self.frame_1 = Frame(
             self.root, 
@@ -62,6 +64,7 @@ class Application(Validate):
             )
         self.frame_1.place(relx=0.015, rely=0.025, relwidth=0.45, relheight=0.95)
 
+        # Cria e define os elementos contidos no frame 1
         self.widgets_frame1()
 
         self.frame_2 = Frame(
@@ -72,7 +75,8 @@ class Application(Validate):
             highlightthickness= 4
             )
         self.frame_2.place(relx=0.465, rely=0.12, relwidth=0.52, relheight=0.855)
-
+        
+        # Cria e define os elementos contidos no frame 2
         self.widgets_frame2()
 
         self.frame_3 = Frame(
@@ -84,6 +88,7 @@ class Application(Validate):
             )
         self.frame_3.place(relx=0.015, rely=0.025, relwidth=0.97, relheight=0.1)
 
+        # Cria e define os elementos contidos no frame 3
         self.widgets_frame3()
 
     def widgets_frame1(self):
@@ -102,12 +107,17 @@ class Application(Validate):
             )
         self.label_coordinates.place(relx=0.005, rely=0.59)
 
+        # Classe persobalizada EntPlaceHold para modificar o Entry adicona uma string como parametro para um "place Holder" 
         self.coordinate_x_entry = EntPlaceHold(self.frame_1, placeholder='X: 0')
+        # Captura a entrada de caracteres da entrada e aplica a função de validação conforme o sinal
         self.coordinate_x_entry.configure(validate= "key", validatecommand=self.val)
 
+        # Classe persobalizada EntPlaceHold para modificar o Entry adicona uma string como parametro para um "place Holder" 
         self.coordinate_y_entry = EntPlaceHold(self.frame_1, placeholder='Y: 0')
+        # Captura a entrada de caracteres da entrada e aplica a função de validação conforme o sinal
         self.coordinate_y_entry.configure(validate= "key", validatecommand=self.val)
 
+        # Cria o Botão Calcular
         self.bt_calc = Button(
             self.frame_1, 
             text="Calcular",
@@ -120,6 +130,7 @@ class Application(Validate):
             )
         self.bt_calc.place(relx=0.79, rely=0.92, relwidth=0.2, relheight=0.07)
 
+        # Lable que da nome pra tabela
         self.label_table = Label(
             self.frame_1, 
             text="__________Tabela de Figuras__________", 
@@ -137,6 +148,7 @@ class Application(Validate):
             )
         self.treeview_list.place(relx=0.01, rely=0.15, relwidth=0.95, relheight=0.4)
 
+        # Cria a barra de srool lateral 
         self.scroobar = Scrollbar(self.frame_1, orient='vertical')               # Define a svrool bar
         self.treeview_list.configure(yscroll=self.scroobar.set)                     # Eixo da scrool bar
         self.scroobar.place(relx=0.96, rely=0.15, relwidth=0.04, relheight=0.4)  # Posição da scrool bar
@@ -290,6 +302,7 @@ class Application(Validate):
             self.system_origin.y = float(self.coordinate_y_entry.get())
         return 1
 
+    # Valida e chama as funções de inserir objetos 
     def add_record(self):
         entry_validate = 0
         if(self.valid_source_plan() == -1):
@@ -323,12 +336,14 @@ class Application(Validate):
 
         self.add_object()
         self.add_figure_matplotlib()
-
+    
+    # Verifica se o objeto será subtraido ou adicionado
     def verify_subare(self):
         if(self.subare_entry.get() == "Subtrair"):
             return True
         return False
 
+    # Identifica o tipo de objeto inserido e o adiciona na tabela e na lista de objetos
     def add_object(self):
         global count
 
@@ -376,10 +391,12 @@ class Application(Validate):
                 text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
             count += 1
     
+    # Remove as formas da tabela e da lista de objetos
     def remove_item(self):
-        select = self.treeview_list.selection()
-        for item in select:
-            self.treeview_list.delete(item)
+        select = self.treeview_list.selection()[0]
+        if(select):
+            item = self.treeview_list.index(select)
+            self.treeview_list.delete(select)
             test = self.list_shapes.drop(item)
 
     def add_figure_matplotlib(self) -> None:
