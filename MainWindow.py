@@ -232,7 +232,8 @@ class Application(Validate):
     self.label_Ixy.place(relx=0.005, rely=0.935, relwidth=0.1, relheight=0.05)
   
   def widgets_frame2(self):
-    self.x_min, self.x_max, self.y_min, self.y_max = -5, 5, -5, 5
+    self.x_min, self.x_max = -5 + self.system_origin.x, 5 + self.system_origin.x
+    self.y_min, self.y_max = -5 + self.system_origin.y, 5 + self.system_origin.y
 
     self.fig, self.ax = plt.subplots()
     self.fig.patch.set_facecolor('#ffffff')
@@ -241,8 +242,7 @@ class Application(Validate):
     self.ax.set_xlabel('$x$', size=10, labelpad=-24, x=1.05)
     self.ax.set_ylabel('$y$', size=10, labelpad=-21, y=1.02, rotation=0)
 
-    # Configurar ticks iniciais
-    self.update_ticks()
+    self.auto_resize_matplotlib()
 
     # Grid
     self.ax.grid(which='both', color='grey', linewidth=1, linestyle='-', alpha=0.2)
@@ -661,7 +661,6 @@ class Application(Validate):
         self.update_w.destroy()
   
   def Modify_object(self):
-    
     select = self.treeview_list.selection()
     if not select:
       messagebox.showwarning("Aviso", "Nenhuma forma selecionada para remover.", parent=self.root)
@@ -777,7 +776,8 @@ class Application(Validate):
     self.composite_figure.components.clear()
     
     # Redefine os limites do gráfico para os valores padrão
-    self.x_min, self.x_max, self.y_min, self.y_max = -5, 5, -5, 5
+    self.x_min, self.x_max = -5 + self.system_origin.x, 5 + self.system_origin.x
+    self.y_min, self.y_max = -5 + self.system_origin.y, 5 + self.system_origin.y
     
     # Redesenha o gráfico vazio
     self.auto_resize_matplotlib()
@@ -1021,7 +1021,6 @@ class Application(Validate):
       self.x_max = max(self.x_max, figure.centroid.x + (figure.width / 2))
       self.y_min = min(self.y_min, figure.centroid.y - (figure.height / 2))
       self.y_max = max(self.y_max, figure.centroid.y + (figure.height / 2))
-      return None
 
     if(isinstance(figure, ICTriangle)):
       self.x_min = min(self.x_min, figure.Pa.x) # Reajustando limite inferior em X caso a figura ultrapasse
@@ -1038,7 +1037,6 @@ class Application(Validate):
       self.x_max = max(self.x_max, figure.Pc.x) # Reajustando limite superior em X caso a figura ultrapasse
       self.y_min = min(self.y_min, figure.Pc.y) # Reajustando limite inferior em Y caso a figura ultrapasse
       self.y_max = max(self.y_max, figure.Pc.y) # Reajustando limite superior em Y caso a figura ultrapasse
-      return None
         
     if(isinstance(figure, ICSemicircle) or
         isinstance(figure, ICQuadrant)):
@@ -1046,15 +1044,18 @@ class Application(Validate):
       self.x_max = max(self.x_max, figure.origin.x + figure.radius)
       self.y_min = min(self.y_min, figure.origin.y - figure.radius)
       self.y_max = max(self.y_max, figure.origin.y + figure.radius)
-      return None
 
     if(isinstance(figure, ICCircle)):
       self.x_min = min(self.x_min, figure.centroid.x - figure.radius)
       self.x_max = max(self.x_max, figure.centroid.x + figure.radius)
       self.y_min = min(self.y_min, figure.centroid.y - figure.radius)
       self.y_max = max(self.y_max, figure.centroid.y + figure.radius)
-      return None
     
+    self.x_min = min(self.x_min, self.system_origin.x)
+    self.x_max = max(self.x_max, self.system_origin.x)
+    self.y_min = min(self.y_min, self.system_origin.y)
+    self.y_max = max(self.y_max, self.system_origin.y)
+
     return None
 
   def remove_item(self) -> None:  
@@ -1085,7 +1086,8 @@ class Application(Validate):
 
     # Atualiza os limites do gráfico
     if not self.composite_figure.components:
-      self.x_min, self.x_max, self.y_min, self.y_max = -5, 5, -5, 5
+      self.x_min, self.x_max = -5 + self.system_origin.x, 5 + self.system_origin.x
+      self.y_min, self.y_max = -5 + self.system_origin.y, 5 + self.system_origin.y
     else:
       self.x_min = self.y_min = float('inf')
       self.x_max = self.y_max = float('-inf')
@@ -1300,15 +1302,23 @@ class Application(Validate):
   
   def auto_resize_matplotlib(self):
     # Configurar eixos
-    self.ax.spines['bottom'].set_position(self.system_origin.x)
-    self.ax.spines['left'].set_position(self.system_origin.y)
+    self.ax.spines['bottom'].set_position(('data', self.system_origin.y))  # Eixo X na coordenada Y da origem
+    self.ax.spines['left'].set_position(('data', self.system_origin.x))    # Eixo Y na coordenada X da origem
     self.ax.spines['top'].set_visible(False)
     self.ax.spines['right'].set_visible(False)
 
     
-    # Aplicar padding de 1 unidade
-    self.ax.set_xlim(self.x_min - 1, self.x_max + 1)
-    self.ax.set_ylim(self.y_min - 1, self.y_max + 1)
+    # Aplicar limites considerando a origem
+    padding = 1  # Espaçamento adicional
+    x_min = min(self.x_min, self.system_origin.x) - padding
+    x_max = max(self.x_max, self.system_origin.x) + padding
+    y_min = min(self.y_min, self.system_origin.y) - padding
+    y_max = max(self.y_max, self.system_origin.y) + padding
+    
+    self.ax.set_xlim(x_min, x_max)
+    self.ax.set_ylim(y_min, y_max)
+    
+    # Atualizar ticks e desenhar
     self.update_ticks()
     plt.draw()
 
@@ -1335,10 +1345,10 @@ class Application(Validate):
     self.ax.set_xticks(x_ticks)
     self.ax.set_yticks(y_ticks)
     self.ax.xaxis.set_major_formatter(
-        plt.FuncFormatter(lambda x, _: f'{int(x)}' if x == 0 else f'{int(x)}')
+        plt.FuncFormatter(lambda x, _: f'{int(x)}' if x == self.system_origin.x else f'{int(x)}')
     )
     self.ax.yaxis.set_major_formatter(
-        plt.FuncFormatter(lambda y, _: '' if y == 0 else f'{int(y)}')
+        plt.FuncFormatter(lambda y, _: '' if y == self.system_origin.y else f'{int(y)}')
     )
 
     return None
