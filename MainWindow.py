@@ -635,7 +635,7 @@ class Application(Validate):
     #======Buttons===========
     self.bt_acept = Button(
       self.frame_update, 
-      text="Inserir",
+      text="Atualizar",
       font=('David', 10),
       bd= 0,
       command= self.add_record,
@@ -731,7 +731,28 @@ class Application(Validate):
       self.coordinate_center_y_entry.delete('0', 'end')
       self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].centroid.y)  
 
-  
+  def atualize_object(self):
+    select = self.treeview_list.selection()
+    if(select):
+        data = self.treeview_list.item(select[0])
+        index = self.treeview_list.index(select)
+
+    #if(self.geometric_form_entry.get() == "Triangulo"):
+#
+    #if(self.geometric_form_entry.get() == "Circunferencia"):
+#
+    #if(self.geometric_form_entry.get() == "Quadrant"):
+#
+    #if(self.geometric_form_entry.get() == "Semicirculo"):
+
+    if(self.geometric_form_entry.get() == "Retandulo"):
+      self.composite_figure.components[index].width = float(self.base_entry.get())
+      self.composite_figure.components[index].height = float(self.base_entry.get())
+      self.composite_figure.components[index].centroid.x = float(self.coordinate_x_entry.get())
+      self.composite_figure.components[index].centroid.y = float(self.coordinate_y_entry.get())
+
+
+      
 
   def ICreset(self):
     # Remove todos os itens da Treeview
