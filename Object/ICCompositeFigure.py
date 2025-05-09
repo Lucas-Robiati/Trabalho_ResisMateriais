@@ -3,6 +3,8 @@ from Forms import ICPoint2D
 from Forms import ICCircle
 from Forms import ICRectangle
 from Forms import ICTriangle
+from Forms import ICSemicircle
+from Forms import ICQuadrant
 
 class ICCompositeFigure(ICForm):
   def __init__(self) -> None:
@@ -61,8 +63,7 @@ class ICCompositeFigure(ICForm):
     self.Jo = self.Ix + self.Iy
     
   def append(self, other) -> None:
-    if((isinstance(other, ICCircle) or (isinstance(other, ICRectangle) or isinstance(other, ICTriangle))) ):
-      self.components.append(other)
+    if(isinstance(other, ICCircle) or isinstance(other, ICRectangle) or isinstance(other, ICTriangle) or isinstance(other, ICSemicircle) or isinstance(other, ICQuadrant)):      self.components.append(other)
       self.__c_area()
       self.__c_centroid()
       self.Ix, self.Iy = self.__c_moment_of_inertia()
