@@ -917,7 +917,7 @@ class Application(Validate):
 
       iid = str(id(new_form))
       self.treeview_list.insert(parent='', index='end', iid=iid, 
-        text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+        text=self.geometric_form_entry.get(), values=(new_form.centroid.x,new_form.centroid.y,self.subare_entry.get()))
 
     if(self.geometric_form_entry.get() == "Circunferencia"):
       new_form =  ICCircle(radius=float(self.rad_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
