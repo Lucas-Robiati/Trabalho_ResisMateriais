@@ -77,8 +77,7 @@ class ICCompositeFigure(ICForm):
     return ixy
     
   def append(self, other) -> None:
-    if((isinstance(other, ICCircle) or (isinstance(other, ICRectangle) or isinstance(other, ICTriangle))) ):
-      self.components.append(other)
+    if(isinstance(other, ICCircle) or isinstance(other, ICRectangle) or isinstance(other, ICTriangle) or isinstance(other, ICSemicircle) or isinstance(other, ICQuadrant)):      self.components.append(other)
       self.update()
       return 
     return
