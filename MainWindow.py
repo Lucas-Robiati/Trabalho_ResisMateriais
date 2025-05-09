@@ -316,6 +316,18 @@ class Application(Validate):
     self.dimensions_c_py_entry.config(state="normal", validate= "key", validatecommand=self.val)
     self.dimensions_c_py_entry.place(relx=0.48, rely=0.295, relwidth=0.5, relheight=0.05)
 
+    self.rad_entry = EntPlaceHold(self.frame_insert, placeholder='raio')
+    self.rad_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.rad_entry.place_forget()
+
+    self.base_entry = EntPlaceHold(self.frame_insert, placeholder='base')
+    self.base_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.base_entry.place_forget()
+
+    self.height_entry = EntPlaceHold(self.frame_insert, placeholder='altura')
+    self.height_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.height_entry.place_forget()
+
     #--------centroid coordinates---------
     self.label_coordinates_center = Label(
       self.frame_insert, 
@@ -648,28 +660,33 @@ class Application(Validate):
       self.dimensions_c_py_entry.bind("<FocusIn>", lambda args: self.dimensions_c_py_entry.delete('0', 'end'))
 
       # Oculta as lables e Entrys desnecessarios
+      self.rad_entry.place_forget()
+      self.base_entry.place_forget()
+      self.height_entry.place_forget()
+      self.combobox_orientation.place_forget()
       self.label_coordinates_center.place_forget()
       self.coordinate_center_x_entry.place_forget()
       self.coordinate_center_y_entry.place_forget()
+      self.combobox_orientation.place_forget()
+      self.label_combobox_orientation.place_forget()
 
     if((self.geometric_form_entry.get() == "Circunferencia")):
-      self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
+      self.rad_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
       
-      self.dimensions_a_px_entry.delete('0', 'end')
-      self.dimensions_a_px_entry.insert(0, 'raio')
-      self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
+      self.rad_entry.delete('0', 'end')
+      self.rad_entry.insert(0, 'raio')
+      self.rad_entry.bind("<FocusIn>", lambda args: self.rad_entry.delete('0', 'end'))
 
-      self.dimensions_b_px_entry.delete('0', 'end')
+      self.base_entry.place_forget()
+      self.height_entry.place_forget()
+      self.dimensions_a_px_entry.place_forget()
       self.dimensions_b_px_entry.place_forget()
-      
-      self.dimensions_c_px_entry.delete('0', 'end')
       self.dimensions_c_px_entry.place_forget()
-
-      self.label_combobox_orientation.place_forget()
-      self.combobox_orientation.place_forget()
       self.dimensions_a_py_entry.place_forget()
       self.dimensions_b_py_entry.place_forget()
       self.dimensions_c_py_entry.place_forget()
+      self.combobox_orientation.place_forget()
+      self.label_combobox_orientation.place_forget()
       
       self.label_coordinates_center.config(text="Coordenada do centróide")
       self.label_coordinates_center.place(relx=0.005, rely=0.5)
@@ -679,11 +696,11 @@ class Application(Validate):
     if((self.geometric_form_entry.get() == "Semicirculo")or
         (self.geometric_form_entry.get() == "Quadrante")):
       
-      self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
+      self.rad_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
       
-      self.dimensions_a_px_entry.delete('0', 'end')
-      self.dimensions_a_px_entry.insert(0, 'raio')
-      self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
+      self.rad_entry.delete('0', 'end')
+      self.rad_entry.insert(0, 'raio')
+      self.rad_entry.bind("<FocusIn>", lambda args: self.rad_entry.delete('0', 'end'))
 
       # Reposiciona a lable de origem 
       self.label_combobox_orientation.place(relx=0.005, rely=0.25, relwidth=0.45, relheight=0.05)
@@ -691,12 +708,11 @@ class Application(Validate):
       # Reposiciona a selecao da origem
       self.combobox_orientation.place(relx=0.005, rely=0.295, relwidth=0.45, relheight=0.05)
 
-      self.dimensions_b_px_entry.delete('0', 'end')
+      self.base_entry.place_forget()
+      self.height_entry.place_forget()
+      self.dimensions_a_px_entry.place_forget()
       self.dimensions_b_px_entry.place_forget()
-      
-      self.dimensions_c_px_entry.delete('0', 'end')
       self.dimensions_c_px_entry.place_forget()
-
       self.dimensions_a_py_entry.place_forget()
       self.dimensions_b_py_entry.place_forget()
       self.dimensions_c_py_entry.place_forget()
@@ -708,22 +724,23 @@ class Application(Validate):
       self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
 
     if(self.geometric_form_entry.get() == "Retangulo"): 
-      self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
-      self.dimensions_b_px_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
+      self.base_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
+      self.height_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
       
-      self.dimensions_a_px_entry.delete('0', 'end')
-      self.dimensions_a_px_entry.insert(0, 'base')
-      self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
+      self.base_entry.delete('0', 'end')
+      self.base_entry.insert(0, 'base')
+      self.base_entry.bind("<FocusIn>", lambda args: self.base_entry.delete('0', 'end'))
 
-      self.dimensions_b_px_entry.delete('0', 'end')
-      self.dimensions_b_px_entry.insert(0, 'altura')
-      self.dimensions_b_px_entry.bind("<FocusIn>", lambda args: self.dimensions_b_px_entry.delete('0', 'end'))
-      
-      self.dimensions_c_px_entry.delete('0', 'end')
-      self.dimensions_c_px_entry.place_forget()
+      self.height_entry.delete('0', 'end')
+      self.height_entry.insert(0, 'altura')
+      self.height_entry.bind("<FocusIn>", lambda args: self.height_entry.delete('0', 'end'))
 
       self.label_combobox_orientation.place_forget()
       self.combobox_orientation.place_forget()
+      self.rad_entry.place_forget()
+      self.dimensions_a_px_entry.place_forget()
+      self.dimensions_b_px_entry.place_forget()
+      self.dimensions_c_px_entry.place_forget()
       self.dimensions_a_py_entry.place_forget()
       self.dimensions_b_py_entry.place_forget()
       self.dimensions_c_py_entry.place_forget()
