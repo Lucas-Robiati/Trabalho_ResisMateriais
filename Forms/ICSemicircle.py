@@ -98,11 +98,11 @@ class ICSemicircle(ICForm):
 
     if((self.orientation == 1) or (self.orientation == 3)):
       ix = self.virtual_form * (((3.14 * (self.radius ** 4)) / 8) + (self.area * ((self.centroid.y - self.system_origin.y) ** 2)))
-      iy = self.virtual_form * (0.1098 * (self.radius ** 4))
+      iy = self.virtual_form * (0.1098 * (self.radius ** 4)) + (self.area * ((self.centroid.x - self.system_origin.x) ** 2))
     
     if((self.orientation == 0) or (self.orientation == 2)):
-      ix = self.virtual_form * (0.1098 * (self.radius * self.radius * self.radius * self.radius))
-      iy = self.virtual_form * (((3.14 * (self.radius * self.radius * self.radius * self.radius)) / 8) + (self.area * ((self.centroid.x - self.system_origin.x) ** 2)))
+      ix = self.virtual_form * (0.1098 * (self.radius ** 4)) + (self.area * ((self.centroid.y - self.system_origin.y) ** 2))
+      iy = self.virtual_form * (((3.14 * (self.radius ** 4)) / 8) + (self.area * ((self.centroid.x - self.system_origin.x) ** 2)))
     
     return ix, iy
   
