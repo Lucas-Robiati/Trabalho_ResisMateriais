@@ -638,7 +638,7 @@ class Application(Validate):
       text="Atualizar",
       font=('David', 10),
       bd= 0,
-      command= self.add_record,
+      command= self.atualize_object,
       activebackground= Color.white.value,
       activeforeground= Color.black.value,
       bg= Color.gray.value,
@@ -737,13 +737,30 @@ class Application(Validate):
         data = self.treeview_list.item(select[0])
         index = self.treeview_list.index(select)
 
-    #if(self.geometric_form_entry.get() == "Triangulo"):
-#
-    #if(self.geometric_form_entry.get() == "Circunferencia"):
-#
-    #if(self.geometric_form_entry.get() == "Quadrant"):
-#
-    #if(self.geometric_form_entry.get() == "Semicirculo"):
+    if(self.geometric_form_entry.get() == "Triangulo"):
+      self.composite_figure.components[index].Pa.x = float(self.dimensions_a_px_entry.get())
+      self.composite_figure.components[index].Pb.x = float(self.dimensions_b_px_entry.get())
+      self.composite_figure.components[index].Pc.x = float(self.dimensions_c_px_entry.get())
+      self.composite_figure.components[index].Pa.y = float(self.dimensions_a_py_entry.get())
+      self.composite_figure.components[index].Pb.y = float(self.dimensions_b_py_entry.get())
+      self.composite_figure.components[index].Pc.y = float(self.dimensions_c_py_entry.get())
+
+    if(self.geometric_form_entry.get() == "Circunferencia"):
+      self.composite_figure.components[index].radius = float(self.rad_entry.get())
+      self.composite_figure.components[index].centroid.x = float(self.coordinate_center_x_entry.get())
+      self.composite_figure.components[index].centroid.y = float(self.coordinate_center_y_entry.get())
+
+    if(self.geometric_form_entry.get() == "Quadrant"):
+      self.composite_figure.components[index].radius = float(self.rad_entry.get())
+      self.composite_figure.components[index].virtual_form = self.Quadrante_combobox_orientation(self.combobox_orientation.get())
+      self.composite_figure.components[index].origin.x = float(self.coordinate_center_x_entry.get())
+      self.composite_figure.components[index].origin.y = float(self.coordinate_center_y_entry.get())
+
+    if(self.geometric_form_entry.get() == "Semicirculo"):
+      self.composite_figure.components[index].radius = float(self.rad_entry.get())
+      self.composite_figure.components[index].virtual_form = self.Semicirculo_combobox_orientation(self.combobox_orientation.get())
+      self.composite_figure.components[index].origin.x = float(self.coordinate_center_x_entry.get())
+      self.composite_figure.components[index].origin.y = float(self.coordinate_center_y_entry.get())
 
     if(self.geometric_form_entry.get() == "Retandulo"):
       self.composite_figure.components[index].width = float(self.base_entry.get())
@@ -751,7 +768,7 @@ class Application(Validate):
       self.composite_figure.components[index].centroid.x = float(self.coordinate_x_entry.get())
       self.composite_figure.components[index].centroid.y = float(self.coordinate_y_entry.get())
 
-
+      self.treeview_list.insert(select, values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
       
 
   def ICreset(self):

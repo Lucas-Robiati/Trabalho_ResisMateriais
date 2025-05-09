@@ -1,43 +1,33 @@
 import tkinter as tk
-import tkinter.ttk as ttk
+from tkinter import ttk
 
-# Cria a janela e a Treeview
-janela = tk.Tk()
-tree = ttk.Treeview(janela, columns=("Coluna 1", "Coluna 2", "Coluna 3"))
-tree.heading("#0", text="Coluna 1")
-tree.heading("Coluna 1", text="Coluna 1")
-tree.heading("Coluna 2", text="Coluna 2")
-tree.heading("Coluna 3", text="Coluna 3")
-tree.pack()
+root = tk.Tk()
+# Criar a Treeview
+tree = ttk.Treeview(root)  # Certifique-se de ter um 'root' (janela)
+tree.pack(pady=10)
 
-# Adiciona alguns dados de exemplo
-tree.insert("", "end", iid="item1", text="Item 1", values=("Valor 1", "Valor 2", "Valor 3"))
-tree.insert("", "end", iid="item2", text="Item 2", values=("Outro Valor 1", "Outro Valor 2", "Outro Valor 3"))
+# Definir colunas (exemplo)
+tree["columns"] = ("Col1", "Col2", "Col3")  # Use o nome das colunas que deseja alterar
+tree.column("#0", width=50)  # Largura da coluna de identificação
+tree.column("Col1", width=100)
+tree.column("Col2", width=150)
+tree.column("Col3", width=100)
 
-# Função para obter informações do item selecionado
-def obter_informacoes():
-    # Obtém o item selecionado
-    selecionado = tree.selection()
+# Definir cabeçalhos
+tree.heading("#0", text="ID")
+tree.heading("Col1", text="Col1")
+tree.heading("Col2", text="Col2")
+tree.heading("Col3", text="Col3")
 
-    # Verifica se houve uma seleção
-    if selecionado:
-        # Obtém o iid do item selecionado
-        iid = selecionado[0]
+# Adicionar um item (exemplo)
+item_id = tree.insert("", "end", text="1", values=("Valor1", "Valor2", "Valor3"))
 
-        # Obtém os valores dos campos do item selecionado
-        valores = tree.item(iid, "values")
+print(item_id)
 
-        # Imprime os valores
-        print(f"Item Selecionado: {iid}")
-        print(f"Coluna 1: {valores[0]}")
-        print(f"Coluna 2: {valores[1]}")
-        print(f"Coluna 3: {valores[2]}")
-    else:
-        print("Nenhum item selecionado.")
+# Alterar o valor em uma coluna (exemplo)
+tree.item(item_id, values=("Novo Valor 1", "Valor2", "Novo Valor 3")) # A coluna 0 é alterada (o texto da linha)
+# Ou, se quiser mudar uma coluna específica:
+# tree.item(item_id, text="Novo Texto da Linha") # Mudar o texto da linha
 
-# Adiciona um botão para chamar a função
-botao = tk.Button(janela, text="Obter Informações", command=obter_informacoes)
-botao.pack()
-
-# Inicia o loop da janela
-janela.mainloop()
+# Exibir a Treeview
+root.mainloop()
