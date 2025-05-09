@@ -55,7 +55,7 @@ class ICRectangle(ICForm):
   # função de calculo de momento de inercia
   def __c_moment_of_inertia(self) -> float:
     ix = self.virtual_form * ((self.width * (self.height ** 3)) / 12) + (self.area * ((self.centroid.y - self.system_origin.y) ** 2))
-    iy = self.vyrtual_form * ((self.height * (self.width ** 3)) / 12) + (self.area * ((self.centroid.x - self.system_origin.x) ** 2))
+    iy = self.virtual_form * ((self.height * (self.width ** 3)) / 12) + (self.area * ((self.centroid.x - self.system_origin.x) ** 2))
     return ix,ix
   
   # função de calculo de produto de inercia
