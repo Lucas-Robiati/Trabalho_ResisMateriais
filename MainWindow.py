@@ -179,57 +179,63 @@ class Application(Validate):
     # ---- label resultados ------
     self.Label_centroid_x = Label(
       self.frame_1, 
-      text="Centroid.x = ", 
+      text="Centroid.x = ",
+      anchor="w", 
       bg= Color.gray.value,
       fg= Color.white.value,
       font= ('David', 11)
     )
-    self.Label_centroid_x.place(relx=0.005, rely=0.68, relwidth=0.22, relheight=0.05)
+    self.Label_centroid_x.place(relx=0.005, rely=0.68, relwidth=0.65, relheight=0.05)
     
     self.Label_centroid_y = Label(
       self.frame_1, 
       text="Centroid.y = ", 
+      anchor="w",
       bg= Color.gray.value,
       fg= Color.white.value,
       font= ('David', 11)
     )
-    self.Label_centroid_y.place(relx=0.005, rely=0.74, relwidth=0.22, relheight=0.05)
+    self.Label_centroid_y.place(relx=0.005, rely=0.74, relwidth=0.65, relheight=0.05)
 
     self.label_Ix = Label(
       self.frame_1, 
-      text="Ix = ", 
+      text="Ix = ",
+      anchor="w", 
       bg= Color.gray.value,
       fg= Color.white.value,
       font= ('David', 11)
     )
-    self.label_Ix.place(relx=0.005, rely=0.785, relwidth=0.1, relheight=0.05)
+    self.label_Ix.place(relx=0.005, rely=0.785, relwidth=0.5, relheight=0.05)
 
     self.label_Iy = Label(
       self.frame_1, 
-      text="Iy = ", 
+      text="Iy = ",
+      anchor="w", 
       bg= Color.gray.value,
       fg= Color.white.value,
       font= ('David', 11)
     )
-    self.label_Iy.place(relx=0.005, rely=0.828, relwidth=0.1, relheight=0.05)
+    self.label_Iy.place(relx=0.005, rely=0.828, relwidth=0.5, relheight=0.05)
 
     self.label_Jo = Label(
       self.frame_1, 
-      text="Jo = ", 
+      text="Jo = ",
+      anchor="w", 
       bg= Color.gray.value,
       fg= Color.white.value,
       font= ('David', 11)
     )
-    self.label_Jo.place(relx=0.005, rely=0.876, relwidth=0.1, relheight=0.05)
+    self.label_Jo.place(relx=0.005, rely=0.876, relwidth=0.5, relheight=0.05)
 
     self.label_Ixy = Label(
       self.frame_1, 
-      text="Ixy = ", 
+      text="Ixy = ",
+      anchor="w", 
       bg= Color.gray.value,
       fg= Color.white.value,
       font= ('David', 11)
     )
-    self.label_Ixy.place(relx=0.005, rely=0.935, relwidth=0.1, relheight=0.05)
+    self.label_Ixy.place(relx=0.005, rely=0.935, relwidth=0.5, relheight=0.05)
   
   def widgets_frame2(self):
     self.x_min, self.x_max = -5 + self.system_origin.x, 5 + self.system_origin.x
@@ -863,13 +869,13 @@ class Application(Validate):
     if(self.geometric_form_entry.get() == "Circunferencia"):
       new_form =  ICCircle(radius=float(self.rad_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
-
-      self.Label_centroid_x.config(text="Centroide.x = "+self.composite_figure.centroid.x)
-      self.Label_centroid_y.config(text="Centroide.y = "+self.composite_figure.centroid.y)
-      #self.label_Ix.config(text="")
-      #self.label_Iy.config(text="")
-      #self.label_Jo.config(text="")
-      #self.label_Ixy.config(text="")
+      
+      self.Label_centroid_x.config(text=f'Centroide.x = {round(self.composite_figure.centroid.x,4)}')
+      self.Label_centroid_y.config(text=f'Centroide.y = {round(self.composite_figure.centroid.y,4)}')
+      self.label_Ix.config(text=f'Ix = {round(self.composite_figure.Ix,4)}')
+      self.label_Iy.config(text=f'Iy = {round(self.composite_figure.Iy,4)}')
+      self.label_Jo.config(text=f'Jo = {round(self.composite_figure._c_polar_moment(),4)}')
+      self.label_Ixy.config(text=f'Ixy = {round(self.composite_figure.Ixy,4)}')
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
@@ -878,6 +884,13 @@ class Application(Validate):
       new_form = ICSemicircle(orientation=self.relation_combobox_orientation(),radius=float(self.rad_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
 
+      self.Label_centroid_x.config(text=f'Centroide.x = {round(self.composite_figure.centroid.x,4)}')
+      self.Label_centroid_y.config(text=f'Centroide.y = {round(self.composite_figure.centroid.y,4)}')
+      self.label_Ix.config(text=f'Ix = {round(self.composite_figure.Ix,4)}')
+      self.label_Iy.config(text=f'Iy = {round(self.composite_figure.Iy,4)}')
+      self.label_Jo.config(text=f'Jo = {round(self.composite_figure._c_polar_moment(),4)}')
+      self.label_Ixy.config(text=f'Ixy = {round(self.composite_figure.Ixy,4)}')
+
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
 
@@ -885,12 +898,26 @@ class Application(Validate):
       new_form = ICQuadrant(orientation=self.relation_combobox_orientation(),radius=float(self.rad_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
+      self.Label_centroid_x.config(text=f'Centroide.x = {round(self.composite_figure.centroid.x,4)}')
+      self.Label_centroid_y.config(text=f'Centroide.y = {round(self.composite_figure.centroid.y,4)}')
+      self.label_Ix.config(text=f'Ix = {round(self.composite_figure.Ix,4)}')
+      self.label_Iy.config(text=f'Iy = {round(self.composite_figure.Iy,4)}')
+      self.label_Jo.config(text=f'Jo = {round(self.composite_figure._c_polar_moment(),4)}')
+      self.label_Ixy.config(text=f'Ixy = {round(self.composite_figure.Ixy,4)}')
+
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
 
     if(self.geometric_form_entry.get() == "Retangulo"):
       new_form = ICRectangle(width=float(self.base_entry.get()), height=float(self.height_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
+
+      self.Label_centroid_x.config(text=f'Centroide.x = {round(self.composite_figure.centroid.x,4)}')
+      self.Label_centroid_y.config(text=f'Centroide.y = {round(self.composite_figure.centroid.y,4)}')
+      self.label_Ix.config(text=f'Ix = {round(self.composite_figure.Ix,4)}')
+      self.label_Iy.config(text=f'Iy = {round(self.composite_figure.Iy,4)}')
+      self.label_Jo.config(text=f'Jo = {round(self.composite_figure._c_polar_moment(),4)}')
+      self.label_Ixy.config(text=f'Ixy = {round(self.composite_figure.Ixy,4)}')
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
