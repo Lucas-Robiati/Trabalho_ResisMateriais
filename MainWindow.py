@@ -70,8 +70,6 @@ class Application(Validate):
     plt.close(self.fig)   # Fecha a figura do Matplotlib
     root.destroy()        # Destroi a janela do Tkinter
 
-# descomentado daqui em diante
-
   def window_frame(self):
   # Cria os frames dentro da janela principal
     self.frame_1 = Frame(
@@ -904,7 +902,7 @@ class Application(Validate):
 
     figureCF = self.add_object()
     figureMPL = self.add_figure_matplotlib(figureCF)
-    self.dict_shapes[figureCF] = figureMPL  # Correção crítica aqui
+    self.dict_shapes[figureCF] = figureMPL
     return None
 
   def add_object(self):
