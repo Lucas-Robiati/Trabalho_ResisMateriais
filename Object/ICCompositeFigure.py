@@ -4,6 +4,23 @@ from Forms import ICCircle
 from Forms import ICRectangle
 from Forms import ICTriangle
 
+
+
+# A classe ICCompositeFigure representa a area composta, ela tem algumas caracteristicas
+# e a dinamica um pouco diferente das outras classes relacionadas a formas geométricas.
+# Como a area composta é a forma final, aqui temos todos os atributos bases herdados de ICForm
+# alem disso a classe tem apenas um atributo:
+# - components: uma lista python que contem todos as formas que compoem a area final
+# alem deste atributo, todos os valores sao calculado a partir dos seguintes metodos da classe:
+# - __c_centroid: função para calcular o centroide geral
+# - __c_area: função responsavel por calcular a area total
+# - __c_moment_of_inertia: função responsavel por calcular o momento de inercia
+# - __c_product_of_inertia: função responsavel por calcular o produto de inercia
+# - append: função responsvel por adicionar novas formas na lista
+# - drop: função responsavel por remover uma forma da lista 
+# - update: função responsavel por atualizar os valores calculados
+
+
 class ICCompositeFigure(ICForm):
   def __init__(self) -> None:
     super().__init__()
@@ -56,28 +73,28 @@ class ICCompositeFigure(ICForm):
       ixy += form.Ixy
 
     return ixy
-  
-  def __c_polar_moment(self) -> None:
-    self.Jo = self.Ix + self.Iy
     
   def append(self, other) -> None:
     if((isinstance(other, ICCircle) or (isinstance(other, ICRectangle) or isinstance(other, ICTriangle))) ):
       self.components.append(other)
-      self.__c_area()
-      self.__c_centroid()
-      self.Ix, self.Iy = self.__c_moment_of_inertia()
-      self.Ixy = self.__c_product_of_inertia()
-      self._c_polar_moment()
+      self.update()
       return 
     return
   
   def drop(self, other) -> None:
     if(other in self.components):
       self.components.remove(other)
-      self.__c_area()
-      self.__c_centroid()
-      self.Ix, self.Iy = self.__c_moment_of_inertia()
-      self.Ixy = self.__c_product_of_inertia()
-      self._c_polar_moment()
+    self.update()
     return
   
+  # função responsavel pela atualização de valores calculados
+  def update(self) -> None:
+    for form in self.components:
+      form.update()
+    
+    self.__c_area()
+    self.__c_centroid()
+    self.Ix, self.Iy = self.__c_moment_of_inertia()
+    self.Ixy = self.__c_product_of_inertia()
+    self._c_polar_moment()
+    return None

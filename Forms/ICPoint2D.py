@@ -51,3 +51,5 @@ class ICPoint2D:
   # Calculo da distancia euclidiana
   def euclidean_distance(self, point:'ICPoint2D') -> float:
     return ((((point.x - self.x) ** 2)+((point.y - self.y) ** 2)) ** 0.5)
+  
+  
