@@ -2,50 +2,59 @@ from Modules import *
 
 class Application(Validate):
   def __init__(self, root:'Tk'):
-    self.root = root                            # Define o bejeto Tk que será usado como janela principal
-    self.composite_figure =  ICCompositeFigure()     # Lista de Obejetos
-    self.dict_shapes = {}
-    self.system_origin = ICPoint2D()            # Variavel que define a origem do sistema
-    self.window()                               # Cria a janela principal sub janelas e widgets
-    root.mainloop()                             # Loop da janela
+    self.root = root                                # Define o bejeto Tk que será usado como janela principal
+    self.composite_figure =  ICCompositeFigure()    # Lista de Obejetos
+    self.dict_shapes = {}                           # Dicionario relacionando figureIC e figureMPL
+    self.system_origin = ICPoint2D()                # Variavel que define a origem do sistema
+    self.window()                                   # Cria a janela principal sub janelas e widgets
+    root.mainloop()                                 # Loop da janela
 
   @property
   def x_min(self) -> float:
+  # Getter x_min
     return self.__x_min
 
   @x_min.setter
   def x_min(self, x_min) -> None:
+  # Setter x_min
     self.__x_min = x_min
     return None
 
   @property
   def x_max(self) -> float:
+  # Getter x_max
     return self.__x_max
-
+  
   @x_max.setter
   def x_max(self, x_max) -> None:
+  # Setter x_max
     self.__x_max = x_max
     return None
 
   @property
   def y_min(self) -> float:
+  # Getter y_min
     return self.__y_min
 
   @y_min.setter
   def y_min(self, y_min) -> None:
+  # Setter y_min
     self.__y_min = y_min
     return None
 
   @property
   def y_max(self) -> float:
+  # Getter y_max
     return self.__y_max
 
   @y_max.setter
   def y_max(self, y_max) -> None:
+  # Setter y_max
     self.__y_max = y_max
     return None
 
   def window(self):
+  # Funcao da janela principal
     self.root.title("InerCalc")                                  # Nome do software
     self.root.configure(background= Color.dark_blue.value)       # Background da janela principal
     self.root.geometry("950x520")                                # Geometria da janela 
@@ -61,8 +70,10 @@ class Application(Validate):
     plt.close(self.fig)   # Fecha a figura do Matplotlib
     root.destroy()        # Destroi a janela do Tkinter
 
-  # Cria os frames dentro da janela principal
+# descomentado daqui em diante
+
   def window_frame(self):
+  # Cria os frames dentro da janela principal
     self.frame_1 = Frame(
       self.root, 
       bd=4, bg=Color.gray.value,
@@ -482,9 +493,6 @@ class Application(Validate):
       )
     self.bt_quit.place(relx=0.55, rely=0.9, relwidth=0.25, relheight=0.08)
   
-  # Foi necessario criar uma nova janela para atualizar as formas geometricas
-  # pois a janela de insert carrega algumas interações especificas
-  #------janela de update da forma---------
   def update_w(self, text:str):
     self.update_w = Toplevel()
     self.update_w.title("Atualizar Forma Geometrica")
@@ -756,6 +764,7 @@ class Application(Validate):
     for figureCF in list(self.dict_shapes.keys()):  # Usar list() para evitar erro de iteração
       figureMPL = self.dict_shapes[figureCF]
       figureMPL.remove()
+      self.composite_figure.drop(figureCF)
     self.dict_shapes.clear()  # Limpa completamente o dicionário
     
     # Limpa a lista de componentes da figura composta
@@ -767,6 +776,10 @@ class Application(Validate):
     
     # Redesenha o gráfico vazio
     self.auto_resize_matplotlib()
+
+    self.atualize_labels()
+
+    return None
 
   def valid_source_plan(self):
     global aux
@@ -794,8 +807,8 @@ class Application(Validate):
       self.system_origin.y = float(self.coordinate_y_entry.get())
     return 1
 
-  # Valida e chama as funções de inserir objetos 
   def add_record(self):
+  # Valida e chama as funções de inserir objetos 
     entry_validate = 0
     if(self.valid_source_plan() == -1):
       return
@@ -831,8 +844,8 @@ class Application(Validate):
     self.dict_shapes[figureCF] = figureMPL  # Correção crítica aqui
     return None
 
-  # Identifica o tipo de objeto inserido e o adiciona na tabela e na lista de objetos
   def add_object(self):
+  # Identifica o tipo de objeto inserido e o adiciona na tabela e na lista de objetos
     if(self.geometric_form_entry.get() == "Triangulo"):
       new_form = ICTriangle(Pa=ICPoint2D(float(self.dimensions_a_px_entry.get()),float(self.dimensions_a_py_entry.get())), Pb=ICPoint2D(float(self.dimensions_b_px_entry.get()),float(self.dimensions_b_py_entry.get())), Pc=ICPoint2D(float(self.dimensions_c_px_entry.get()),float(self.dimensions_c_py_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare()) 
       if(new_form.valido() == -1):
@@ -877,17 +890,12 @@ class Application(Validate):
       self.treeview_list.insert(parent='', index='end', iid=iid, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
     
-    self.Label_centroid_x.config(text=f'Centroide.x = {round(self.composite_figure.centroid.x,4)}')
-    self.Label_centroid_y.config(text=f'Centroide.y = {round(self.composite_figure.centroid.y,4)}')
-    self.label_Ix.config(text=f'Ix = {round(self.composite_figure.Ix,4)}')
-    self.label_Iy.config(text=f'Iy = {round(self.composite_figure.Iy,4)}')
-    self.label_Jo.config(text=f'Jo = {round(self.composite_figure._c_polar_moment(),4)}')
-    self.label_Ixy.config(text=f'Ixy = {round(self.composite_figure.Ixy,4)}')
+    self.atualize_labels()
     
     return new_form
   
-  # Adiciona as figuras do MatPlotLib
   def add_figure_matplotlib(self, figure) -> None:
+  # Adiciona as figuras do MatPlotLib
     if(self.verify_subare()):
       subarea = 2     # Subtrair (Fica a frente)
       edgeclr='black' # Cor da borda
@@ -1003,6 +1011,16 @@ class Application(Validate):
 
     return figureMPL
 
+  def atualize_labels(self) -> None:
+    self.Label_centroid_x.config(text=f'Centroide.x = {round(self.composite_figure.centroid.x, 4)}')
+    self.Label_centroid_y.config(text=f'Centroide.y = {round(self.composite_figure.centroid.y, 4)}')
+    self.label_Ix.config(text=f'Ix = {round(self.composite_figure.Ix, 4)}')
+    self.label_Iy.config(text=f'Iy = {round(self.composite_figure.Iy, 4)}')
+    self.label_Jo.config(text=f'Jo = {round(self.composite_figure._c_polar_moment(), 4)}')
+    self.label_Ixy.config(text=f'Ixy = {round(self.composite_figure.Ixy, 4)}')
+
+    return None
+
   def get_min_max_point_figures(self, figure) -> None:
     if(isinstance(figure, ICRectangle)):
       self.x_min = min(self.x_min, figure.centroid.x - (figure.width / 2))
@@ -1049,17 +1067,17 @@ class Application(Validate):
   def remove_item(self) -> None:  
     selected_items = self.treeview_list.selection()
     if not selected_items:
-        messagebox.showwarning("Aviso", "Nenhuma forma selecionada para remover.", parent=self.root)
-        return
+      messagebox.showwarning("Aviso", "Nenhuma forma selecionada para remover.", parent=self.root)
+      return
 
     selected_iid = selected_items[0]
     
     # Recuperar o objeto usando o iid diretamente do dicionário dict_shapes
     figureCF = None
     for key in list(self.dict_shapes.keys()):
-        if str(id(key)) == selected_iid:  # Usar id do objeto como iid único
-            figureCF = key
-            break
+      if str(id(key)) == selected_iid:  # Usar id do objeto como iid único
+        figureCF = key
+        break
     
     if not figureCF:
         messagebox.showerror("Erro", "Item não encontrado.", parent=self.root)
@@ -1067,12 +1085,12 @@ class Application(Validate):
 
     # Remover da composite_figure
     if figureCF in self.composite_figure.components:
-        self.composite_figure.components.remove(figureCF)
+      self.composite_figure.drop(figureCF)
     
     # Remover do dict_shapes e do matplotlib
     figureMPL = self.dict_shapes.pop(figureCF, None)
     if figureMPL:
-        figureMPL.remove()
+      figureMPL.remove()
     
     # Remover da Treeview
     self.treeview_list.delete(selected_iid)
@@ -1081,6 +1099,8 @@ class Application(Validate):
     self.update_plot_limits()
 
     self.auto_resize_matplotlib()
+
+    self.atualize_labels()
 
   def select_form(self, event):
     self.Decision_form()
@@ -1236,8 +1256,8 @@ class Application(Validate):
   def validate_entry(self):
     self.val = (self.root.register(self.validate_float), '%P')
 
-  # Verifica se o objeto será subtraido ou adicionado
   def verify_subare(self):
+  # Verifica se o objeto será subtraido ou adicionado
     if(self.subare_entry.get() == "Subtrair"):
       return True
     return False

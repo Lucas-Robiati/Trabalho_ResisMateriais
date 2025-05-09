@@ -26,13 +26,13 @@ from Forms import ICQuadrant
 class ICCompositeFigure(ICForm):
   def __init__(self) -> None:
     super().__init__()
-    self.components = []   
+    self.components = []
     return None
   
 
   def __c_centroid(self) -> ICPoint2D:
     if(not self.components):
-      return None
+      return ICPoint2D()
     
     x = 0.0
     y = 0.0
@@ -42,18 +42,18 @@ class ICCompositeFigure(ICForm):
     x = x / (self.area)
     y = y / (self.area)
 
-    self.centroid = ICPoint2D(x, y)   
-    return None 
+    return ICPoint2D(x, y)   
 
   def __c_area(self) -> None:
     if not self.components:
-      self.area = 0.0
-      return None
+      return 0.0
     
-    self.area = 0.0
+    area = 0.0
     for form in self.components:
-      self.area += form.area * form.virtual_form
-    return None
+      area += form.area * form.virtual_form
+
+    return area
+    
 
   def __c_moment_of_inertia(self) -> float:
     if not self.components:
@@ -68,7 +68,7 @@ class ICCompositeFigure(ICForm):
 
   def __c_product_of_inertia(self) -> float:
     if not self.components:
-      return 0.0, 0.0
+      return 0.0
     
     ixy = 0.0
     for form in self.components:
@@ -94,8 +94,8 @@ class ICCompositeFigure(ICForm):
     #for form in self.components:
     #  form.update()
     
-    self.__c_area()
-    self.__c_centroid()
+    self.area = self.__c_area()
+    self.centroid = self.__c_centroid()
     self.Ix, self.Iy = self.__c_moment_of_inertia()
     self.Ixy = self.__c_product_of_inertia()
     self._c_polar_moment()
