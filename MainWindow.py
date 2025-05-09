@@ -773,6 +773,7 @@ class Application(Validate):
         component.Pa = ICPoint2D(float(self.dimensions_a_px_entry.get()), float(self.dimensions_a_py_entry.get()))
         component.Pb = ICPoint2D(float(self.dimensions_b_px_entry.get()), float(self.dimensions_b_py_entry.get()))
         component.Pc = ICPoint2D(float(self.dimensions_c_px_entry.get()), float(self.dimensions_c_py_entry.get()))
+        component.centroid = component.c_centroid()
 
       elif self.geometric_form_entry.get() == "Circunferencia":
         component.radius = float(self.rad_entry.get())
@@ -782,11 +783,13 @@ class Application(Validate):
         component.radius = float(self.rad_entry.get())
         component.orientation = self.relation_combobox_orientation()
         component.origin = ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))
+        component.centroid = component.c_centroid()
 
       elif self.geometric_form_entry.get() == "Semicirculo":
         component.radius = float(self.rad_entry.get())
         component.orientation = self.relation_combobox_orientation()
         component.origin = ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))
+        component.centroid = component.c_centroid()
 
       elif self.geometric_form_entry.get() == "Retangulo":
         component.width = float(self.base_entry.get())
@@ -830,6 +833,7 @@ class Application(Validate):
     
     # Limpa a lista de componentes da figura composta
     self.composite_figure.components.clear()
+    self.composite_figure.update()
     
     # Redefine os limites do gráfico para os valores padrão
     self.x_min, self.x_max = -5 + self.system_origin.x, 5 + self.system_origin.x
@@ -839,6 +843,10 @@ class Application(Validate):
     self.auto_resize_matplotlib()
 
     self.atualize_labels()
+  
+    
+    self.coordinate_x_entry.config(state='normal')
+    self.coordinate_y_entry.config(state='normal')
 
     return None
 

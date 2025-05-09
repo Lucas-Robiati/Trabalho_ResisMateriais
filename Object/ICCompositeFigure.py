@@ -29,7 +29,6 @@ class ICCompositeFigure(ICForm):
     self.components = []
     return None
   
-
   def __c_centroid(self) -> ICPoint2D:
     if(not self.components):
       return ICPoint2D()
@@ -42,7 +41,6 @@ class ICCompositeFigure(ICForm):
     x = x / (self.area)
     y = y / (self.area)
 
-    self.centroid = ICPoint2D(x, y)
     return ICPoint2D(x, y)   
 
   def __c_area(self) -> None:

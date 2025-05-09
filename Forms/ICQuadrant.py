@@ -13,7 +13,7 @@ orientation 3: 270°-0°
 # - orientation: representa a orientação do quarto de circulo conforme a descrito acima
 # - origem: representa a origem do quadrante de circulo
 # A classe também implementa os seguiintes métodos:
-# - __c_centroid: função responsavel pelo calculo do centroide do quadrante de circulo
+# - c_centroid: função responsavel pelo calculo do centroide do quadrante de circulo
 # - __c_moment_of_inertia: função responsavel pelo calculo do momento de inercia dos eixos x e y
 # - __c_product_of_inertia: função resposavel pelo calculo do produto de inercia
 # - update função responsavel pela rotina de atualização dos valores calculados após a edição dos atributos
@@ -26,7 +26,7 @@ class ICQuadrant(ICForm):
     self.radius = radius                                        # atribuição do valor do raio          
     self.orientation = orientation                              # atribuição da orientação da figura
     self.origin = origin                                        # atribuição da origem do quadrante de circulo
-    super().__init__(self.__c_centroid(), system_origin, virtual_form)         # inicialização da classe PAI
+    super().__init__(self.c_centroid(), system_origin, virtual_form)         # inicialização da classe PAI
     self.area = self.__c_area()                                 # atribuição do valor da area atraves do retorno da função __c_area
     self.Ix, self.Iy = self.__c_moment_of_inertia()             # atribuição do valor do momento de inercia atraves do retorno da função __c_moment_of_inertia
     self.Jo = self._c_polar_moment()                            # atribuição do valor do momento polar atraves do retorno da função __c_polar_moment
@@ -63,7 +63,7 @@ class ICQuadrant(ICForm):
   # fim dos getters e setters
 
   # Função de calculo do centroide
-  def __c_centroid(self) -> ICPoint2D:
+  def c_centroid(self) -> ICPoint2D:
 
     # cada if representa uma orientação do quadrante de circulo
     # esta estrutura foi definida devido ao fato que dependendo da orintação 
@@ -119,7 +119,7 @@ class ICQuadrant(ICForm):
   
   # Função responsavel pela rotina de atualização de valores calculados
   def update(self) -> None:
-    self.centroid = self.__c_centroid()                         
+    self.centroid = self.c_centroid()                         
     self.area = self.__c_area()                                 
     self.Ix, self.Iy = self.__c_moment_of_inertia()             
     self.Jo = self._c_polar_moment()                            
