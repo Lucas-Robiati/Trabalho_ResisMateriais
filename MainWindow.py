@@ -295,7 +295,7 @@ class Application(Validate):
     self.dimensions_a_px_entry.config(state="normal", validate= "key", validatecommand=self.val)
     self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.45, relheight=0.05)
 
-    self.dimensions_b_px_entry = EntPlaceHold(self.frame_insert, placeholder='ponto Bx')
+    self.dimensions_b_px_entry = EntPlaceHold(self.frame_insert, placeholder='ponto Ay')
     self.dimensions_b_px_entry.config(state="normal", validate= "key", validatecommand=self.val)
     self.dimensions_b_px_entry.place(relx=0.005, rely=0.23, relwidth=0.45, relheight=0.05)
 
@@ -352,6 +352,22 @@ class Application(Validate):
     self.subare_entry.config(foreground= Color.black.value, background= Color.light_gray.value)
     self.subare_entry.place(relx=0.005, rely=0.42, relwidth=0.95, relheight=0.05)
 
+    self.label_combobox_orientation = Label(self.frame_insert, 
+      text="Orientação", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 10)
+      )
+    self.label_combobox_orientation.place_forget()
+
+    self.combobox_orientation = ttk.Combobox(self.frame_insert,
+      state= "readonly",
+      justify="center",
+      font= ('David', 10), 
+      values=["◴", "◷", "◵", "◶"]
+      )
+    self.combobox_orientation.place_forget()
+
     #======Buttons===========
     self.bt_acept = Button(
       self.frame_insert, 
@@ -381,6 +397,16 @@ class Application(Validate):
 
   def destroy_insert_window(self):
     self.insert.destroy()
+
+  def relation_combobox_orientation(self):
+    if(self.combobox_orientation.get() == "◷"):
+      return 0
+    if(self.combobox_orientation.get() == "◴"):
+      return 1
+    if(self.combobox_orientation.get() == "◵"):
+      return 2
+    if(self.combobox_orientation.get() == "◶"):
+      return 3
 
   def valid_source_plan(self):
     global aux
@@ -473,7 +499,7 @@ class Application(Validate):
       return new_form
         
     if(self.geometric_form_entry.get() == "Semicirculo"):
-      new_form = ICSemicircle(radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form = ICSemicircle(orientation=self.relation_combobox_orientation(),radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
 
       self.treeview_list.insert(parent='', index='end', iid=count, 
@@ -482,7 +508,7 @@ class Application(Validate):
       return new_form
 
     if(self.geometric_form_entry.get() == "Quadrante"):
-      new_form = ICQuadrant(radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form = ICQuadrant(orientation=self.relation_combobox_orientation(),radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
@@ -603,6 +629,7 @@ class Application(Validate):
       self.dimensions_b_py_entry.place(relx=0.48, rely=0.23, relwidth=0.5, relheight=0.05)
       self.dimensions_c_py_entry.place(relx=0.48, rely=0.295, relwidth=0.5, relheight=0.05)
 
+      # Eventos para apagar a escrita do placeholder ponto Ax.Bx.Cx e reescrver o novo texto dos Entry
       self.dimensions_a_px_entry.delete('0', 'end')
       self.dimensions_a_px_entry.insert(0, 'ponto Ax')
       self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
@@ -615,18 +642,12 @@ class Application(Validate):
       self.dimensions_c_px_entry.insert(0, 'ponto Cx')
       self.dimensions_c_px_entry.bind("<FocusIn>", lambda args: self.dimensions_c_px_entry.delete('0', 'end'))
 
-      #self.dimensions_a_py_entry.delete('0', 'end')
-      #self.dimensions_a_py_entry.insert(0, 'ponto Ay')
+      # Eventos para apagar a escrita do placeholder ponto Ay.By.Cy
       self.dimensions_a_py_entry.bind("<FocusIn>", lambda args: self.dimensions_a_py_entry.delete('0', 'end'))
-
-      #self.dimensions_b_py_entry.delete('0', 'end')
-      #self.dimensions_b_py_entry.insert(0, 'ponto By')
       self.dimensions_b_py_entry.bind("<FocusIn>", lambda args: self.dimensions_b_py_entry.delete('0', 'end'))
-      
-      #self.dimensions_c_py_entry.delete('0', 'end')
-      #self.dimensions_c_py_entry.insert(0, 'ponto Cy')
       self.dimensions_c_py_entry.bind("<FocusIn>", lambda args: self.dimensions_c_py_entry.delete('0', 'end'))
 
+      # Oculta as lables e Entrys desnecessarios
       self.label_coordinates_center.place_forget()
       self.coordinate_center_x_entry.place_forget()
       self.coordinate_center_y_entry.place_forget()
@@ -644,6 +665,8 @@ class Application(Validate):
       self.dimensions_c_px_entry.delete('0', 'end')
       self.dimensions_c_px_entry.place_forget()
 
+      self.label_combobox_orientation.place_forget()
+      self.combobox_orientation.place_forget()
       self.dimensions_a_py_entry.place_forget()
       self.dimensions_b_py_entry.place_forget()
       self.dimensions_c_py_entry.place_forget()
@@ -661,6 +684,12 @@ class Application(Validate):
       self.dimensions_a_px_entry.delete('0', 'end')
       self.dimensions_a_px_entry.insert(0, 'raio')
       self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
+
+      # Reposiciona a lable de origem 
+      self.label_combobox_orientation.place(relx=0.005, rely=0.25, relwidth=0.45, relheight=0.05)
+
+      # Reposiciona a selecao da origem
+      self.combobox_orientation.place(relx=0.005, rely=0.295, relwidth=0.45, relheight=0.05)
 
       self.dimensions_b_px_entry.delete('0', 'end')
       self.dimensions_b_px_entry.place_forget()
@@ -693,6 +722,8 @@ class Application(Validate):
       self.dimensions_c_px_entry.delete('0', 'end')
       self.dimensions_c_px_entry.place_forget()
 
+      self.label_combobox_orientation.place_forget()
+      self.combobox_orientation.place_forget()
       self.dimensions_a_py_entry.place_forget()
       self.dimensions_b_py_entry.place_forget()
       self.dimensions_c_py_entry.place_forget()
