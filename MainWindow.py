@@ -123,19 +123,6 @@ class Application(Validate):
     # Captura a entrada de caracteres da entrada e aplica a função de validação conforme o sinal
     self.coordinate_y_entry.configure(validate= "key", validatecommand=self.val)
 
-    # Cria o Botão Calcular
-    self.bt_calc = Button(
-      self.frame_1, 
-      text="Calcular",
-      font=('David', 10),
-      bd= 0,
-      activebackground= Color.white.value,
-      activeforeground= Color.black.value,
-      bg= Color.gray.value,
-      fg= Color.white.value
-      )
-    self.bt_calc.place(relx=0.79, rely=0.92, relwidth=0.2, relheight=0.07)
-
     # Lable que da nome pra tabela
     self.label_table = Label(
       self.frame_1, 
@@ -188,6 +175,61 @@ class Application(Validate):
       background=[('selected', Color.light_blue.value)],
       foreground=[('selected', Color.white.value)]
       )
+
+    # ---- label resultados ------
+    self.Label_centroid_x = Label(
+      self.frame_1, 
+      text="Centroid.x = ", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 11)
+    )
+    self.Label_centroid_x.place(relx=0.005, rely=0.68, relwidth=0.22, relheight=0.05)
+    
+    self.Label_centroid_y = Label(
+      self.frame_1, 
+      text="Centroid.y = ", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 11)
+    )
+    self.Label_centroid_y.place(relx=0.005, rely=0.74, relwidth=0.22, relheight=0.05)
+
+    self.label_Ix = Label(
+      self.frame_1, 
+      text="Ix = ", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 11)
+    )
+    self.label_Ix.place(relx=0.005, rely=0.785, relwidth=0.1, relheight=0.05)
+
+    self.label_Iy = Label(
+      self.frame_1, 
+      text="Iy = ", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 11)
+    )
+    self.label_Iy.place(relx=0.005, rely=0.828, relwidth=0.1, relheight=0.05)
+
+    self.label_Jo = Label(
+      self.frame_1, 
+      text="Jo = ", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 11)
+    )
+    self.label_Jo.place(relx=0.005, rely=0.876, relwidth=0.1, relheight=0.05)
+
+    self.label_Ixy = Label(
+      self.frame_1, 
+      text="Ixy = ", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 11)
+    )
+    self.label_Ixy.place(relx=0.005, rely=0.935, relwidth=0.1, relheight=0.05)
   
   def widgets_frame2(self):
     self.x_min, self.x_max, self.y_min, self.y_max = -5, 5, -5, 5
@@ -437,18 +479,18 @@ class Application(Validate):
   # Foi necessario criar uma nova janela para atualizar as formas geometricas
   # pois a janela de insert carrega algumas interações especificas
   #------janela de update da forma---------
-  def update_toplevel(self, text:str):
-    self.update_toplevel = Toplevel()
-    self.update_toplevel.title("Atualizar Forma Geometrica")
-    self.update_toplevel.configure(background= Color.dark_blue.value)
-    self.update_toplevel.geometry("300x500")
-    self.update_toplevel.resizable(False, False)
-    self.update_toplevel.transient(self.root)
-    self.update_toplevel.focus_force()
-    self.update_toplevel.grab_set()
+  def update_w(self, text:str):
+    self.update_w = Toplevel()
+    self.update_w.title("Atualizar Forma Geometrica")
+    self.update_w.configure(background= Color.dark_blue.value)
+    self.update_w.geometry("300x500")
+    self.update_w.resizable(False, False)
+    self.update_w.transient(self.root)
+    self.update_w.focus_force()
+    self.update_w.grab_set()
 
     self.frame_update = Frame(
-      self.update_toplevel, 
+      self.update_w, 
       bd=4, bg=Color.gray.value,
       highlightbackground= Color.light_gray.value, 
       highlightthickness= 4
@@ -603,7 +645,7 @@ class Application(Validate):
       text="Cancelar",
       font=('David', 10),
       bd= 0,
-      command= self.destroy_update_toplevel,
+      command= self.destroy_update_w,
       activebackground= Color.white.value,
       activeforeground= Color.black.value,
       bg= Color.gray.value,
@@ -614,9 +656,9 @@ class Application(Validate):
   def destroy_insert_window(self):
     self.insert.destroy()
 
-  def destroy_update_toplevel(self):
-     if hasattr(self, 'update_toplevel'):
-        self.update_toplevel.destroy()
+  def destroy_update_w(self):
+     if hasattr(self, 'update_w'):
+        self.update_w.destroy()
   
   def Modify_object(self):
     
@@ -718,7 +760,7 @@ class Application(Validate):
       self.coordinate_center_y_entry.delete('0', 'end')
       self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].centroid.y)
           
-    self.update_toplevel(_str)
+    self.update_w(_str)
 
   def ICreset(self):
     # Remove todos os itens da Treeview
@@ -821,6 +863,13 @@ class Application(Validate):
     if(self.geometric_form_entry.get() == "Circunferencia"):
       new_form =  ICCircle(radius=float(self.rad_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
+
+      self.Label_centroid_x.config(text="Centroide.x = "+self.composite_figure.centroid.x)
+      self.Label_centroid_y.config(text="Centroide.y = "+self.composite_figure.centroid.y)
+      #self.label_Ix.config(text="")
+      #self.label_Iy.config(text="")
+      #self.label_Jo.config(text="")
+      #self.label_Ixy.config(text="")
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
@@ -1255,6 +1304,7 @@ class Application(Validate):
     self.ax.spines['left'].set_position(self.system_origin.y)
     self.ax.spines['top'].set_visible(False)
     self.ax.spines['right'].set_visible(False)
+
     
     # Aplicar padding de 1 unidade
     self.ax.set_xlim(self.x_min - 1, self.x_max + 1)
