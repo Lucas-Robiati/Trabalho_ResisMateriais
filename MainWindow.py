@@ -195,20 +195,9 @@ class Application(Validate):
     self.fig, self.ax = plt.subplots()
     self.fig.patch.set_facecolor('#ffffff')
 
-    # Configurar eixos
-    self.ax.spines['bottom'].set_position('zero')
-    self.ax.spines['left'].set_position('zero')
-    self.ax.spines['top'].set_visible(False)
-    self.ax.spines['right'].set_visible(False)
-
     # Rótulos dos eixos
     self.ax.set_xlabel('$x$', size=10, labelpad=-24, x=1.05)
     self.ax.set_ylabel('$y$', size=10, labelpad=-21, y=1.02, rotation=0)
-
-    # Limites iniciais sem padding
-    self.ax.set(xlim=(self.x_min, self.x_max), 
-                ylim=(self.y_min, self.y_max), 
-                aspect='equal')
 
     # Configurar ticks iniciais
     self.update_ticks()
@@ -655,9 +644,8 @@ class Application(Validate):
     #    index = self.treeview_list.index(select)
     #    iid = select[0]
     #    _str = data['text']
-    #    values = self.treeview_list.item(iid, "values")
-
-    self.update_toplevel(_str)
+    #    values = self.treeview_list.item(iid, "values") 
+    #    self.update_window(_str)
         
     if(_str == "Triangulo"):
       self.dimensions_a_px_entry.delete('0', 'end')
@@ -730,7 +718,7 @@ class Application(Validate):
       self.coordinate_center_y_entry.delete('0', 'end')
       self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].centroid.y)
           
-    #self.update_toplevel(_str)
+    self.update_toplevel(_str)
 
   def ICreset(self):
     # Remove todos os itens da Treeview
@@ -867,10 +855,12 @@ class Application(Validate):
       subarea = 2     # Subtrair (Fica a frente)
       edgeclr='black' # Cor da borda
       faceclr='white' # Cor de preenchimento
+      aph = 0.55
     else:
       subarea = 1     # Adicionar (Fica atras)
       edgeclr='black' # Borda
       faceclr='blue'  # Preenchimento
+      aph = 0.4
 
     figureMPL = None
 
@@ -884,7 +874,8 @@ class Application(Validate):
         closed = True,             # Fechar o polígono
         edgecolor = edgeclr,       # Cor da borda
         facecolor = faceclr,       # Cor de preenchimento
-        zorder = subarea           # Ordem
+        zorder = subarea,          # Ordem
+        alpha = aph
       )
 
     if(isinstance(figure, ICCircle)):
@@ -893,7 +884,8 @@ class Application(Validate):
         radius = figure.radius,                           # Raio
         edgecolor = edgeclr,                              # Cor da borda
         facecolor = faceclr,                              # Cor de preenchimento
-        zorder = subarea                                  # Ordem
+        zorder = subarea,                                  # Ordem
+        alpha = aph
       )
 
     if(isinstance(figure, ICSemicircle)):
@@ -913,7 +905,8 @@ class Application(Validate):
         theta2 = t2,                                       # Ângulo final (graus)
         edgecolor = edgeclr,                              # Cor da borda
         facecolor = faceclr,                              # Cor de preenchimento
-        zorder = subarea                                  # Ordem
+        zorder = subarea,                                  # Ordem
+        alpha = aph
       )
       """
         situações de orientação meio_circulo
@@ -940,7 +933,8 @@ class Application(Validate):
         theta2 = t2,                                        # Ângulo final (graus)
         edgecolor = edgeclr,                              # Cor da borda
         facecolor = faceclr,                              # Cor de preenchimento
-        zorder = subarea                                  # Ordem
+        zorder = subarea,                                  # Ordem
+        alpha = aph
       )
       """
         situações de orientação quarto de circulo
@@ -952,16 +946,21 @@ class Application(Validate):
 
     if(isinstance(figure, ICRectangle)):
       figureMPL = Rectangle(
-        xy = [(figure.centroid.x) - (figure.centroid.x / 2),
-              (figure.centroid.y) - (figure.centroid.y / 2)],     # Canto inferior esquerdo
+        xy = [(figure.centroid.x) - (figure.width / 2),
+              (figure.centroid.y) - (figure.height / 2)],     # Canto inferior esquerdo
         width = figure.width,                                     # Largura
         height = figure.height,                                   # Altura
         edgecolor = edgeclr,                                      # Cor da borda
         facecolor = faceclr,                                      # Cor de preenchimento
-        zorder = subarea                                          # Ordem
+        zorder = subarea,                                          # Ordem
+        alpha = aph
       )
 
+    if(not self.dict_shapes):
+      self.x_min = self.y_min = float('inf')
+      self.x_max = self.y_max = float('-inf')
     self.get_min_max_point_figures(figure)
+
     self.ax.add_patch(figureMPL)
     self.auto_resize_matplotlib()
 
@@ -976,14 +975,20 @@ class Application(Validate):
       return None
 
     if(isinstance(figure, ICTriangle)):
-      points = [(figure.Pa.x, figure.Pa.y),  # Ponto A Vértices (x, y)
-                (figure.Pb.x, figure.Pb.y),  # Ponto B Vértices (x, y)
-                (figure.Pc.x, figure.Pc.y)]  # Ponto C Vértices (x, y)
-      
-      self.x_min = min(self.x_min, [p[0] for p in points]) # Reajustando limite inferior em X caso a figura ultrapasse
-      self.x_max = max(self.x_max, [p[0] for p in points]) # Reajustando limite superior em X caso a figura ultrapasse
-      self.y_min = min(self.y_min, [p[1] for p in points]) # Reajustando limite inferior em Y caso a figura ultrapasse
-      self.y_max = max(self.y_max, [p[1] for p in points]) # Reajustando limite superior em Y caso a figura ultrapasse
+      self.x_min = min(self.x_min, figure.Pa.x) # Reajustando limite inferior em X caso a figura ultrapasse
+      self.x_max = max(self.x_max, figure.Pa.x) # Reajustando limite superior em X caso a figura ultrapasse
+      self.y_min = min(self.y_min, figure.Pa.y) # Reajustando limite inferior em Y caso a figura ultrapasse
+      self.y_max = max(self.y_max, figure.Pa.y) # Reajustando limite superior em Y caso a figura ultrapasse
+
+      self.x_min = min(self.x_min, figure.Pb.x) # Reajustando limite inferior em X caso a figura ultrapasse
+      self.x_max = max(self.x_max, figure.Pb.x) # Reajustando limite superior em X caso a figura ultrapasse
+      self.y_min = min(self.y_min, figure.Pb.y) # Reajustando limite inferior em Y caso a figura ultrapasse
+      self.y_max = max(self.y_max, figure.Pb.y) # Reajustando limite superior em Y caso a figura ultrapasse
+
+      self.x_min = min(self.x_min, figure.Pc.x) # Reajustando limite inferior em X caso a figura ultrapasse
+      self.x_max = max(self.x_max, figure.Pc.x) # Reajustando limite superior em X caso a figura ultrapasse
+      self.y_min = min(self.y_min, figure.Pc.y) # Reajustando limite inferior em Y caso a figura ultrapasse
+      self.y_max = max(self.y_max, figure.Pc.y) # Reajustando limite superior em Y caso a figura ultrapasse
       return None
         
     if(isinstance(figure, ICSemicircle) or
@@ -1016,7 +1021,7 @@ class Application(Validate):
       index = int(selected_iid)
       # Remove da composite_figure
       figureCF = self.composite_figure.components[index]
-      self.composite_figure.drop(index)
+      self.composite_figure.drop(figureCF)
     except (IndexError, ValueError, TypeError) as e:
       messagebox.showerror("Erro", f"Falha ao remover item: {e}", parent=self.root)
       return
@@ -1245,9 +1250,15 @@ class Application(Validate):
       self.coordinate_y_entry.place(relx=0.55, rely=0.58, relwidth=0.3, relheight=0.04)
   
   def auto_resize_matplotlib(self):
+    # Configurar eixos
+    self.ax.spines['bottom'].set_position(self.system_origin.x)
+    self.ax.spines['left'].set_position(self.system_origin.y)
+    self.ax.spines['top'].set_visible(False)
+    self.ax.spines['right'].set_visible(False)
+    
     # Aplicar padding de 1 unidade
-    self.ax.set_xlim(self.x_min - 2, self.x_max + 2)
-    self.ax.set_ylim(self.y_min - 2, self.y_max + 2)
+    self.ax.set_xlim(self.x_min - 1, self.x_max + 1)
+    self.ax.set_ylim(self.y_min - 1, self.y_max + 1)
     self.update_ticks()
     plt.draw()
 
@@ -1260,13 +1271,13 @@ class Application(Validate):
 
     # Gerar ticks cobrindo todo o intervalo
     x_ticks = np.arange(
-        start=self.x_min, 
-        stop=self.x_max + self.ticks_frequency_x, 
+        start=self.x_min - 1, 
+        stop=self.x_max + 1 + self.ticks_frequency_x, 
         step=self.ticks_frequency_x
     )
     y_ticks = np.arange(
-        start=self.y_min, 
-        stop=self.y_max + self.ticks_frequency_y, 
+        start=self.y_min - 1, 
+        stop=self.y_max + 1 + self.ticks_frequency_y, 
         step=self.ticks_frequency_y
     )
 
