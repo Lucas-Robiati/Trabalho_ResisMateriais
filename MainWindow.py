@@ -762,13 +762,13 @@ class Application(Validate):
       self.composite_figure.components[index].origin.x = float(self.coordinate_center_x_entry.get())
       self.composite_figure.components[index].origin.y = float(self.coordinate_center_y_entry.get())
 
-    if(self.geometric_form_entry.get() == "Retandulo"):
+    if(self.geometric_form_entry.get() == "Retangulo"):
       self.composite_figure.components[index].width = float(self.base_entry.get())
       self.composite_figure.components[index].height = float(self.base_entry.get())
-      self.composite_figure.components[index].centroid.x = float(self.coordinate_x_entry.get())
-      self.composite_figure.components[index].centroid.y = float(self.coordinate_y_entry.get())
+      self.composite_figure.components[index].centroid.x = float(self.coordinate_center_x_entry.get())
+      self.composite_figure.components[index].centroid.y = float(self.coordinate_center_y_entry.get())
 
-      self.treeview_list.insert(select, values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
+      self.treeview_list.insert(index, values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
       
 
   def ICreset(self):
