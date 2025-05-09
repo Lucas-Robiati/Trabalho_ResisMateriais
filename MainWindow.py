@@ -614,7 +614,7 @@ class Application(Validate):
       text="Cancelar",
       font=('David', 10),
       bd= 0,
-      command= self.destroy_insert_window,
+      command= self.destroy_update_window,
       activebackground= Color.white.value,
       activeforeground= Color.black.value,
       bg= Color.gray.value,
@@ -624,17 +624,37 @@ class Application(Validate):
 
   def destroy_insert_window(self):
     self.insert.destroy()
+
+  def destroy_update_window(self):
+    self.update_window.destroy()
   
   def Modify_object(self):
-
+    
     select = self.treeview_list.selection()
-    if(select):
-        data = self.treeview_list.item(select[0])
-        index = self.treeview_list.index(select)
-        iid = select[0]
-        _str = data['text']
-        values = self.treeview_list.item(iid, "values") 
-        self.update_window(_str)
+    if not select:
+      messagebox.showwarning("Aviso", "Nenhuma forma selecionada para remover.", parent=self.root)
+      return
+
+    selected_iid = select[0]
+
+    try:
+      index = int(selected_iid)
+    except (IndexError, ValueError, TypeError) as e:
+      messagebox.showerror("Erro", f"Falha ao remover item: {e}", parent=self.root)
+      return
+    
+    data = self.treeview_list.item(selected_iid)
+    _str = data['text']
+    values = self.treeview_list.item(selected_iid, "values") 
+
+    #select = self.treeview_list.selection()
+    #if(select):
+    #    data = self.treeview_list.item(select[0])
+    #    index = self.treeview_list.index(select)
+    #    iid = select[0]
+    #    _str = data['text']
+    #    values = self.treeview_list.item(iid, "values") 
+    #    self.update_window(_str)
         
     if(_str == "Triangulo"):
       self.dimensions_a_px_entry.delete('0', 'end')
@@ -707,6 +727,8 @@ class Application(Validate):
       self.coordinate_center_y_entry.delete('0', 'end')
       self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].centroid.y)
           
+    self.update_window(_str)
+
   def ICreset(self):
     # Remove todos os itens da Treeview
     for item in self.treeview_list.get_children():
