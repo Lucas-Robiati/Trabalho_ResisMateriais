@@ -9,6 +9,38 @@ class Application(Validate):
     self.window()                               # Cria a janela principal sub janelas e widgets
     root.mainloop()                             # Loop da janela
 
+  @property
+  def x_min(self) -> float:
+    return self.__x_min
+
+  @x_min.setter
+  def x_min(self, x_min) -> None:
+    self.x_min = min(self.x_min, x_min)
+
+  @property
+  def x_max(self) -> float:
+    return self.__x_max
+
+  @x_min.setter
+  def x_max(self, x_max) -> None:
+    self.x_max = max(self.x_max, x_max)
+
+  @property
+  def y_min(self) -> float:
+    return self.__y_min
+
+  @y_min.setter
+  def y_min(self, y_min) -> None:
+    self.y_min = min(self.y_min, y_min)
+
+  @property
+  def y_max(self) -> float:
+    return self.__y_max
+
+  @y_max.setter
+  def y_max(self, y_max) -> None:
+    self.y_max = max(self.y_max, y_max)
+
   def window(self):
     self.root.title("InerCalc")                                  # Nome do software
     self.root.configure(background= Color.dark_blue.value)       # Background da janela principal
@@ -63,7 +95,6 @@ class Application(Validate):
     self.widgets_frame3()
 
   def widgets_frame1(self):
-      
     global count,aux
     count = 0
     aux = 0
@@ -155,8 +186,8 @@ class Application(Validate):
       )
   
   def widgets_frame2(self):
-    self.xmin, self.xmax, self.ymin, self.ymax = -5, 5, -5, 5
-    self.ticks_frequency = 1
+    self.__x_min, self.__x_max, self.__y_min, self.__y_max = -5, 5, -5, 5
+    self.ticks_frequency = 1  # Valor inicial, será ajustado dinamicamente
 
     self.fig, self.ax = plt.subplots()
     self.fig.patch.set_facecolor('#ffffff')
@@ -171,9 +202,9 @@ class Application(Validate):
     self.ax.set_ylabel('$y$', size=10, labelpad=-21, y=1.02, rotation=0)
     
     plt.text(0.49, 0.49, r"$O$", ha='right', va='top',
-      transform=self.ax.transAxes,
-      horizontalalignment='center', fontsize=8
-      )
+             transform=self.ax.transAxes,
+             horizontalalignment='center', fontsize=8
+             )
     
     self.auto_resize_matplotlib()
     
@@ -499,6 +530,7 @@ class Application(Validate):
       count += 1
       return new_form
   
+  # Adiciona as figuras do MatPlotLib
   def add_figure_matplotlib(self) -> None:
     if(self.verify_subare()):
       subarea = 2     # Subtrair (Fica a frente)
@@ -509,35 +541,52 @@ class Application(Validate):
       edgeclr='black' # Borda
       faceclr='blue'  # Preenchimento
 
-    if(self.geometric_form_entry.get() == "Triangulo"):
+    figure = None
+    form = self.geometric_form_entry.get()
+
+    if(form == "Triangulo"):
+      points = [(float(self.dimensions_a_px_entry.get()), float(self.dimensions_a_py_entry.get())),  # Ponto A Vértices (x, y)
+                (float(self.dimensions_b_px_entry.get()), float(self.dimensions_b_py_entry.get())),  # Ponto B Vértices (x, y)
+                (float(self.dimensions_c_px_entry.get()), float(self.dimensions_c_py_entry.get()))   # Ponto C Vértices (x, y)
+      ]
+
       figure = Polygon(
-        xy=[(float(self.dimensions_a_px_entry.get()),float(self.dimensions_a_py_entry.get())),  # Ponto A Vértices (x, y)
-            (float(self.dimensions_b_px_entry.get()),float(self.dimensions_b_py_entry.get())),  # Ponto B Vértices (x, y)
-            (float(self.dimensions_c_px_entry.get()),float(self.dimensions_c_py_entry.get()))], # Ponto C Vértices (x, y)
-        closed=True,                              # Fechar o polígono
-        edgecolor=edgeclr,                        # Cor da borda
-        facecolor=faceclr,                        # Cor de preenchimento
-        zorder=subarea                            # Ordem
+        xy = points,               # Pontos do Triangulo
+        closed = True,             # Fechar o polígono
+        edgecolor = edgeclr,       # Cor da borda
+        facecolor = faceclr,       # Cor de preenchimento
+        zorder = subarea           # Ordem
       )
 
-    if(self.geometric_form_entry.get() == "Circunferencia"):
+      self.x_min = [p[0] for p in points] # Reajustando limite inferior em X caso a figura ultrapasse
+      self.x_max = [p[0] for p in points] # Reajustando limite superior em X caso a figura ultrapasse
+      self.y_max = [p[1] for p in points] # Reajustando limite inferior em Y caso a figura ultrapasse
+      self.y_min = [p[1] for p in points] # Reajustando limite superior em Y caso a figura ultrapasse
+
+    if(form == "Circunferencia"):
+      origin = [(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))]
+      rad = float(self.dimensions_a_px_entry.get())
+
       figure = Circle(
-        xy=(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())),     # Centro do círculo
-        radius=float(self.dimensions_a_px_entry.get()),        # Raio
-        edgecolor=edgeclr, # Cor da borda
-        facecolor=faceclr, # Cor de preenchimento
-        zorder=subarea           # Ordem
+        xy = origin,          # Centro do círculo
+        radius = rad,         # Raio
+        edgecolor = edgeclr,  # Cor da borda
+        facecolor = faceclr,  # Cor de preenchimento
+        zorder = subarea      # Ordem
       )
 
-    if(self.geometric_form_entry.get() == "Semicirculo"):
+    if(form == "Semicirculo"):
+      origin = [(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))]
+      r = float(self.dimensions_a_px_entry.get())
+
       figure = Wedge(
-        center=(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), # Centro
-        r=float(self.dimensions_a_px_entry.get()),              # Raio
-        theta1=0,         # Ângulo inicial (graus)
+        center = origin,      # Centro do círculo
+        radius = rad,         # Raio
+        theta1=0,             # Ângulo inicial (graus)
         theta2=180,           # Ângulo final (graus)
-        edgecolor=edgeclr,  # Cor da borda
-        facecolor=faceclr,  # Cor de preenchimento
-        zorder=subarea            # Ordem
+        edgecolor = edgeclr,  # Cor da borda
+        facecolor = faceclr,  # Cor de preenchimento
+        zorder = subarea      # Ordem
       )
       """
         situações de orientação meio_circulo
@@ -547,7 +596,7 @@ class Application(Validate):
         orientacao 3: 270-90
       """
     
-    if(self.geometric_form_entry.get() == "Quadrante"):
+    if(form == "Quadrante"):
       figure = Wedge(
         center=(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), # Centro
         r=float(self.dimensions_a_px_entry.get()),               # Raio
@@ -565,7 +614,7 @@ class Application(Validate):
         orientacao 3: 270-0
       """
 
-    if(self.geometric_form_entry.get() == "Retangulo"):
+    if(form == "Retangulo"):
       figure = Rectangle(
         xy=((float(self.coordinate_center_x_entry.get()) - (float(self.dimensions_a_px_entry.get()) / 2)),
             (float(self.coordinate_center_y_entry.get()) - (float(self.dimensions_b_px_entry.get()) / 2))),       # Canto inferior esquerdo
@@ -577,6 +626,7 @@ class Application(Validate):
       )
 
     plt.gca().add_patch(figure)
+    self.auto_resize_matplotlib()
     plt.draw()
     return figure
 
@@ -592,6 +642,10 @@ class Application(Validate):
       self.composite_figure.drop(index)
 
       plt.draw()
+
+  # Modifica valores nos objetos
+  def modify_object(self) -> None:
+    return None
 
   def select_form(self, event):
     if(self.geometric_form_entry.get() == "Triangulo"):
@@ -720,13 +774,24 @@ class Application(Validate):
       self.coordinate_y_entry.place(relx=0.55, rely=0.58, relwidth=0.3, relheight=0.04)
   
   def auto_resize_matplotlib(self):
-    self.ax.set(xlim=(self.xmin-1, self.xmax+1), ylim=(self.ymin-1, self.ymax+1), aspect='equal')
+    # Calcular frequência dos ticks baseada no range
+    x_padded_range = (self.x_max + 1) - (self.x_min - 1)
+    y_padded_range = (self.y_max + 1) - (self.y_min - 1)
     
-    self.x_ticks = np.arange(self.xmin, self.xmax+1, self.ticks_frequency)
-    self.y_ticks = np.arange(self.ymin, self.ymax+1, self.ticks_frequency)
+    self.ticks_frequency_x = max(1, int(round(x_padded_range / 10)))
+    self.ticks_frequency_y = max(1, int(round(y_padded_range / 10)))
+
+    # Aplicar limites e ticks
+    self.ax.set(xlim=(self.x_min - 1, self.x_max + 1), 
+                ylim=(self.y_min - 1, self.y_max + 1), 
+                aspect='equal')
     
-    self.ax.set_xticks(self.x_ticks[self.x_ticks != 0])
-    self.ax.set_yticks(self.y_ticks[self.y_ticks != 0])
+    x_ticks = np.arange(self.x_min - 1, self.x_max + 1 + self.ticks_frequency_x, self.ticks_frequency_x)
+    y_ticks = np.arange(self.y_min - 1, self.y_max + 1 + self.ticks_frequency_y, self.ticks_frequency_y)
+    
+    self.ax.set_xticks([x for x in x_ticks if x != 0])
+    self.ax.set_yticks([y for y in y_ticks if y != 0])
+    plt.draw()
 
 root = Tk()
 Application(root)
