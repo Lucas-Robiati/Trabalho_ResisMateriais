@@ -1,0 +1,13 @@
+Alunos do grupo:
+Gustavo Oliveira da Silva - 049572
+Lucas Robiati Sant'Ana  - 49579
+Edson Augusto Pereira Ferreira - 25720
+
+Linguagem de Programação: Python
+IDE e pacotes:
+Neste trabalho nao foram usadas IDE's para o desenvolvimento, foi gerado um ambiente virtual
+do python com o comando python -m venv .venv, onde foram instaladas todas as bibliotecas
+e frameworks que foram utilizadas, estas são:
+  - Matplotlib -> Utilizada para geração de graficos
+  - Tkinter -> Utilizada para geração de interface gráfica
+  - Nukita -> Utilizada para geração do executável

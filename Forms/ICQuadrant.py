@@ -26,7 +26,7 @@ class ICQuadrant(ICForm):
     self.radius = radius                                        # atribuição do valor do raio          
     self.orientation = orientation                              # atribuição da orientação da figura
     self.origin = origin                                        # atribuição da origem do quadrante de circulo
-    super().__init__(self.__c_centroid(), virtual_form)         # inicialização da classe PAI
+    super().__init__(self.__c_centroid(), system_origin, virtual_form)         # inicialização da classe PAI
     self.area = self.__c_area()                                 # atribuição do valor da area atraves do retorno da função __c_area
     self.Ix, self.Iy = self.__c_moment_of_inertia()             # atribuição do valor do momento de inercia atraves do retorno da função __c_moment_of_inertia
     self.Jo = self._c_polar_moment()                            # atribuição do valor do momento polar atraves do retorno da função __c_polar_moment
@@ -99,8 +99,8 @@ class ICQuadrant(ICForm):
   
   # função do calculo de momento de inercia
   def __c_moment_of_inertia(self) -> float:
-    ix = self.virtual_form * (((3.14 * (self.radius ** 4)) / 16) + (self.area * (self.centroid.y ** 2)))
-    iy = self.virtual_form * (((3.14 * (self.radius ** 4)) / 16) + (self.area * (self.centroid.x ** 2)))
+    ix = self.virtual_form * (((3.14 * (self.radius ** 4)) / 16) + (self.area * ((self.centroid.y - self.system_origin.y) ** 2)))
+    iy = self.virtual_form * (((3.14 * (self.radius ** 4)) / 16) + (self.area * ((self.centroid.x - self.system_origin.x) ** 2)))
     return ix, iy
   
   # função de calculo de produto de inercia
@@ -114,7 +114,7 @@ class ICQuadrant(ICForm):
     if((self.orientation == 1) or (self.orientation == 3)):
       signal_self_product_of_inertia = 1
     
-    return (self.virtual_form * (signal_self_product_of_inertia * ((0.001647 * (self.radius ** 4))) + (self.area * self.centroid.x * self.centroid.y)))
+    return (self.virtual_form * (signal_self_product_of_inertia * ((0.001647 * (self.radius ** 4))) + (self.area * (self.centroid.x - self.system_origin.x) * (self.centroid.y - self.system_origin.y ))))
   
   
   # Função responsavel pela rotina de atualização de valores calculados

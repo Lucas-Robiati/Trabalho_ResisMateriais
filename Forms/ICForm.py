@@ -35,6 +35,7 @@ class ICForm:
     self.centroid = centroid                # Atributo que representa o centroide da forma
     self.virtual_form = virtual_form        # Atributo que representa a área real ou virtual
     self.area = 0.0                         # Atributo que representa a área da figura
+    self.system_origin = system_origin      # Atributo que representa a origem do sistema para os calculos
     self.Ix, self.Iy = 0.0, 0.0             # Atributos que representam o Momento de inércia nos eixos x e y
     self.Jo = 0.0                           # Atributo que representa o Momento Polar
     self.Ixy = 0.0                          # Atributo que representa o Produto de inércia
@@ -53,7 +54,17 @@ class ICForm:
   def centroid(self, centroid:ICPoint2D) -> None:
     self.__centroid = centroid.clone()
     return None
+  
+  @property
+  def system_origin(self) -> ICPoint2D:
+    return self.__system_origin.clone()
 
+  @system_origin.setter
+  def system_origin(self, new:ICPoint2D) -> None:
+    self.__system_origin = new
+    return None
+  
+   
   @property
   def virtual_form(self) -> float:
     if(self.__virtual_form):
