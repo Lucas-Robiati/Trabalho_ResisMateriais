@@ -193,6 +193,7 @@ class Application(Validate):
       text="Redefinir tudo",
       font=('David', 10),
       bd= 0,
+      command=self.ICreset,
       activebackground= Color.white.value,
       activeforeground= Color.black.value,
       bg= Color.gray.value,
@@ -410,15 +411,22 @@ class Application(Validate):
   def destroy_insert_window(self):
     self.insert.destroy()
 
-  def relation_combobox_orientation(self):
-    if(self.combobox_orientation.get() == "◷"):
-      return 0
-    if(self.combobox_orientation.get() == "◴"):
-      return 1
-    if(self.combobox_orientation.get() == "◵"):
-      return 2
-    if(self.combobox_orientation.get() == "◶"):
-      return 3
+  def ICreset(self):
+    
+    # Remove todos os itens da Treeview
+    for item in self.treeview_list.get_children():
+        self.treeview_list.delete(item)
+        
+    for item in range(len(self.composite_figure.components)):
+      self.composite_figure.drop(item)
+      figure = self.dict_shapes[self.composite_figure.components[item]]
+      figure.remove()
+  
+    # Limpa o dicionário de formas gráficas
+    self.dict_shapes.clear()
+    # Redesenha o gráfico vazio
+    self.auto_resize_matplotlib()
+    plt.draw()
 
   def valid_source_plan(self):
     global aux
@@ -462,12 +470,12 @@ class Application(Validate):
           entry_validate = float(self.dimensions_b_py_entry.get())
           entry_validate = float(self.dimensions_c_py_entry.get())
         
-        else:
-          entry_validate = float(self.coordinate_center_x_entry.get())
-          entry_validate = float(self.coordinate_center_y_entry.get())
-          entry_validate = float(self.dimensions_a_px_entry.get())
-          if(self.geometric_form_entry.get() == "Retangulo"):
-            entry_validate = float(self.dimensions_b_px_entry.get())
+        if((self.geometric_form_entry.get() == "Circulo") or (self.geometric_form_entry.get() == "Semicirculo") or (self.geometric_form_entry.get() == "Quadrante")):
+          entry_validate = float(self.rad_entry.get())
+        
+        if(self.geometric_form_entry.get() == "Retangulo"):
+          entry_validate = float(self.base_entry.get())
+          entry_validate = float(self.height_entry.get())
                   
       except ValueError:
         msg = "Campo não preenchido ou invalido"
@@ -502,7 +510,7 @@ class Application(Validate):
       return new_form
 
     if(self.geometric_form_entry.get() == "Circunferencia"):
-      new_form =  ICCircle(radius=float(self.dimensions_a_px_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form =  ICCircle(radius=float(self.rad_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
@@ -511,7 +519,7 @@ class Application(Validate):
       return new_form
         
     if(self.geometric_form_entry.get() == "Semicirculo"):
-      new_form = ICSemicircle(orientation=self.relation_combobox_orientation(),radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form = ICSemicircle(orientation=self.relation_combobox_orientation(),radius=float(self.rad_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
 
       self.treeview_list.insert(parent='', index='end', iid=count, 
@@ -520,7 +528,7 @@ class Application(Validate):
       return new_form
 
     if(self.geometric_form_entry.get() == "Quadrante"):
-      new_form = ICQuadrant(orientation=self.relation_combobox_orientation(),radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form = ICQuadrant(orientation=self.relation_combobox_orientation(),radius=float(self.rad_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
@@ -529,7 +537,7 @@ class Application(Validate):
       return new_form
 
     if(self.geometric_form_entry.get() == "Retangulo"):
-      new_form = ICRectangle(width=float(self.dimensions_a_px_entry.get()), height=float(self.dimensions_b_px_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form = ICRectangle(width=float(self.base_entry.get()), height=float(self.height_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
@@ -561,7 +569,7 @@ class Application(Validate):
     if(self.geometric_form_entry.get() == "Circunferencia"):
       figure = Circle(
         xy=(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())),     # Centro do círculo
-        radius=float(self.dimensions_a_px_entry.get()),        # Raio
+        radius=float(self.rad_entry.get()),        # Raio
         edgecolor=edgeclr, # Cor da borda
         facecolor=faceclr, # Cor de preenchimento
         zorder=subarea           # Ordem
@@ -570,7 +578,7 @@ class Application(Validate):
     if(self.geometric_form_entry.get() == "Semicirculo"):
       figure = Wedge(
         center=(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), # Centro
-        r=float(self.dimensions_a_px_entry.get()),              # Raio
+        r=float(self.rad_entry.get()),              # Raio
         theta1=0,         # Ângulo inicial (graus)
         theta2=180,           # Ângulo final (graus)
         edgecolor=edgeclr,  # Cor da borda
@@ -588,7 +596,7 @@ class Application(Validate):
     if(self.geometric_form_entry.get() == "Quadrante"):
       figure = Wedge(
         center=(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), # Centro
-        r=float(self.dimensions_a_px_entry.get()),               # Raio
+        r=float(self.rad_entry.get()),               # Raio
         theta1=90,            # Ângulo inicial (graus)
         theta2=180,           # Ângulo final (graus)
         edgecolor=edgeclr,   # Cor da borda
@@ -605,10 +613,10 @@ class Application(Validate):
 
     if(self.geometric_form_entry.get() == "Retangulo"):
       figure = Rectangle(
-        xy=((float(self.coordinate_center_x_entry.get()) - (float(self.dimensions_a_px_entry.get()) / 2)),
-            (float(self.coordinate_center_y_entry.get()) - (float(self.dimensions_b_px_entry.get()) / 2))),       # Canto inferior esquerdo
-        width=float(self.dimensions_a_px_entry.get()),           # Largura
-        height=float(self.dimensions_b_px_entry.get()),          # Altura
+        xy=((float(self.coordinate_center_x_entry.get()) - (float(self.base_entry.get()) / 2)),
+            (float(self.coordinate_center_y_entry.get()) - (float(self.height_entry.get()) / 2))),       # Canto inferior esquerdo
+        width=float(self.base_entry.get()),           # Largura
+        height=float(self.height_entry.get()),          # Altura
         edgecolor=edgeclr, # Borda
         facecolor=faceclr,  # Preenchimento
         zorder=subarea           # Ordem
@@ -759,6 +767,16 @@ class Application(Validate):
       return True
     return False
   
+  def relation_combobox_orientation(self):
+    if(self.combobox_orientation.get() == "◷"):
+      return 0
+    if(self.combobox_orientation.get() == "◴"):
+      return 1
+    if(self.combobox_orientation.get() == "◵"):
+      return 2
+    if(self.combobox_orientation.get() == "◶"):
+      return 3
+
   def on_resize(self, event):
     if (event.width <= 950 and event.height <= 520):
       self.coordinate_x_entry.place(relx=0.33, rely=0.58, relwidth=0.25, relheight=0.05)
