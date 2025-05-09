@@ -232,6 +232,7 @@ class Application(Validate):
       text="Modificar Forma",
       font=('David', 10),
       bd= 0,
+      command=self.Modify_object,
       activebackground= Color.white.value,
       activeforeground= Color.black.value,
       bg= Color.gray.value,
@@ -407,12 +408,189 @@ class Application(Validate):
       fg= Color.white.value
       )
     self.bt_quit.place(relx=0.55, rely=0.9, relwidth=0.25, relheight=0.08)
+  
+  # Foi necessario criar uma nova janela para atualizar as formas geometricas
+  # pois a janela de insert carrega algumas interações especificas
+  #------janela de update da forma---------
+  def update_window(self, text:str):
+    self.update_window = Toplevel()
+    self.update_window.title("Atualizar Forma Geometrica")
+    self.update_window.configure(background= Color.dark_blue.value)
+    self.update_window.geometry("300x500")
+    self.update_window.resizable(False, False)
+    self.update_window.transient(self.root)
+    self.update_window.focus_force()
+    self.update_window.grab_set()
+
+    self.frame_update = Frame(
+      self.update_window, 
+      bd=4, bg=Color.gray.value,
+      highlightbackground= Color.light_gray.value, 
+      highlightthickness= 4
+      )
+    self.frame_update.place(relx=0.024, rely=0.025, relwidth=0.95, relheight=0.95)
+
+    #------geometric form--------
+    self.label_geometric_form = Label(
+      self.frame_update, 
+      text="Forma a ser atualizada", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 10)
+      )
+    self.label_geometric_form.place(relx=0.005, rely=0.01)
+
+    self.geometric_form_entry = ttk.Combobox(
+      self.frame_update,
+      state= "normal", 
+      values=["Triangulo", "Circunferencia", "Quadrante", "Semicirculo", "Retangulo"]
+      )
+    self.geometric_form_entry.config(
+      foreground= Color.black.value, 
+      background= Color.light_gray.value,
+      )
+    self.geometric_form_entry.place(relx=0.005, rely=0.045, relwidth=0.95, relheight=0.05)
+
+    self.geometric_form_entry.bind("<<ComboboxSelected>>", self.select_form)
+    # ver como fazer
+    self.geometric_form_entry.set(text)
+    self.geometric_form_entry.configure(state="disabled")
+
+    #-----------dimensions------------
+    self.label_dimensions = Label(
+      self.frame_update, 
+      text="Dimensões", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 10)
+      )
+    self.label_dimensions.place(relx=0.005, rely=0.13)
+    
+    #---Entry eixo x dos pontos do triangulo------
+    self.dimensions_a_px_entry = EntPlaceHold(self.frame_update, placeholder='ponto Ax')
+    self.dimensions_a_px_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.dimensions_a_px_entry.place_forget()
+
+    self.dimensions_b_px_entry = EntPlaceHold(self.frame_update, placeholder='ponto Ay')
+    self.dimensions_b_px_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.dimensions_b_px_entry.place_forget()
+
+    self.dimensions_c_px_entry = EntPlaceHold(self.frame_update, placeholder='ponto Cx')
+    self.dimensions_c_px_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.dimensions_c_px_entry.place_forget()
+    
+    #---Entry eixo y dos pontos do triangulo------
+    self.dimensions_a_py_entry = EntPlaceHold(self.frame_update, placeholder='ponto Ay')
+    self.dimensions_a_py_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.dimensions_a_py_entry.place_forget()
+
+    self.dimensions_b_py_entry = EntPlaceHold(self.frame_update, placeholder='ponto By')
+    self.dimensions_b_py_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.dimensions_b_py_entry.place_forget()
+
+    self.dimensions_c_py_entry = EntPlaceHold(self.frame_update, placeholder='ponto Cy')
+    self.dimensions_c_py_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.dimensions_c_py_entry.place_forget()
+
+    self.rad_entry = EntPlaceHold(self.frame_update, placeholder='raio')
+    self.rad_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.rad_entry.place_forget()
+
+    self.base_entry = EntPlaceHold(self.frame_update, placeholder='base')
+    self.base_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.base_entry.place_forget()
+
+    self.height_entry = EntPlaceHold(self.frame_update, placeholder='altura')
+    self.height_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.height_entry.place_forget()
+    
+    #--------centroid coordinates---------
+    self.label_coordinates_center = Label(
+      self.frame_update, 
+      text="Coordenada do centróide", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 10)
+      )
+    self.label_coordinates_center.place_forget()
+
+    self.coordinate_center_x_entry = EntPlaceHold(self.frame_update, placeholder='X:')
+    self.coordinate_center_x_entry.configure(validate= "key", validatecommand=self.val)
+    self.coordinate_center_x_entry.place_forget()
+
+    self.coordinate_center_y_entry = EntPlaceHold(self.frame_update, placeholder='Y:')
+    self.coordinate_center_y_entry.configure(validate= "key", validatecommand=self.val)
+    self.coordinate_center_y_entry.place_forget()
+
+    #-----------sub-are--------------
+    self.label_subare = Label(
+      self.frame_update, 
+      text="Subárea adicionada", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 10)
+      )
+    self.label_subare.place(relx=0.005, rely=0.38)
+
+    self.subare_entry = ttk.Combobox(
+      self.frame_update, 
+      state="readonly", 
+      values=["Subtrair", "Adicionar"]
+      )
+    self.subare_entry.config(foreground= Color.black.value, background= Color.light_gray.value)
+    self.subare_entry.place(relx=0.005, rely=0.42, relwidth=0.95, relheight=0.05)
+
+    self.label_combobox_orientation = Label(self.frame_update, 
+      text="Orientação", 
+      bg= Color.gray.value,
+      fg= Color.white.value,
+      font= ('David', 10)
+      )
+    self.label_combobox_orientation.place_forget()
+
+    self.combobox_orientation = ttk.Combobox(
+      self.frame_update,
+      state= "readonly",
+      justify="center",
+      font= ('David', 10), 
+      values=["◴", "◷", "◵", "◶"]
+      )
+    self.combobox_orientation.place_forget()
+
+    self.Decision_form()
+
+    #======Buttons===========
+    self.bt_acept = Button(
+      self.frame_update, 
+      text="Inserir",
+      font=('David', 10),
+      bd= 0,
+      command= self.add_record,
+      activebackground= Color.white.value,
+      activeforeground= Color.black.value,
+      bg= Color.gray.value,
+      fg= Color.white.value
+      )
+    self.bt_acept.place(relx=0.2, rely=0.9, relwidth=0.25, relheight=0.08)
+
+    self.bt_quit = Button(
+      self.frame_update, 
+      text="Cancelar",
+      font=('David', 10),
+      bd= 0,
+      command= self.destroy_insert_window,
+      activebackground= Color.white.value,
+      activeforeground= Color.black.value,
+      bg= Color.gray.value,
+      fg= Color.white.value
+      )
+    self.bt_quit.place(relx=0.55, rely=0.9, relwidth=0.25, relheight=0.08)
 
   def destroy_insert_window(self):
     self.insert.destroy()
 
-  def ICreset(self):
-    
+  def ICreset(self): 
+    global aux
     # Remove todos os itens da Treeview
     for item in self.treeview_list.get_children():
         self.treeview_list.delete(item)
@@ -421,12 +599,112 @@ class Application(Validate):
       self.composite_figure.drop(item)
       figure = self.dict_shapes[self.composite_figure.components[item]]
       figure.remove()
-  
     # Limpa o dicionário de formas gráficas
     self.dict_shapes.clear()
     # Redesenha o gráfico vazio
     self.auto_resize_matplotlib()
     plt.draw()
+    aux = 0
+    self.coordinate_x_entry.configure(state='normal')
+    self.coordinate_y_entry.configure(state='normal')
+
+      # Remove as formas da tabela e da lista de objetos
+  def remove_item(self):
+    select = self.treeview_list.selection()[0]
+    if(select):
+      index = self.treeview_list.index(select)
+      print(index)
+      self.treeview_list.delete(select)
+      figure = self.dict_shapes[self.composite_figure.components[index]]
+      figure.remove()
+      self.dict_shapes.pop(self.composite_figure.components[index])            
+      self.composite_figure.drop(index)
+      plt.draw()
+  
+  def Modify_object(self):
+
+    select = self.treeview_list.selection()
+    if(select):
+        data = self.treeview_list.item(select[0])
+        index = self.treeview_list.index(select)
+        iid = select[0]
+        _str = data['text']
+        values = self.treeview_list.item(iid, "values") 
+        self.update_window(_str)
+        
+    if(_str == "Triangulo"):
+      self.dimensions_a_px_entry.delete('0', 'end')
+      self.dimensions_a_px_entry.insert(0,self.composite_figure.components[index].Pa.x)
+      self.dimensions_b_px_entry.delete('0', 'end')
+      self.dimensions_b_px_entry.insert(0,self.composite_figure.components[index].Pb.x)
+      self.dimensions_c_px_entry.delete('0', 'end')
+      self.dimensions_c_px_entry.insert(0,self.composite_figure.components[index].Pc.x)
+      self.dimensions_a_py_entry.delete('0', 'end')
+      self.dimensions_a_py_entry.insert(0,self.composite_figure.components[index].Pa.y)
+      self.dimensions_b_py_entry.delete('0', 'end')
+      self.dimensions_b_py_entry.insert(0,self.composite_figure.components[index].Pb.y)
+      self.dimensions_c_py_entry.delete('0', 'end')
+      self.dimensions_c_py_entry.insert(0,self.composite_figure.components[index].Pc.y)
+        
+      self.subare_entry.set(values[2])          
+          
+    if(_str == "Circunferencia"):
+      self.rad_entry.delete('0', 'end')
+      self.rad_entry.insert(0, self.composite_figure.components[index].radius)
+        
+      self.coordinate_center_x_entry.delete('0', 'end')
+      self.coordinate_center_x_entry.insert(0, self.composite_figure.components[index].centroid.x)
+        
+      self.coordinate_center_y_entry.delete('0', 'end')
+      self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].centroid.y)
+        
+      self.subare_entry.set(values[2])
+
+    if(_str == "Quadrante"):
+      self.rad_entry.delete('0', 'end')
+      self.rad_entry.insert(0, self.composite_figure.components[index].radius)
+
+      self.combobox_orientation.set(self.Quadrante_combobox_orientation(self.composite_figure.components[index].orientation))
+          
+      self.coordinate_center_x_entry.delete('0', 'end')
+      self.coordinate_center_x_entry.insert(0, self.composite_figure.components[index].origin.x)
+
+      self.coordinate_center_y_entry.delete('0', 'end')
+      self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].origin.y)
+
+      self.subare_entry.set(values[2])
+      
+    if(_str == "Semicirculo"):
+      self.rad_entry.delete('0', 'end')
+      self.rad_entry.insert(0, self.composite_figure.components[index].radius)
+
+      self.combobox_orientation.set(self.Semicirculo_combobox_orientation(self.composite_figure.components[index].orientation))
+
+      self.coordinate_center_x_entry.delete('0', 'end')
+      self.coordinate_center_x_entry.insert(0, self.composite_figure.components[index].origin.x)
+
+      self.coordinate_center_y_entry.delete('0', 'end')
+      self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].origin.y)
+
+      self.subare_entry.set(values[2])
+        
+    if(_str == "Retangulo"):
+      self.base_entry.delete('0', 'end')
+      self.base_entry.insert(0, self.composite_figure.components[index].width)
+          
+      self.height_entry.delete('0', 'end')
+      self.height_entry.insert(0, self.composite_figure.components[index].height)
+
+      self.subare_entry.set(values[2])
+
+      self.coordinate_center_x_entry.delete('0', 'end')
+      self.coordinate_center_x_entry.insert(0, self.composite_figure.components[index].centroid.x)
+
+      self.coordinate_center_y_entry.delete('0', 'end')
+      self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].centroid.y)
+          
+
+      
 
   def valid_source_plan(self):
     global aux
@@ -626,20 +904,11 @@ class Application(Validate):
     plt.draw()
     return figure
 
-  # Remove as formas da tabela e da lista de objetos
-  def remove_item(self):
-    select = self.treeview_list.selection()[0]
-    if(select):
-      index = self.treeview_list.index(select)
-      self.treeview_list.delete(select)
-      figure = self.dict_shapes[self.composite_figure.components[index]]
-      figure.remove()
-      self.dict_shapes.pop(self.composite_figure.components[index])            
-      self.composite_figure.drop(index)
-
-      plt.draw()
-
+  # Encapsulamento necessario devido a update
   def select_form(self, event):
+    self.Decision_form()
+    
+  def Decision_form(self):
     if(self.geometric_form_entry.get() == "Triangulo"):
       self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.45, relheight=0.05)
       self.dimensions_b_px_entry.place(relx=0.005, rely=0.23, relwidth=0.45, relheight=0.05)
@@ -701,8 +970,36 @@ class Application(Validate):
       self.coordinate_center_x_entry.place(relx=0.005, rely=0.545, relwidth=0.95, relheight=0.05)
       self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
 
-    if((self.geometric_form_entry.get() == "Semicirculo")or
-        (self.geometric_form_entry.get() == "Quadrante")):
+    if(self.geometric_form_entry.get() == "Semicirculo"):
+      self.rad_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
+      
+      self.rad_entry.delete('0', 'end')
+      self.rad_entry.insert(0, 'raio')
+      self.rad_entry.bind("<FocusIn>", lambda args: self.rad_entry.delete('0', 'end'))
+
+      # Reposiciona a lable de origem 
+      self.label_combobox_orientation.place(relx=0.005, rely=0.25, relwidth=0.45, relheight=0.05)
+
+      # Reposiciona a selecao da origem
+      self.combobox_orientation.place(relx=0.005, rely=0.295, relwidth=0.45, relheight=0.05)
+      self.combobox_orientation['values'] = ["◗","◖","◒","◓"]
+
+      self.base_entry.place_forget()
+      self.height_entry.place_forget()
+      self.dimensions_a_px_entry.place_forget()
+      self.dimensions_b_px_entry.place_forget()
+      self.dimensions_c_px_entry.place_forget()
+      self.dimensions_a_py_entry.place_forget()
+      self.dimensions_b_py_entry.place_forget()
+      self.dimensions_c_py_entry.place_forget()
+      
+      self.label_coordinates_center.config(text="Origem")
+      self.label_coordinates_center.place(relx=0.005, rely=0.5)
+      
+      self.coordinate_center_x_entry.place(relx=0.005, rely=0.545, relwidth=0.95, relheight=0.05)
+      self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
+      
+    if(self.geometric_form_entry.get() == "Quadrante"):
       
       self.rad_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
       
@@ -715,6 +1012,7 @@ class Application(Validate):
 
       # Reposiciona a selecao da origem
       self.combobox_orientation.place(relx=0.005, rely=0.295, relwidth=0.45, relheight=0.05)
+      self.combobox_orientation['values'] = ["◴", "◷", "◵", "◶"]
 
       self.base_entry.place_forget()
       self.height_entry.place_forget()
@@ -756,8 +1054,8 @@ class Application(Validate):
       self.label_coordinates_center.config(text="Coordenada do centróide")
       self.label_coordinates_center.place(relx=0.005, rely=0.5)
       self.coordinate_center_x_entry.place(relx=0.005, rely=0.545, relwidth=0.95, relheight=0.05)
-      self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
-      
+      self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)  
+  
   def validate_entry(self):
     self.val = (self.root.register(self.validate_float), '%P')
 
@@ -766,16 +1064,42 @@ class Application(Validate):
     if(self.subare_entry.get() == "Subtrair"):
       return True
     return False
-  
+
   def relation_combobox_orientation(self):
-    if(self.combobox_orientation.get() == "◷"):
+    if(self.combobox_orientation.get() == "◷") or (self.combobox_orientation.get() == "◓"):
       return 0
-    if(self.combobox_orientation.get() == "◴"):
+    if(self.combobox_orientation.get() == "◴") or (self.combobox_orientation.get() == "◖"):
       return 1
-    if(self.combobox_orientation.get() == "◵"):
+    if(self.combobox_orientation.get() == "◵") or (self.combobox_orientation.get() == "◒"):
       return 2
-    if(self.combobox_orientation.get() == "◶"):
+    if(self.combobox_orientation.get() == "◶") or (self.combobox_orientation.get() == "◗"):
       return 3
+  
+  def Semicirculo_combobox_orientation(self, ori):
+    if(ori == 0):
+      return "◓"
+
+    if(ori == 1):
+      return "◖"
+
+    if(ori == 2):
+      return "◒"
+
+    if(ori == 3):
+      return "◗"
+
+  def Quadrante_combobox_orientation(self, ori):
+    if(ori == 0):
+      return "◷"
+
+    if(ori == 1):
+      return "◴"
+
+    if(ori == 2):
+      return "◵"
+
+    if(ori == 3):
+      return "◶"
 
   def on_resize(self, event):
     if (event.width <= 950 and event.height <= 520):

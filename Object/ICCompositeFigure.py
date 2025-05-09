@@ -89,8 +89,8 @@ class ICCompositeFigure(ICForm):
   
   # função responsavel pela atualização de valores calculados
   def update(self) -> None:
-    for form in self.components:
-      form.update()
+    #for form in self.components:
+    #  form.update()
     
     self.__c_area()
     self.__c_centroid()
