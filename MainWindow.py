@@ -493,7 +493,10 @@ class Application(Validate):
       )
     self.bt_quit.place(relx=0.55, rely=0.9, relwidth=0.25, relheight=0.08)
   
-  def update_w(self, text:str):
+  # Foi necessario criar uma nova janela para atualizar as formas geometricas
+  # pois a janela de insert carrega algumas interações especificas
+  #------janela de update da forma---------
+  def update_window(self, text:str):
     self.update_w = Toplevel()
     self.update_w.title("Atualizar Forma Geometrica")
     self.update_w.configure(background= Color.dark_blue.value)
@@ -643,10 +646,10 @@ class Application(Validate):
     #======Buttons===========
     self.bt_acept = Button(
       self.frame_update, 
-      text="Inserir",
+      text="Atualizar",
       font=('David', 10),
       bd= 0,
-      command= self.add_record,
+      command= self.atualize_object,
       activebackground= Color.white.value,
       activeforeground= Color.black.value,
       bg= Color.gray.value,
@@ -680,81 +683,141 @@ class Application(Validate):
       messagebox.showwarning("Aviso", "Nenhuma forma selecionada para modificar.", parent=self.root)
       return
 
-    selected_iid = select[0]
-
-    # Recuperar o objeto usando o iid
-    figureCF = None
-    for key in self.dict_shapes.keys():
-      if str(id(key)) == selected_iid:
-        figureCF = key
-        break
-
-    if not figureCF:
-      messagebox.showerror("Erro", "Item não encontrado.", parent=self.root)
+    iid = select[0]
+    component = next((comp for comp in self.composite_figure.components if str(id(comp)) == iid), None)
+    
+    if component is None:
+      messagebox.showerror("Erro", "Componente não encontrado na lista.", parent=self.root)
       return
 
-    data = self.treeview_list.item(selected_iid)
+    data = self.treeview_list.item(iid)
     _str = data['text']
     values = data['values']
+    self.update_window(_str)
 
-    # Preencher os campos com os dados do objeto
     if _str == "Triangulo":
-      self.dimensions_a_px_entry.delete('0', 'end')
-      self.dimensions_a_px_entry.insert(0, figureCF.Pa.x)
-      self.dimensions_b_px_entry.delete('0', 'end')
-      self.dimensions_b_px_entry.insert(0, figureCF.Pb.x)
-      self.dimensions_c_px_entry.delete('0', 'end')
-      self.dimensions_c_px_entry.insert(0, figureCF.Pc.x)
-      self.dimensions_a_py_entry.delete('0', 'end')
-      self.dimensions_a_py_entry.insert(0, figureCF.Pa.y)
-      self.dimensions_b_py_entry.delete('0', 'end')
-      self.dimensions_b_py_entry.insert(0, figureCF.Pb.y)
-      self.dimensions_c_py_entry.delete('0', 'end')
-      self.dimensions_c_py_entry.insert(0, figureCF.Pc.y)
+      self.dimensions_a_px_entry.delete(0, 'end')
+      self.dimensions_a_px_entry.insert(0, component.Pa.x)
+      self.dimensions_b_px_entry.delete(0, 'end')
+      self.dimensions_b_px_entry.insert(0, component.Pb.x)
+      self.dimensions_c_px_entry.delete(0, 'end')
+      self.dimensions_c_px_entry.insert(0, component.Pc.x)
+      self.dimensions_a_py_entry.delete(0, 'end')
+      self.dimensions_a_py_entry.insert(0, component.Pa.y)
+      self.dimensions_b_py_entry.delete(0, 'end')
+      self.dimensions_b_py_entry.insert(0, component.Pb.y)
+      self.dimensions_c_py_entry.delete(0, 'end')
+      self.dimensions_c_py_entry.insert(0, component.Pc.y)
       self.subare_entry.set(values[2])
 
     elif _str == "Circunferencia":
-      self.rad_entry.delete('0', 'end')
-      self.rad_entry.insert(0, figureCF.radius)
-      self.coordinate_center_x_entry.delete('0', 'end')
-      self.coordinate_center_x_entry.insert(0, figureCF.centroid.x)
-      self.coordinate_center_y_entry.delete('0', 'end')
-      self.coordinate_center_y_entry.insert(0, figureCF.centroid.y)
+      self.rad_entry.delete(0, 'end')
+      self.rad_entry.insert(0, component.radius)
+      self.coordinate_center_x_entry.delete(0, 'end')
+      self.coordinate_center_x_entry.insert(0, component.centroid.x)
+      self.coordinate_center_y_entry.delete(0, 'end')
+      self.coordinate_center_y_entry.insert(0, component.centroid.y)
       self.subare_entry.set(values[2])
 
     elif _str == "Quadrante":
-      self.rad_entry.delete('0', 'end')
-      self.rad_entry.insert(0, figureCF.radius)
-      self.combobox_orientation.set(self.Quadrante_combobox_orientation(figureCF.orientation))
-      self.coordinate_center_x_entry.delete('0', 'end')
-      self.coordinate_center_x_entry.insert(0, figureCF.origin.x)
-      self.coordinate_center_y_entry.delete('0', 'end')
-      self.coordinate_center_y_entry.insert(0, figureCF.origin.y)
+      self.rad_entry.delete(0, 'end')
+      self.rad_entry.insert(0, component.radius)
+      self.combobox_orientation.set(self.Quadrante_combobox_orientation(component.orientation))
+      self.coordinate_center_x_entry.delete(0, 'end')
+      self.coordinate_center_x_entry.insert(0, component.origin.x)
+      self.coordinate_center_y_entry.delete(0, 'end')
+      self.coordinate_center_y_entry.insert(0, component.origin.y)
       self.subare_entry.set(values[2])
 
     elif _str == "Semicirculo":
-      self.rad_entry.delete('0', 'end')
-      self.rad_entry.insert(0, figureCF.radius)
-      self.combobox_orientation.set(self.Semicirculo_combobox_orientation(figureCF.orientation))
-      self.coordinate_center_x_entry.delete('0', 'end')
-      self.coordinate_center_x_entry.insert(0, figureCF.origin.x)
-      self.coordinate_center_y_entry.delete('0', 'end')
-      self.coordinate_center_y_entry.insert(0, figureCF.origin.y)
+      self.rad_entry.delete(0, 'end')
+      self.rad_entry.insert(0, component.radius)
+      self.combobox_orientation.set(self.Semicirculo_combobox_orientation(component.orientation))
+      self.coordinate_center_x_entry.delete(0, 'end')
+      self.coordinate_center_x_entry.insert(0, component.origin.x)
+      self.coordinate_center_y_entry.delete(0, 'end')
+      self.coordinate_center_y_entry.insert(0, component.origin.y)
       self.subare_entry.set(values[2])
 
     elif _str == "Retangulo":
-      self.base_entry.delete('0', 'end')
-      self.base_entry.insert(0, figureCF.width)
-      self.height_entry.delete('0', 'end')
-      self.height_entry.insert(0, figureCF.height)
+      self.base_entry.delete(0, 'end')
+      self.base_entry.insert(0, component.width)
+      self.height_entry.delete(0, 'end')
+      self.height_entry.insert(0, component.height)
       self.subare_entry.set(values[2])
-      self.coordinate_center_x_entry.delete('0', 'end')
-      self.coordinate_center_x_entry.insert(0, figureCF.centroid.x)
-      self.coordinate_center_y_entry.delete('0', 'end')
-      self.coordinate_center_y_entry.insert(0, figureCF.centroid.y)
+      self.coordinate_center_x_entry.delete(0, 'end')
+      self.coordinate_center_x_entry.insert(0, component.centroid.x)
+      self.coordinate_center_y_entry.delete(0, 'end')
+      self.coordinate_center_y_entry.insert(0, component.centroid.y) 
 
-    self.update_window(_str)
+  def atualize_object(self):
+    select = self.treeview_list.selection()
+    if not select:
+      messagebox.showwarning("Aviso", "Nenhuma forma selecionada para atualizar.", parent=self.root)
+      return
 
+    iid = select[0]
+    component = next((comp for comp in self.composite_figure.components if str(id(comp)) == iid), None)
+    
+    if component is None:
+      messagebox.showerror("Erro", "Componente não encontrado na lista.", parent=self.root)
+      return
+
+    try:
+      # Remover o patch antigo do matplotlib
+      old_patch = self.dict_shapes.get(component)
+      if old_patch:
+        old_patch.remove()
+        del self.dict_shapes[component]
+
+      # Atualizar propriedades do componente
+      if self.geometric_form_entry.get() == "Triangulo":
+        component.Pa = ICPoint2D(float(self.dimensions_a_px_entry.get()), float(self.dimensions_a_py_entry.get()))
+        component.Pb = ICPoint2D(float(self.dimensions_b_px_entry.get()), float(self.dimensions_b_py_entry.get()))
+        component.Pc = ICPoint2D(float(self.dimensions_c_px_entry.get()), float(self.dimensions_c_py_entry.get()))
+
+      elif self.geometric_form_entry.get() == "Circunferencia":
+        component.radius = float(self.rad_entry.get())
+        component.centroid = ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))
+
+      elif self.geometric_form_entry.get() == "Quadrante":
+        component.radius = float(self.rad_entry.get())
+        component.orientation = self.relation_combobox_orientation()
+        component.origin = ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))
+
+      elif self.geometric_form_entry.get() == "Semicirculo":
+        component.radius = float(self.rad_entry.get())
+        component.orientation = self.relation_combobox_orientation()
+        component.origin = ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))
+
+      elif self.geometric_form_entry.get() == "Retangulo":
+        component.width = float(self.base_entry.get())
+        component.height = float(self.height_entry.get())
+        component.centroid = ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))
+
+      # Recriar o patch no matplotlib com os novos valores
+      new_patch = self.add_figure_matplotlib(component)
+      self.dict_shapes[component] = new_patch
+
+      # Atualizar Treeview
+      new_values = (
+        str(round(component.centroid.x, 2)),
+        str(round(component.centroid.y, 2)),
+        self.subare_entry.get()
+      )
+      self.treeview_list.item(iid, values=new_values)
+
+      # Forçar atualização do gráfico e labels
+      self.composite_figure.update()
+      self.ax.relim()
+      self.ax.autoscale_view()
+      self.fig.canvas.draw_idle()
+      self.atualize_labels()
+      self.auto_resize_matplotlib()
+
+    except ValueError as e:
+      messagebox.showerror("Erro", f"Entrada inválida: {str(e)}", parent=self.update_w)
+    
   def ICreset(self):
     # Remove todos os itens da Treeview
     for item in self.treeview_list.get_children():
@@ -991,8 +1054,7 @@ class Application(Validate):
 
     if(isinstance(figure, ICRectangle)):
       figureMPL = Rectangle(
-        xy = [(figure.centroid.x) - (figure.width / 2),
-              (figure.centroid.y) - (figure.height / 2)],     # Canto inferior esquerdo
+        xy = figure.bottom_left(),     # Canto inferior esquerdo
         width = figure.width,                                     # Largura
         height = figure.height,                                   # Altura
         edgecolor = edgeclr,                                      # Cor da borda
@@ -1321,7 +1383,6 @@ class Application(Validate):
     self.ax.spines['left'].set_position(('data', self.system_origin.x))    # Eixo Y na coordenada X da origem
     self.ax.spines['top'].set_visible(False)
     self.ax.spines['right'].set_visible(False)
-
     
     # Aplicar limites considerando a origem
     padding = 1  # Espaçamento adicional
@@ -1336,6 +1397,7 @@ class Application(Validate):
     # Atualizar ticks e desenhar
     self.update_ticks()
     plt.draw()
+    self.fig.canvas.draw_idle()
 
   def update_ticks(self) -> None:
     # Calcular frequência dos ticks

@@ -46,6 +46,9 @@ class ICRectangle(ICForm):
     self.__height = height
     return None
   
+  def bottom_left(self):
+    return (self.centroid.x - self.width/2, self.centroid.y - self.height/2)
+
   def __c_area(self) -> float:
     return self.width * self.height
 
