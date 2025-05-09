@@ -15,7 +15,7 @@ orientation 3: 270°-90°
 # - radius: representa o raio do semicirculo
 # 
 # A classe também implementa os seguiintes métodos:
-# __c_centroid: função responsavel pelo calculo do centroide do quadrante de circulo
+# c_centroid: função responsavel pelo calculo do centroide do quadrante de circulo
 # __c_moment_of_inertia: função responsavel pelo calculo do momento de inercia dos eixos x e y
 # __c_product_of_inertia: função resposavel pelo calculo do produto de inercia
 # - update função responsavel pela rotina de atualização dos valores calculados após a edição dos atributos
@@ -25,7 +25,7 @@ class ICSemicircle(ICForm):
     self.origin = origin                                                        # atribuição da origem do semicirculo
     self.orientation = orientation                                              # atribuição da orientação da figura
     self.radius = radius                                                        # atribuição do valor do raio          
-    super().__init__(self.__c_centroid(), system_origin, virtual_form)          # inicialização da classe PAI
+    super().__init__(self.c_centroid(), system_origin, virtual_form)          # inicialização da classe PAI
     self.area = self.__c_area()                                                 # calculo da area
     self.Ix, self.Iy = self.__c_moment_of_inertia()                             # calculo do momento de inercia
     self.Jo = self._c_polar_moment()                                            # calculo do momento polar
@@ -63,7 +63,7 @@ class ICSemicircle(ICForm):
   # fim dos getters e setters
 
   # função do calculo de centroide levando em consideração a orientação do semicirculo
-  def __c_centroid(self) -> ICPoint2D:
+  def c_centroid(self) -> ICPoint2D:
     if (self.orientation == 0):
       centroid = ICPoint2D()
       centroid.x = self.origin.x
@@ -112,7 +112,7 @@ class ICSemicircle(ICForm):
   
   # função responsavel pela atualização de valores calculados
   def update(self) -> None:
-    self.centroid = self.__c_centroid()                         
+    self.centroid = self.c_centroid()                         
     self.area = self.__c_area()                                 
     self.Ix, self.Iy = self.__c_moment_of_inertia()             
     self.Jo = self._c_polar_moment()                            
