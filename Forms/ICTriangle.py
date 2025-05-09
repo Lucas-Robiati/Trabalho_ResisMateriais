@@ -164,8 +164,8 @@ class ICTriangle(ICForm):
     return ICPoint2D(((self.Pa.x + self.Pb.x + self.Pc.x) / 3), ((self.Pa.y + self.Pb.y + self.Pc.y) / 3))
   
   def __c_moment_of_inertia(self) -> float:
-    ix = self.virtual_form * ((self.length * (self.height ** 3)) / 36) + (self.area * (self.centroid.y ** 2))
-    iy = self.virtual_form * ((self.height * (self.length ** 3)) / 36) + (self.area * (self.centroid.x ** 2))
+    ix = self.virtual_form * ((self.length * (self.height ** 3)) / 36) + (self.area * ((self.centroid.y - self.system_origin.y)** 2))
+    iy = self.virtual_form * ((self.height * (self.length ** 3)) / 36) + (self.area * ((self.centroid.x - self.system_origin.x) ** 2))
     return ix,iy
   
   def __c_product_of_inertia(self) -> float:
@@ -175,4 +175,4 @@ class ICTriangle(ICForm):
     if((self.orientation == 1) or (self.orientation == 3)):
       signal_self_product_of_inertia = 1
     
-    return (self.virtual_form * (signal_self_product_of_inertia * (((self.length ** 2) * (self.height ** 2)) / 72)) * (self.area * self.centroid.x * self.centroid.y))
+    return (self.virtual_form * (signal_self_product_of_inertia * (((self.length ** 2) * (self.height ** 2)) / 72)) * (self.area * (self.centroid.x - self.system_origin.x) * (self.centroid.y - self.system_origin.y)))

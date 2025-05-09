@@ -20,7 +20,7 @@ class ICRectangle(ICForm):
   def __init__(self, width:float = 0.0, height:float = 0.0, centroid:ICPoint2D = ICPoint2D(), system_origin:ICPoint2D = ICPoint2D(), virtual_form:bool = False) -> None:
     self.width = width                                  # Atributo que representa o comprimento
     self.height = height                                  # Atributo que representa a altura
-    super().__init__(centroid, virtual_form)              # Construtor da classe PAI
+    super().__init__(centroid, system_origin, virtual_form)              # Construtor da classe PAI
     self.area = self.__c_area()                           # Atribuição de valor a área atravéz do retorno da função __c_area
     self.Ix, self.Iy = self.__c_moment_of_inertia()       # Atribuição do valor do momento de inercia atravéz do retorno da função __c_moment_of_inertia
     self.Jo = self._c_polar_moment()                      # Atribuição do valor do momento polar atravéz do retorno da função _c_polar_moment
@@ -54,13 +54,13 @@ class ICRectangle(ICForm):
 
   # função de calculo de momento de inercia
   def __c_moment_of_inertia(self) -> float:
-    ix = self.virtual_form * ((self.width * (self.height ** 3)) / 12) + (self.area * (self.centroid.y ** 2))
-    iy = self.virtual_form * ((self.height * (self.width ** 3)) / 12) + (self.area * (self.centroid.x ** 2))
-    return ix,iy
+    ix = self.virtual_form * ((self.width * (self.height ** 3)) / 12) + (self.area * ((self.centroid.y - self.system_origin.y) ** 2))
+    iy = self.virtual_form * ((self.height * (self.width ** 3)) / 12) + (self.area * ((self.centroid.x - self.system_origin.x) ** 2))
+    return ix,ix
   
   # função de calculo de produto de inercia
   def __c_product_of_inertia(self) -> float:
-    return (self.virtual_form * (self.area * self.centroid.x * self.centroid.y))
+    return (self.virtual_form * (self.area * (self.centroid.x - self.system_origin.x) * (self.centroid.y - self.system_origin.y)))
   
   # Função responsavel pela rotina de atualização de valores calculados
   def update(self) -> None:                         
