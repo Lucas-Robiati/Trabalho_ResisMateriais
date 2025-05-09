@@ -41,13 +41,13 @@ class ICCircle(ICForm):
   
   # calculo do momento de inercia
   def __c_moment_of_inertia(self) -> float:
-    ix = self.virtual_form * (((3.14 * (self.radius ** 4)) / 4) + (self.area * (self.centroid.y ** 2)))
-    iy = self.virtual_form * (((3.14 * (self.radius ** 4)) / 4) + (self.area * (self.centroid.x ** 2)))
+    ix = self.virtual_form * (((3.14 * (self.radius ** 4)) / 4) + (self.area * ((self.centroid.y - self.system_origin.y)** 2)))
+    iy = self.virtual_form * (((3.14 * (self.radius ** 4)) / 4) + (self.area * ((self.centroid.x - self.system_origin.x)** 2)))
     return ix, iy
   
   # Calculo do produto de inercia 
   def __c_product_of_inertia(self) -> float:
-    return (self.virtual_form * (self.area * self.centroid.x * self.centroid.y))
+    return (self.virtual_form * (self.area * (self.centroid.x - self.system_origin.x) * (self.centroid.y - self.system_origin.y)))
   
   # Função responsavel pela rotina de atualização de valores calculados
   def update(self) -> None:                         

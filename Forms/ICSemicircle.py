@@ -22,14 +22,14 @@ orientation 3: 270°-90°
 
 class ICSemicircle(ICForm):
   def __init__(self, orientation:int = 0, radius:float = 0.0, origin:ICPoint2D = ICPoint2D(), system_origin:ICPoint2D = ICPoint2D(), virtual_form:bool = False) -> None:
-    self.origin = origin                                        # atribuição da origem do semicirculo
-    self.orientation = orientation                              # atribuição da orientação da figura
-    self.radius = radius                                        # atribuição do valor do raio          
-    super().__init__(self.__c_centroid(),virtual_form)          # inicialização da classe PAI
-    self.area = self.__c_area()                                 # calculo da area
-    self.Ix, self.Iy = self.__c_moment_of_inertia()             # calculo do momento de inercia
-    self.Jo = self._c_polar_moment()                            # calculo do momento polar
-    self.Ixy = self.__c_product_of_inertia()                    # calculo do produto de inercia
+    self.origin = origin                                                        # atribuição da origem do semicirculo
+    self.orientation = orientation                                              # atribuição da orientação da figura
+    self.radius = radius                                                        # atribuição do valor do raio          
+    super().__init__(self.__c_centroid(), system_origin, virtual_form)          # inicialização da classe PAI
+    self.area = self.__c_area()                                                 # calculo da area
+    self.Ix, self.Iy = self.__c_moment_of_inertia()                             # calculo do momento de inercia
+    self.Jo = self._c_polar_moment()                                            # calculo do momento polar
+    self.Ixy = self.__c_product_of_inertia()                                    # calculo do produto de inercia
     return None
   
    # Inicio dos getters e setters
@@ -97,18 +97,18 @@ class ICSemicircle(ICForm):
     ix, iy = 0.0, 0.0
 
     if((self.orientation == 1) or (self.orientation == 3)):
-      ix = self.virtual_form * (((3.14 * (self.radius ** 4)) / 8) + (self.area * (self.centroid.x * self.centroid.x)))
+      ix = self.virtual_form * (((3.14 * (self.radius ** 4)) / 8) + (self.area * ((self.centroid.y - self.system_origin.y) ** 2)))
       iy = self.virtual_form * (0.1098 * (self.radius ** 4))
     
     if((self.orientation == 0) or (self.orientation == 2)):
       ix = self.virtual_form * (0.1098 * (self.radius * self.radius * self.radius * self.radius))
-      iy = self.virtual_form * (((3.14 * (self.radius * self.radius * self.radius * self.radius)) / 8) + (self.area * (self.centroid.x * self.centroid.x)))
+      iy = self.virtual_form * (((3.14 * (self.radius * self.radius * self.radius * self.radius)) / 8) + (self.area * ((self.centroid.x - self.system_origin.x) ** 2)))
     
     return ix, iy
   
   # calculo do produto de inercia
   def __c_product_of_inertia(self):
-    return (self.virtual_form * (self.area * self.centroid.x * self.centroid.y))
+    return (self.virtual_form * (self.area * (self.centroid.x - self.system_origin.x) * (self.centroid.y - self.system_origin.y)))
   
   # função responsavel pela atualização de valores calculados
   def update(self) -> None:
