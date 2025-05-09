@@ -5,7 +5,6 @@ class Application(Validate):
     self.root = root                            # Define o bejeto Tk que será usado como janela principal
     self.composite_figure =  ICCompositeFigure()     # Lista de Obejetos
     self.dict_shapes = {}
-    self.iid_to_figure = {}  # Mapeia iid da treeview para o objeto da figura
     self.system_origin = ICPoint2D()            # Variavel que define a origem do sistema
     self.window()                               # Cria a janela principal sub janelas e widgets
     root.mainloop()                             # Loop da janela
@@ -205,11 +204,6 @@ class Application(Validate):
     # Rótulos dos eixos
     self.ax.set_xlabel('$x$', size=10, labelpad=-24, x=1.05)
     self.ax.set_ylabel('$y$', size=10, labelpad=-21, y=1.02, rotation=0)
-    
-    # Texto da origem (O)
-    plt.text(0.49, 0.49, r"$O$", ha='right', va='top',
-             transform=self.ax.transAxes,
-             horizontalalignment='center', fontsize=8)
 
     # Limites iniciais sem padding
     self.ax.set(xlim=(self.x_min, self.x_max), 
@@ -235,6 +229,7 @@ class Application(Validate):
       text="Redefinir tudo",
       font=('David', 10),
       bd= 0,
+      command=self.ICreset,
       activebackground= Color.white.value,
       activeforeground= Color.black.value,
       bg= Color.gray.value,
@@ -358,6 +353,18 @@ class Application(Validate):
     self.dimensions_c_py_entry.config(state="normal", validate= "key", validatecommand=self.val)
     self.dimensions_c_py_entry.place(relx=0.48, rely=0.295, relwidth=0.5, relheight=0.05)
 
+    self.rad_entry = EntPlaceHold(self.frame_insert, placeholder='raio')
+    self.rad_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.rad_entry.place_forget()
+
+    self.base_entry = EntPlaceHold(self.frame_insert, placeholder='base')
+    self.base_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.base_entry.place_forget()
+
+    self.height_entry = EntPlaceHold(self.frame_insert, placeholder='altura')
+    self.height_entry.config(state="normal", validate= "key", validatecommand=self.val)
+    self.height_entry.place_forget()
+
     #--------centroid coordinates---------
     self.label_coordinates_center = Label(
       self.frame_insert, 
@@ -440,15 +447,25 @@ class Application(Validate):
   def destroy_insert_window(self):
     self.insert.destroy()
 
-  def relation_combobox_orientation(self):
-    if(self.combobox_orientation.get() == "◷"):
-      return 0
-    if(self.combobox_orientation.get() == "◴"):
-      return 1
-    if(self.combobox_orientation.get() == "◵"):
-      return 2
-    if(self.combobox_orientation.get() == "◶"):
-      return 3
+  def ICreset(self):
+    # Remove todos os itens da Treeview
+    for item in self.treeview_list.get_children():
+      self.treeview_list.delete(item)
+    
+    # Remove todas as figuras do matplotlib e limpa o dict_shapes
+    for figureCF in list(self.dict_shapes.keys()):  # Usar list() para evitar erro de iteração
+      figureMPL = self.dict_shapes[figureCF]
+      figureMPL.remove()
+    self.dict_shapes.clear()  # Limpa completamente o dicionário
+    
+    # Limpa a lista de componentes da figura composta
+    self.composite_figure.components.clear()
+    
+    # Redefine os limites do gráfico para os valores padrão
+    self.x_min, self.x_max, self.y_min, self.y_max = -5, 5, -5, 5
+    
+    # Redesenha o gráfico vazio
+    self.auto_resize_matplotlib()
 
   def valid_source_plan(self):
     global aux
@@ -478,29 +495,34 @@ class Application(Validate):
 
   # Valida e chama as funções de inserir objetos 
   def add_record(self):
-    if self.valid_source_plan() == -1:
+    entry_validate = 0
+    if(self.valid_source_plan() == -1):
       return
 
-    try:
-      # Validação dos campos de entrada
-      if self.geometric_form_entry.get() == "Triangulo":
-        # Verificação de todos os pontos do triângulo
-        [float(entry.get()) for entry in [
-            self.dimensions_a_px_entry, self.dimensions_b_px_entry, 
-            self.dimensions_c_px_entry, self.dimensions_a_py_entry,
-            self.dimensions_b_py_entry, self.dimensions_c_py_entry
-        ]]
-      else:
-        # Verificação de campos genéricos
-        float(self.coordinate_center_x_entry.get())
-        float(self.coordinate_center_y_entry.get())
-        float(self.dimensions_a_px_entry.get())
+    if(self.subare_entry.get()): 
+      try:
+        if(self.geometric_form_entry.get() == "Triangulo"):
+          entry_validate = float(self.dimensions_a_px_entry.get())
+          entry_validate = float(self.dimensions_b_px_entry.get())
+          entry_validate = float(self.dimensions_c_px_entry.get())
+          entry_validate = float(self.dimensions_a_py_entry.get())
+          entry_validate = float(self.dimensions_b_py_entry.get())
+          entry_validate = float(self.dimensions_c_py_entry.get())
         
-        if self.geometric_form_entry.get() == "Retangulo":
-          float(self.dimensions_b_px_entry.get())
-
-    except ValueError:
-      messagebox.showerror("Error", "Campos inválidos ou não preenchidos", parent=self.insert)
+        if((self.geometric_form_entry.get() == "Circulo") or (self.geometric_form_entry.get() == "Semicirculo") or (self.geometric_form_entry.get() == "Quadrante")):
+          entry_validate = float(self.rad_entry.get())
+        
+        if(self.geometric_form_entry.get() == "Retangulo"):
+          entry_validate = float(self.base_entry.get())
+          entry_validate = float(self.height_entry.get())
+                  
+      except ValueError:
+        msg = "Campo não preenchido ou invalido"
+        messagebox.showerror("Error", msg, parent=self.insert)
+        return
+    else:
+      msg = "Campo não preenchido ou invalido"
+      messagebox.showerror("Error", msg, parent=self.insert)
       return
 
     figureCF = self.add_object()
@@ -551,8 +573,6 @@ class Application(Validate):
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
     
-
-    self.iid_to_figure[count] = new_form  # Mapeamento direto iid -> objeto
     count += 1  # Incremento único garantido
     return new_form
   
@@ -592,11 +612,20 @@ class Application(Validate):
       )
 
     if(isinstance(figure, ICSemicircle)):
+      if(figure.orientation == 0):
+        t1, t2 = 0, 180
+      if(figure.orientation == 1):
+        t1, t2 = 90, 270
+      if(figure.orientation == 2):
+        t1, t2 = 180, 0
+      if(figure.orientation == 3):
+        t1, t2 = 270, 90
+
       figureMPL = Wedge(
         center = [figure.origin.x, figure.origin.y],      # Centro do círculo
-        radius = figure.radius,                           # Raio
-        theta1=0,                                         # Ângulo inicial (graus)
-        theta2=180,                                       # Ângulo final (graus)
+        r = figure.radius,                           # Raio
+        theta1 = t1,                                         # Ângulo inicial (graus)
+        theta2 = t2,                                       # Ângulo final (graus)
         edgecolor = edgeclr,                              # Cor da borda
         facecolor = faceclr,                              # Cor de preenchimento
         zorder = subarea                                  # Ordem
@@ -610,14 +639,20 @@ class Application(Validate):
       """
     
     if(isinstance(figure, ICQuadrant)):
-      origin = ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))
-      r = float(self.dimensions_a_px_entry.get())
+      if(figure.orientation == 0):
+        t1, t2 = 0, 90
+      if(figure.orientation == 1):
+        t1, t2 = 90, 180
+      if(figure.orientation == 2):
+        t1, t2 = 180, 270
+      if(figure.orientation == 3):
+        t1, t2 = 270, 0
 
       figureMPL = Wedge(
         center = [figure.origin.x, figure.origin.y],      # Centro do círculo
-        radius = figure.radius,                           # Raio
-        theta1=0,                                         # Ângulo inicial (graus)
-        theta2=90,                                        # Ângulo final (graus)
+        r = figure.radius,                           # Raio
+        theta1 = t1,                                         # Ângulo inicial (graus)
+        theta2 = t2,                                        # Ângulo final (graus)
         edgecolor = edgeclr,                              # Cor da borda
         facecolor = faceclr,                              # Cor de preenchimento
         zorder = subarea                                  # Ordem
@@ -683,34 +718,33 @@ class Application(Validate):
     
     return None
 
-  def remove_item(self) -> None:
+  def remove_item(self) -> None:  
+    # Obtém o item selecionado na Treeview
     selected_items = self.treeview_list.selection()
     if not selected_items:
+      messagebox.showwarning("Aviso", "Nenhuma forma selecionada para remover.", parent=self.root)
       return
 
-    print("entrou")
     selected_iid = selected_items[0]
-    
-    # Recupera a figura usando o iid
-    figure = self.iid_to_figure.pop(selected_iid, None)
-    if figure is None:
+
+    try:
+      index = int(selected_iid)
+      # Remove da composite_figure
+      figureCF = self.composite_figure.components[index]
+      self.composite_figure.drop(index)
+    except (IndexError, ValueError, TypeError) as e:
+      messagebox.showerror("Erro", f"Falha ao remover item: {e}", parent=self.root)
       return
 
-    # Remove da treeview
+    # Remove do dict_shapes e do matplotlib
+    figureMPL = self.dict_shapes.pop(figureCF, None)
+    if figureMPL:
+      figureMPL.remove()
+
+    # Remove da Treeview
     self.treeview_list.delete(selected_iid)
 
-    # Remove da lista de componentes
-    try:
-      self.composite_figure.components.remove(figure)
-    except ValueError:
-      pass
-
-    # Remove do matplotlib e do dicionário
-    figure_mpl = self.dict_shapes.pop(figure, None)
-    if figure_mpl:
-      figure_mpl.remove()
-
-    # Atualização dos limites do gráfico
+    # Atualiza os limites do gráfico
     if not self.composite_figure.components:
       self.x_min, self.x_max, self.y_min, self.y_max = -5, 5, -5, 5
     else:
@@ -720,7 +754,7 @@ class Application(Validate):
         self.get_min_max_point_figures(fig)
 
     self.auto_resize_matplotlib()
-
+  
   # Modifica valores nos objetos
   def modify_object(self) -> None:
     return None
@@ -754,28 +788,33 @@ class Application(Validate):
       self.dimensions_c_py_entry.bind("<FocusIn>", lambda args: self.dimensions_c_py_entry.delete('0', 'end'))
 
       # Oculta as lables e Entrys desnecessarios
+      self.rad_entry.place_forget()
+      self.base_entry.place_forget()
+      self.height_entry.place_forget()
+      self.combobox_orientation.place_forget()
       self.label_coordinates_center.place_forget()
       self.coordinate_center_x_entry.place_forget()
       self.coordinate_center_y_entry.place_forget()
+      self.combobox_orientation.place_forget()
+      self.label_combobox_orientation.place_forget()
 
     if((self.geometric_form_entry.get() == "Circunferencia")):
-      self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
+      self.rad_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
       
-      self.dimensions_a_px_entry.delete('0', 'end')
-      self.dimensions_a_px_entry.insert(0, 'raio')
-      self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
+      self.rad_entry.delete('0', 'end')
+      self.rad_entry.insert(0, 'raio')
+      self.rad_entry.bind("<FocusIn>", lambda args: self.rad_entry.delete('0', 'end'))
 
-      self.dimensions_b_px_entry.delete('0', 'end')
+      self.base_entry.place_forget()
+      self.height_entry.place_forget()
+      self.dimensions_a_px_entry.place_forget()
       self.dimensions_b_px_entry.place_forget()
-      
-      self.dimensions_c_px_entry.delete('0', 'end')
       self.dimensions_c_px_entry.place_forget()
-
-      self.label_combobox_orientation.place_forget()
-      self.combobox_orientation.place_forget()
       self.dimensions_a_py_entry.place_forget()
       self.dimensions_b_py_entry.place_forget()
       self.dimensions_c_py_entry.place_forget()
+      self.combobox_orientation.place_forget()
+      self.label_combobox_orientation.place_forget()
       
       self.label_coordinates_center.config(text="Coordenada do centróide")
       self.label_coordinates_center.place(relx=0.005, rely=0.5)
@@ -785,11 +824,11 @@ class Application(Validate):
     if((self.geometric_form_entry.get() == "Semicirculo")or
         (self.geometric_form_entry.get() == "Quadrante")):
       
-      self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
+      self.rad_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
       
-      self.dimensions_a_px_entry.delete('0', 'end')
-      self.dimensions_a_px_entry.insert(0, 'raio')
-      self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
+      self.rad_entry.delete('0', 'end')
+      self.rad_entry.insert(0, 'raio')
+      self.rad_entry.bind("<FocusIn>", lambda args: self.rad_entry.delete('0', 'end'))
 
       # Reposiciona a lable de origem 
       self.label_combobox_orientation.place(relx=0.005, rely=0.25, relwidth=0.45, relheight=0.05)
@@ -797,12 +836,11 @@ class Application(Validate):
       # Reposiciona a selecao da origem
       self.combobox_orientation.place(relx=0.005, rely=0.295, relwidth=0.45, relheight=0.05)
 
-      self.dimensions_b_px_entry.delete('0', 'end')
+      self.base_entry.place_forget()
+      self.height_entry.place_forget()
+      self.dimensions_a_px_entry.place_forget()
       self.dimensions_b_px_entry.place_forget()
-      
-      self.dimensions_c_px_entry.delete('0', 'end')
       self.dimensions_c_px_entry.place_forget()
-
       self.dimensions_a_py_entry.place_forget()
       self.dimensions_b_py_entry.place_forget()
       self.dimensions_c_py_entry.place_forget()
@@ -814,22 +852,23 @@ class Application(Validate):
       self.coordinate_center_y_entry.place(relx=0.005, rely=0.61, relwidth=0.95, relheight=0.05)
 
     if(self.geometric_form_entry.get() == "Retangulo"): 
-      self.dimensions_a_px_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
-      self.dimensions_b_px_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
+      self.base_entry.place(relx=0.005, rely=0.17, relwidth=0.95, relheight=0.05)
+      self.height_entry.place(relx=0.005, rely=0.23, relwidth=0.95, relheight=0.05)
       
-      self.dimensions_a_px_entry.delete('0', 'end')
-      self.dimensions_a_px_entry.insert(0, 'base')
-      self.dimensions_a_px_entry.bind("<FocusIn>", lambda args: self.dimensions_a_px_entry.delete('0', 'end'))
+      self.base_entry.delete('0', 'end')
+      self.base_entry.insert(0, 'base')
+      self.base_entry.bind("<FocusIn>", lambda args: self.base_entry.delete('0', 'end'))
 
-      self.dimensions_b_px_entry.delete('0', 'end')
-      self.dimensions_b_px_entry.insert(0, 'altura')
-      self.dimensions_b_px_entry.bind("<FocusIn>", lambda args: self.dimensions_b_px_entry.delete('0', 'end'))
-      
-      self.dimensions_c_px_entry.delete('0', 'end')
-      self.dimensions_c_px_entry.place_forget()
+      self.height_entry.delete('0', 'end')
+      self.height_entry.insert(0, 'altura')
+      self.height_entry.bind("<FocusIn>", lambda args: self.height_entry.delete('0', 'end'))
 
       self.label_combobox_orientation.place_forget()
       self.combobox_orientation.place_forget()
+      self.rad_entry.place_forget()
+      self.dimensions_a_px_entry.place_forget()
+      self.dimensions_b_px_entry.place_forget()
+      self.dimensions_c_px_entry.place_forget()
       self.dimensions_a_py_entry.place_forget()
       self.dimensions_b_py_entry.place_forget()
       self.dimensions_c_py_entry.place_forget()
@@ -848,6 +887,16 @@ class Application(Validate):
       return True
     return False
   
+  def relation_combobox_orientation(self):
+    if(self.combobox_orientation.get() == "◷"):
+      return 0
+    if(self.combobox_orientation.get() == "◴"):
+      return 1
+    if(self.combobox_orientation.get() == "◵"):
+      return 2
+    if(self.combobox_orientation.get() == "◶"):
+      return 3
+
   def on_resize(self, event):
     if (event.width <= 950 and event.height <= 520):
       self.coordinate_x_entry.place(relx=0.33, rely=0.58, relwidth=0.25, relheight=0.05)
@@ -858,8 +907,8 @@ class Application(Validate):
   
   def auto_resize_matplotlib(self):
     # Aplicar padding de 1 unidade
-    self.ax.set_xlim(self.x_min - 1, self.x_max + 1)
-    self.ax.set_ylim(self.y_min - 1, self.y_max + 1)
+    self.ax.set_xlim(self.x_min - 2, self.x_max + 2)
+    self.ax.set_ylim(self.y_min - 2, self.y_max + 2)
     self.update_ticks()
     plt.draw()
 
@@ -886,7 +935,7 @@ class Application(Validate):
     self.ax.set_xticks(x_ticks)
     self.ax.set_yticks(y_ticks)
     self.ax.xaxis.set_major_formatter(
-        plt.FuncFormatter(lambda x, _: '' if x == 0 else f'{int(x)}')
+        plt.FuncFormatter(lambda x, _: f'{int(x)}' if x == 0 else f'{int(x)}')
     )
     self.ax.yaxis.set_major_formatter(
         plt.FuncFormatter(lambda y, _: '' if y == 0 else f'{int(y)}')
