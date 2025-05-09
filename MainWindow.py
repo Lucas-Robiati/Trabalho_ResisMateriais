@@ -5,6 +5,7 @@ class Application(Validate):
     self.root = root                            # Define o bejeto Tk que será usado como janela principal
     self.composite_figure =  ICCompositeFigure()     # Lista de Obejetos
     self.dict_shapes = {}
+    self.iid_to_figure = {}  # Mapeia iid da treeview para o objeto da figura
     self.system_origin = ICPoint2D()            # Variavel que define a origem do sistema
     self.window()                               # Cria a janela principal sub janelas e widgets
     root.mainloop()                             # Loop da janela
@@ -15,15 +16,17 @@ class Application(Validate):
 
   @x_min.setter
   def x_min(self, x_min) -> None:
-    self.x_min = min(self.x_min, x_min)
+    self.__x_min = x_min
+    return None
 
   @property
   def x_max(self) -> float:
     return self.__x_max
 
-  @x_min.setter
+  @x_max.setter
   def x_max(self, x_max) -> None:
-    self.x_max = max(self.x_max, x_max)
+    self.__x_max = x_max
+    return None
 
   @property
   def y_min(self) -> float:
@@ -31,7 +34,8 @@ class Application(Validate):
 
   @y_min.setter
   def y_min(self, y_min) -> None:
-    self.y_min = min(self.y_min, y_min)
+    self.__y_min = y_min
+    return None
 
   @property
   def y_max(self) -> float:
@@ -39,7 +43,8 @@ class Application(Validate):
 
   @y_max.setter
   def y_max(self, y_max) -> None:
-    self.y_max = max(self.y_max, y_max)
+    self.__y_max = y_max
+    return None
 
   def window(self):
     self.root.title("InerCalc")                                  # Nome do software
@@ -186,37 +191,43 @@ class Application(Validate):
       )
   
   def widgets_frame2(self):
-    self.__x_min, self.__x_max, self.__y_min, self.__y_max = -5, 5, -5, 5
-    self.ticks_frequency = 1  # Valor inicial, será ajustado dinamicamente
+    self.x_min, self.x_max, self.y_min, self.y_max = -5, 5, -5, 5
 
     self.fig, self.ax = plt.subplots()
     self.fig.patch.set_facecolor('#ffffff')
 
+    # Configurar eixos
     self.ax.spines['bottom'].set_position('zero')
     self.ax.spines['left'].set_position('zero')
-
     self.ax.spines['top'].set_visible(False)
     self.ax.spines['right'].set_visible(False)
 
+    # Rótulos dos eixos
     self.ax.set_xlabel('$x$', size=10, labelpad=-24, x=1.05)
     self.ax.set_ylabel('$y$', size=10, labelpad=-21, y=1.02, rotation=0)
     
+    # Texto da origem (O)
     plt.text(0.49, 0.49, r"$O$", ha='right', va='top',
              transform=self.ax.transAxes,
-             horizontalalignment='center', fontsize=8
-             )
-    
-    self.auto_resize_matplotlib()
-    
-    # Alterar tamanho dos números dos eixos
-    self.ax.tick_params(axis='x', labelsize=8)
-    self.ax.tick_params(axis='y', labelsize=8)  # Tamanho 8
+             horizontalalignment='center', fontsize=8)
 
+    # Limites iniciais sem padding
+    self.ax.set(xlim=(self.x_min, self.x_max), 
+                ylim=(self.y_min, self.y_max), 
+                aspect='equal')
+
+    # Configurar ticks iniciais
+    self.update_ticks()
+
+    # Grid
     self.ax.grid(which='both', color='grey', linewidth=1, linestyle='-', alpha=0.2)
+    self.ax.tick_params(axis='both', labelsize=8)
 
-    # Create Canvas
+    # Canvas
     canvas = FigureCanvasTkAgg(self.fig, master=self.frame_2)  
     canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+
+    return None
 
   def widgets_frame3(self):
     self.bt_reset = Button(
@@ -467,40 +478,34 @@ class Application(Validate):
 
   # Valida e chama as funções de inserir objetos 
   def add_record(self):
-    entry_validate = 0
-    if(self.valid_source_plan() == -1):
+    if self.valid_source_plan() == -1:
       return
 
-    if(self.subare_entry.get()): 
-      try:
-        if(self.geometric_form_entry.get() == "Triangulo"):
-          entry_validate = float(self.dimensions_a_px_entry.get())
-          entry_validate = float(self.dimensions_b_px_entry.get())
-          entry_validate = float(self.dimensions_c_px_entry.get())
-          entry_validate = float(self.dimensions_a_py_entry.get())
-          entry_validate = float(self.dimensions_b_py_entry.get())
-          entry_validate = float(self.dimensions_c_py_entry.get())
+    try:
+      # Validação dos campos de entrada
+      if self.geometric_form_entry.get() == "Triangulo":
+        # Verificação de todos os pontos do triângulo
+        [float(entry.get()) for entry in [
+            self.dimensions_a_px_entry, self.dimensions_b_px_entry, 
+            self.dimensions_c_px_entry, self.dimensions_a_py_entry,
+            self.dimensions_b_py_entry, self.dimensions_c_py_entry
+        ]]
+      else:
+        # Verificação de campos genéricos
+        float(self.coordinate_center_x_entry.get())
+        float(self.coordinate_center_y_entry.get())
+        float(self.dimensions_a_px_entry.get())
         
-        else:
-          entry_validate = float(self.coordinate_center_x_entry.get())
-          entry_validate = float(self.coordinate_center_y_entry.get())
-          entry_validate = float(self.dimensions_a_px_entry.get())
-          if(self.geometric_form_entry.get() == "Retangulo"):
-            entry_validate = float(self.dimensions_b_px_entry.get())
-                  
-      except ValueError:
-        msg = "Campo não preenchido ou invalido"
-        messagebox.showerror("Error", msg, parent=self.insert)
-        return
-    else:
-      msg = "Campo não preenchido ou invalido"
-      messagebox.showerror("Error", msg, parent=self.insert)
+        if self.geometric_form_entry.get() == "Retangulo":
+          float(self.dimensions_b_px_entry.get())
+
+    except ValueError:
+      messagebox.showerror("Error", "Campos inválidos ou não preenchidos", parent=self.insert)
       return
 
     figureCF = self.add_object()
-    figureMPL = self.add_figure_matplotlib()
-
-    self.dict_shapes |= {figureCF: figureMPL}
+    figureMPL = self.add_figure_matplotlib(figureCF)
+    self.dict_shapes[figureCF] = figureMPL  # Correção crítica aqui
     return None
 
   # Identifica o tipo de objeto inserido e o adiciona na tabela e na lista de objetos
@@ -517,47 +522,42 @@ class Application(Validate):
 
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
-      count += 1
-      return new_form
 
     if(self.geometric_form_entry.get() == "Circunferencia"):
-      new_form =  ICCircle(radius=float(self.dimensions_a_px_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form =  ICCircle(radius=float(self.rad_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
-      count += 1
-      return new_form
         
     if(self.geometric_form_entry.get() == "Semicirculo"):
-      new_form = ICSemicircle(orientation=self.relation_combobox_orientation(),radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form = ICSemicircle(orientation=self.relation_combobox_orientation(),radius=float(self.rad_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
 
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
-      count += 1
-      return new_form
 
     if(self.geometric_form_entry.get() == "Quadrante"):
-      new_form = ICQuadrant(orientation=self.relation_combobox_orientation(),radius=float(self.dimensions_a_px_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form = ICQuadrant(orientation=self.relation_combobox_orientation(),radius=float(self.rad_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
-      count += 1
-      return new_form
 
     if(self.geometric_form_entry.get() == "Retangulo"):
-      new_form = ICRectangle(width=float(self.dimensions_a_px_entry.get()), height=float(self.dimensions_b_px_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
+      new_form = ICRectangle(width=float(self.base_entry.get()), height=float(self.height_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
       self.treeview_list.insert(parent='', index='end', iid=count, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
-      count += 1
-      return new_form
+    
+
+    self.iid_to_figure[count] = new_form  # Mapeamento direto iid -> objeto
+    count += 1  # Incremento único garantido
+    return new_form
   
   # Adiciona as figuras do MatPlotLib
-  def add_figure_matplotlib(self) -> None:
+  def add_figure_matplotlib(self, figure) -> None:
     if(self.verify_subare()):
       subarea = 2     # Subtrair (Fica a frente)
       edgeclr='black' # Cor da borda
@@ -567,16 +567,14 @@ class Application(Validate):
       edgeclr='black' # Borda
       faceclr='blue'  # Preenchimento
 
-    figure = None
-    form = self.geometric_form_entry.get()
+    figureMPL = None
 
-    if(form == "Triangulo"):
-      points = [(float(self.dimensions_a_px_entry.get()), float(self.dimensions_a_py_entry.get())),  # Ponto A Vértices (x, y)
-                (float(self.dimensions_b_px_entry.get()), float(self.dimensions_b_py_entry.get())),  # Ponto B Vértices (x, y)
-                (float(self.dimensions_c_px_entry.get()), float(self.dimensions_c_py_entry.get()))   # Ponto C Vértices (x, y)
-      ]
+    if(isinstance(figure, ICTriangle)):
+      points = [(figure.Pa.x, figure.Pa.y),  # Ponto A Vértices (x, y)
+                (figure.Pb.x, figure.Pb.y),  # Ponto B Vértices (x, y)
+                (figure.Pc.x, figure.Pc.y)]  # Ponto C Vértices (x, y)
 
-      figure = Polygon(
+      figureMPL = Polygon(
         xy = points,               # Pontos do Triangulo
         closed = True,             # Fechar o polígono
         edgecolor = edgeclr,       # Cor da borda
@@ -584,35 +582,24 @@ class Application(Validate):
         zorder = subarea           # Ordem
       )
 
-      self.x_min = [p[0] for p in points] # Reajustando limite inferior em X caso a figura ultrapasse
-      self.x_max = [p[0] for p in points] # Reajustando limite superior em X caso a figura ultrapasse
-      self.y_max = [p[1] for p in points] # Reajustando limite inferior em Y caso a figura ultrapasse
-      self.y_min = [p[1] for p in points] # Reajustando limite superior em Y caso a figura ultrapasse
-
-    if(form == "Circunferencia"):
-      origin = [(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))]
-      rad = float(self.dimensions_a_px_entry.get())
-
-      figure = Circle(
-        xy = origin,          # Centro do círculo
-        radius = rad,         # Raio
-        edgecolor = edgeclr,  # Cor da borda
-        facecolor = faceclr,  # Cor de preenchimento
-        zorder = subarea      # Ordem
+    if(isinstance(figure, ICCircle)):
+      figureMPL = Circle(
+        xy = [figure.centroid.x, figure.centroid.y],      # Centro do círculo
+        radius = figure.radius,                           # Raio
+        edgecolor = edgeclr,                              # Cor da borda
+        facecolor = faceclr,                              # Cor de preenchimento
+        zorder = subarea                                  # Ordem
       )
 
-    if(form == "Semicirculo"):
-      origin = [(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))]
-      r = float(self.dimensions_a_px_entry.get())
-
-      figure = Wedge(
-        center = origin,      # Centro do círculo
-        radius = rad,         # Raio
-        theta1=0,             # Ângulo inicial (graus)
-        theta2=180,           # Ângulo final (graus)
-        edgecolor = edgeclr,  # Cor da borda
-        facecolor = faceclr,  # Cor de preenchimento
-        zorder = subarea      # Ordem
+    if(isinstance(figure, ICSemicircle)):
+      figureMPL = Wedge(
+        center = [figure.origin.x, figure.origin.y],      # Centro do círculo
+        radius = figure.radius,                           # Raio
+        theta1=0,                                         # Ângulo inicial (graus)
+        theta2=180,                                       # Ângulo final (graus)
+        edgecolor = edgeclr,                              # Cor da borda
+        facecolor = faceclr,                              # Cor de preenchimento
+        zorder = subarea                                  # Ordem
       )
       """
         situações de orientação meio_circulo
@@ -622,15 +609,18 @@ class Application(Validate):
         orientacao 3: 270-90
       """
     
-    if(form == "Quadrante"):
-      figure = Wedge(
-        center=(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), # Centro
-        r=float(self.dimensions_a_px_entry.get()),               # Raio
-        theta1=90,            # Ângulo inicial (graus)
-        theta2=180,           # Ângulo final (graus)
-        edgecolor=edgeclr,   # Cor da borda
-        facecolor=faceclr,   # Cor de preenchimento
-        zorder=subarea             # Ordem
+    if(isinstance(figure, ICQuadrant)):
+      origin = ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get()))
+      r = float(self.dimensions_a_px_entry.get())
+
+      figureMPL = Wedge(
+        center = [figure.origin.x, figure.origin.y],      # Centro do círculo
+        radius = figure.radius,                           # Raio
+        theta1=0,                                         # Ângulo inicial (graus)
+        theta2=90,                                        # Ângulo final (graus)
+        edgecolor = edgeclr,                              # Cor da borda
+        facecolor = faceclr,                              # Cor de preenchimento
+        zorder = subarea                                  # Ordem
       )
       """
         situações de orientação quarto de circulo
@@ -640,34 +630,96 @@ class Application(Validate):
         orientacao 3: 270-0
       """
 
-    if(form == "Retangulo"):
-      figure = Rectangle(
-        xy=((float(self.coordinate_center_x_entry.get()) - (float(self.dimensions_a_px_entry.get()) / 2)),
-            (float(self.coordinate_center_y_entry.get()) - (float(self.dimensions_b_px_entry.get()) / 2))),       # Canto inferior esquerdo
-        width=float(self.dimensions_a_px_entry.get()),           # Largura
-        height=float(self.dimensions_b_px_entry.get()),          # Altura
-        edgecolor=edgeclr, # Borda
-        facecolor=faceclr,  # Preenchimento
-        zorder=subarea           # Ordem
+    if(isinstance(figure, ICRectangle)):
+      figureMPL = Rectangle(
+        xy = [(figure.centroid.x) - (figure.centroid.x / 2),
+              (figure.centroid.y) - (figure.centroid.y / 2)],     # Canto inferior esquerdo
+        width = figure.width,                                     # Largura
+        height = figure.height,                                   # Altura
+        edgecolor = edgeclr,                                      # Cor da borda
+        facecolor = faceclr,                                      # Cor de preenchimento
+        zorder = subarea                                          # Ordem
       )
 
-    plt.gca().add_patch(figure)
+    self.get_min_max_point_figures(figure)
+    self.ax.add_patch(figureMPL)
     self.auto_resize_matplotlib()
-    plt.draw()
-    return figure
 
-  # Remove as formas da tabela e da lista de objetos
-  def remove_item(self):
-    select = self.treeview_list.selection()[0]
-    if(select):
-      index = self.treeview_list.index(select)
-      self.treeview_list.delete(select)
-      figure = self.dict_shapes[self.composite_figure.components[index]]
-      figure.remove()
-      self.dict_shapes.pop(self.composite_figure.components[index])            
-      self.composite_figure.drop(index)
+    return figureMPL
 
-      plt.draw()
+  def get_min_max_point_figures(self, figure) -> None:
+    if(isinstance(figure, ICRectangle)):
+      self.x_min = min(self.x_min, figure.centroid.x - (figure.width / 2))
+      self.x_max = max(self.x_max, figure.centroid.x + (figure.width / 2))
+      self.y_min = min(self.y_min, figure.centroid.y - (figure.height / 2))
+      self.y_max = max(self.y_max, figure.centroid.y + (figure.height / 2))
+      return None
+
+    if(isinstance(figure, ICTriangle)):
+      points = [(figure.Pa.x, figure.Pa.y),  # Ponto A Vértices (x, y)
+                (figure.Pb.x, figure.Pb.y),  # Ponto B Vértices (x, y)
+                (figure.Pc.x, figure.Pc.y)]  # Ponto C Vértices (x, y)
+      
+      self.x_min = min(self.x_min, [p[0] for p in points]) # Reajustando limite inferior em X caso a figura ultrapasse
+      self.x_max = max(self.x_max, [p[0] for p in points]) # Reajustando limite superior em X caso a figura ultrapasse
+      self.y_min = min(self.y_min, [p[1] for p in points]) # Reajustando limite inferior em Y caso a figura ultrapasse
+      self.y_max = max(self.y_max, [p[1] for p in points]) # Reajustando limite superior em Y caso a figura ultrapasse
+      return None
+        
+    if(isinstance(figure, ICSemicircle) or
+        isinstance(figure, ICQuadrant)):
+      self.x_min = min(self.x_min, figure.origin.x - figure.radius)
+      self.x_max = max(self.x_max, figure.origin.x + figure.radius)
+      self.y_min = min(self.y_min, figure.origin.y - figure.radius)
+      self.y_max = max(self.y_max, figure.origin.y + figure.radius)
+      return None
+
+    if(isinstance(figure, ICCircle)):
+      self.x_min = min(self.x_min, figure.centroid.x - figure.radius)
+      self.x_max = max(self.x_max, figure.centroid.x + figure.radius)
+      self.y_min = min(self.y_min, figure.centroid.y - figure.radius)
+      self.y_max = max(self.y_max, figure.centroid.y + figure.radius)
+      return None
+    
+    return None
+
+  def remove_item(self) -> None:
+    selected_items = self.treeview_list.selection()
+    if not selected_items:
+      return
+
+    print("entrou")
+    selected_iid = selected_items[0]
+    
+    # Recupera a figura usando o iid
+    figure = self.iid_to_figure.pop(selected_iid, None)
+    if figure is None:
+      return
+
+    # Remove da treeview
+    self.treeview_list.delete(selected_iid)
+
+    # Remove da lista de componentes
+    try:
+      self.composite_figure.components.remove(figure)
+    except ValueError:
+      pass
+
+    # Remove do matplotlib e do dicionário
+    figure_mpl = self.dict_shapes.pop(figure, None)
+    if figure_mpl:
+      figure_mpl.remove()
+
+    # Atualização dos limites do gráfico
+    if not self.composite_figure.components:
+      self.x_min, self.x_max, self.y_min, self.y_max = -5, 5, -5, 5
+    else:
+      self.x_min = self.y_min = float('inf')
+      self.x_max = self.y_max = float('-inf')
+      for fig in self.composite_figure.components:
+        self.get_min_max_point_figures(fig)
+
+    self.auto_resize_matplotlib()
 
   # Modifica valores nos objetos
   def modify_object(self) -> None:
@@ -805,24 +857,42 @@ class Application(Validate):
       self.coordinate_y_entry.place(relx=0.55, rely=0.58, relwidth=0.3, relheight=0.04)
   
   def auto_resize_matplotlib(self):
-    # Calcular frequência dos ticks baseada no range
-    x_padded_range = (self.x_max + 1) - (self.x_min - 1)
-    y_padded_range = (self.y_max + 1) - (self.y_min - 1)
-    
-    self.ticks_frequency_x = max(1, int(round(x_padded_range / 10)))
-    self.ticks_frequency_y = max(1, int(round(y_padded_range / 10)))
-
-    # Aplicar limites e ticks
-    self.ax.set(xlim=(self.x_min - 1, self.x_max + 1), 
-                ylim=(self.y_min - 1, self.y_max + 1), 
-                aspect='equal')
-    
-    x_ticks = np.arange(self.x_min - 1, self.x_max + 1 + self.ticks_frequency_x, self.ticks_frequency_x)
-    y_ticks = np.arange(self.y_min - 1, self.y_max + 1 + self.ticks_frequency_y, self.ticks_frequency_y)
-    
-    self.ax.set_xticks([x for x in x_ticks if x != 0])
-    self.ax.set_yticks([y for y in y_ticks if y != 0])
+    # Aplicar padding de 1 unidade
+    self.ax.set_xlim(self.x_min - 1, self.x_max + 1)
+    self.ax.set_ylim(self.y_min - 1, self.y_max + 1)
+    self.update_ticks()
     plt.draw()
+
+  def update_ticks(self) -> None:
+    # Calcular frequência dos ticks
+    x_range = self.x_max - self.x_min
+    y_range = self.y_max - self.y_min
+    self.ticks_frequency_x = max(1, round(x_range / 10))
+    self.ticks_frequency_y = max(1, round(y_range / 10))
+
+    # Gerar ticks cobrindo todo o intervalo
+    x_ticks = np.arange(
+        start=self.x_min, 
+        stop=self.x_max + self.ticks_frequency_x, 
+        step=self.ticks_frequency_x
+    )
+    y_ticks = np.arange(
+        start=self.y_min, 
+        stop=self.y_max + self.ticks_frequency_y, 
+        step=self.ticks_frequency_y
+    )
+
+    # Definir ticks e ocultar rótulo no zero
+    self.ax.set_xticks(x_ticks)
+    self.ax.set_yticks(y_ticks)
+    self.ax.xaxis.set_major_formatter(
+        plt.FuncFormatter(lambda x, _: '' if x == 0 else f'{int(x)}')
+    )
+    self.ax.yaxis.set_major_formatter(
+        plt.FuncFormatter(lambda y, _: '' if y == 0 else f'{int(y)}')
+    )
+
+    return None
 
 root = Tk()
 Application(root)
