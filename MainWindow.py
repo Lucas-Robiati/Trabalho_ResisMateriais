@@ -620,101 +620,82 @@ class Application(Validate):
   def Modify_object(self):
     select = self.treeview_list.selection()
     if not select:
-      messagebox.showwarning("Aviso", "Nenhuma forma selecionada para remover.", parent=self.root)
+      messagebox.showwarning("Aviso", "Nenhuma forma selecionada para modificar.", parent=self.root)
       return
 
     selected_iid = select[0]
 
-    try:
-      index = int(selected_iid)
-    except (IndexError, ValueError, TypeError) as e:
-      messagebox.showerror("Erro", f"Falha ao remover item: {e}", parent=self.root)
+    # Recuperar o objeto usando o iid
+    figureCF = None
+    for key in self.dict_shapes.keys():
+      if str(id(key)) == selected_iid:
+        figureCF = key
+        break
+
+    if not figureCF:
+      messagebox.showerror("Erro", "Item não encontrado.", parent=self.root)
       return
-    
+
     data = self.treeview_list.item(selected_iid)
     _str = data['text']
-    values = self.treeview_list.item(selected_iid, "values") 
+    values = data['values']
 
-    #select = self.treeview_list.selection()
-    #if(select):
-    #    data = self.treeview_list.item(select[0])
-    #    index = self.treeview_list.index(select)
-    #    iid = select[0]
-    #    _str = data['text']
-    #    values = self.treeview_list.item(iid, "values") 
-    #    self.update_window(_str)
-        
-    if(_str == "Triangulo"):
+    # Preencher os campos com os dados do objeto
+    if _str == "Triangulo":
       self.dimensions_a_px_entry.delete('0', 'end')
-      self.dimensions_a_px_entry.insert(0,self.composite_figure.components[index].Pa.x)
+      self.dimensions_a_px_entry.insert(0, figureCF.Pa.x)
       self.dimensions_b_px_entry.delete('0', 'end')
-      self.dimensions_b_px_entry.insert(0,self.composite_figure.components[index].Pb.x)
+      self.dimensions_b_px_entry.insert(0, figureCF.Pb.x)
       self.dimensions_c_px_entry.delete('0', 'end')
-      self.dimensions_c_px_entry.insert(0,self.composite_figure.components[index].Pc.x)
+      self.dimensions_c_px_entry.insert(0, figureCF.Pc.x)
       self.dimensions_a_py_entry.delete('0', 'end')
-      self.dimensions_a_py_entry.insert(0,self.composite_figure.components[index].Pa.y)
+      self.dimensions_a_py_entry.insert(0, figureCF.Pa.y)
       self.dimensions_b_py_entry.delete('0', 'end')
-      self.dimensions_b_py_entry.insert(0,self.composite_figure.components[index].Pb.y)
+      self.dimensions_b_py_entry.insert(0, figureCF.Pb.y)
       self.dimensions_c_py_entry.delete('0', 'end')
-      self.dimensions_c_py_entry.insert(0,self.composite_figure.components[index].Pc.y)
-        
-      self.subare_entry.set(values[2])          
-          
-    if(_str == "Circunferencia"):
-      self.rad_entry.delete('0', 'end')
-      self.rad_entry.insert(0, self.composite_figure.components[index].radius)
-        
-      self.coordinate_center_x_entry.delete('0', 'end')
-      self.coordinate_center_x_entry.insert(0, self.composite_figure.components[index].centroid.x)
-        
-      self.coordinate_center_y_entry.delete('0', 'end')
-      self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].centroid.y)
-        
+      self.dimensions_c_py_entry.insert(0, figureCF.Pc.y)
       self.subare_entry.set(values[2])
 
-    if(_str == "Quadrante"):
+    elif _str == "Circunferencia":
       self.rad_entry.delete('0', 'end')
-      self.rad_entry.insert(0, self.composite_figure.components[index].radius)
-
-      self.combobox_orientation.set(self.Quadrante_combobox_orientation(self.composite_figure.components[index].orientation))
-          
+      self.rad_entry.insert(0, figureCF.radius)
       self.coordinate_center_x_entry.delete('0', 'end')
-      self.coordinate_center_x_entry.insert(0, self.composite_figure.components[index].origin.x)
-
+      self.coordinate_center_x_entry.insert(0, figureCF.centroid.x)
       self.coordinate_center_y_entry.delete('0', 'end')
-      self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].origin.y)
-
+      self.coordinate_center_y_entry.insert(0, figureCF.centroid.y)
       self.subare_entry.set(values[2])
-      
-    if(_str == "Semicirculo"):
+
+    elif _str == "Quadrante":
       self.rad_entry.delete('0', 'end')
-      self.rad_entry.insert(0, self.composite_figure.components[index].radius)
-
-      self.combobox_orientation.set(self.Semicirculo_combobox_orientation(self.composite_figure.components[index].orientation))
-
+      self.rad_entry.insert(0, figureCF.radius)
+      self.combobox_orientation.set(self.Quadrante_combobox_orientation(figureCF.orientation))
       self.coordinate_center_x_entry.delete('0', 'end')
-      self.coordinate_center_x_entry.insert(0, self.composite_figure.components[index].origin.x)
-
+      self.coordinate_center_x_entry.insert(0, figureCF.origin.x)
       self.coordinate_center_y_entry.delete('0', 'end')
-      self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].origin.y)
-
+      self.coordinate_center_y_entry.insert(0, figureCF.origin.y)
       self.subare_entry.set(values[2])
-        
-    if(_str == "Retangulo"):
+
+    elif _str == "Semicirculo":
+      self.rad_entry.delete('0', 'end')
+      self.rad_entry.insert(0, figureCF.radius)
+      self.combobox_orientation.set(self.Semicirculo_combobox_orientation(figureCF.orientation))
+      self.coordinate_center_x_entry.delete('0', 'end')
+      self.coordinate_center_x_entry.insert(0, figureCF.origin.x)
+      self.coordinate_center_y_entry.delete('0', 'end')
+      self.coordinate_center_y_entry.insert(0, figureCF.origin.y)
+      self.subare_entry.set(values[2])
+
+    elif _str == "Retangulo":
       self.base_entry.delete('0', 'end')
-      self.base_entry.insert(0, self.composite_figure.components[index].width)
-          
+      self.base_entry.insert(0, figureCF.width)
       self.height_entry.delete('0', 'end')
-      self.height_entry.insert(0, self.composite_figure.components[index].height)
-
+      self.height_entry.insert(0, figureCF.height)
       self.subare_entry.set(values[2])
-
       self.coordinate_center_x_entry.delete('0', 'end')
-      self.coordinate_center_x_entry.insert(0, self.composite_figure.components[index].centroid.x)
-
+      self.coordinate_center_x_entry.insert(0, figureCF.centroid.x)
       self.coordinate_center_y_entry.delete('0', 'end')
-      self.coordinate_center_y_entry.insert(0, self.composite_figure.components[index].centroid.y)
-          
+      self.coordinate_center_y_entry.insert(0, figureCF.centroid.y)
+
     self.update_window(_str)
 
   def ICreset(self):
@@ -803,8 +784,6 @@ class Application(Validate):
 
   # Identifica o tipo de objeto inserido e o adiciona na tabela e na lista de objetos
   def add_object(self):
-    global count
-
     if(self.geometric_form_entry.get() == "Triangulo"):
       new_form = ICTriangle(Pa=ICPoint2D(float(self.dimensions_a_px_entry.get()),float(self.dimensions_a_py_entry.get())), Pb=ICPoint2D(float(self.dimensions_b_px_entry.get()),float(self.dimensions_b_py_entry.get())), Pc=ICPoint2D(float(self.dimensions_c_px_entry.get()),float(self.dimensions_c_py_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare()) 
       if(new_form.valido() == -1):
@@ -813,38 +792,42 @@ class Application(Validate):
         return
       self.composite_figure.append(new_form)
 
-      self.treeview_list.insert(parent='', index='end', iid=count, 
+      iid = str(id(new_form))
+      self.treeview_list.insert(parent='', index='end', iid=iid, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
 
     if(self.geometric_form_entry.get() == "Circunferencia"):
       new_form =  ICCircle(radius=float(self.rad_entry.get()),  centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()), float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
-      self.treeview_list.insert(parent='', index='end', iid=count, 
+      iid = str(id(new_form))
+      self.treeview_list.insert(parent='', index='end', iid=iid, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
         
     if(self.geometric_form_entry.get() == "Semicirculo"):
       new_form = ICSemicircle(orientation=self.relation_combobox_orientation(),radius=float(self.rad_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
 
-      self.treeview_list.insert(parent='', index='end', iid=count, 
+      iid = str(id(new_form))
+      self.treeview_list.insert(parent='', index='end', iid=iid, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
 
     if(self.geometric_form_entry.get() == "Quadrante"):
       new_form = ICQuadrant(orientation=self.relation_combobox_orientation(),radius=float(self.rad_entry.get()), origin=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
-      self.treeview_list.insert(parent='', index='end', iid=count, 
+      iid = str(id(new_form))
+      self.treeview_list.insert(parent='', index='end', iid=iid, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
 
     if(self.geometric_form_entry.get() == "Retangulo"):
       new_form = ICRectangle(width=float(self.base_entry.get()), height=float(self.height_entry.get()), centroid=ICPoint2D(float(self.coordinate_center_x_entry.get()),float(self.coordinate_center_y_entry.get())), system_origin=self.system_origin, virtual_form=self.verify_subare())
       self.composite_figure.append(new_form)
       
-      self.treeview_list.insert(parent='', index='end', iid=count, 
+      iid = str(id(new_form))
+      self.treeview_list.insert(parent='', index='end', iid=iid, 
         text=self.geometric_form_entry.get(), values=(self.coordinate_center_x_entry.get(),self.coordinate_center_y_entry.get(),self.subare_entry.get()))
     
-    count += 1  # Incremento único garantido
     return new_form
   
   # Adiciona as figuras do MatPlotLib
@@ -1008,40 +991,38 @@ class Application(Validate):
     return None
 
   def remove_item(self) -> None:  
-    # Obtém o item selecionado na Treeview
     selected_items = self.treeview_list.selection()
     if not selected_items:
-      messagebox.showwarning("Aviso", "Nenhuma forma selecionada para remover.", parent=self.root)
-      return
+        messagebox.showwarning("Aviso", "Nenhuma forma selecionada para remover.", parent=self.root)
+        return
 
     selected_iid = selected_items[0]
+    
+    # Recuperar o objeto usando o iid diretamente do dicionário dict_shapes
+    figureCF = None
+    for key in list(self.dict_shapes.keys()):
+        if str(id(key)) == selected_iid:  # Usar id do objeto como iid único
+            figureCF = key
+            break
+    
+    if not figureCF:
+        messagebox.showerror("Erro", "Item não encontrado.", parent=self.root)
+        return
 
-    try:
-      index = int(selected_iid)
-      # Remove da composite_figure
-      figureCF = self.composite_figure.components[index]
-      self.composite_figure.drop(figureCF)
-    except (IndexError, ValueError, TypeError) as e:
-      messagebox.showerror("Erro", f"Falha ao remover item: {e}", parent=self.root)
-      return
-
-    # Remove do dict_shapes e do matplotlib
+    # Remover da composite_figure
+    if figureCF in self.composite_figure.components:
+        self.composite_figure.components.remove(figureCF)
+    
+    # Remover do dict_shapes e do matplotlib
     figureMPL = self.dict_shapes.pop(figureCF, None)
     if figureMPL:
-      figureMPL.remove()
-
-    # Remove da Treeview
+        figureMPL.remove()
+    
+    # Remover da Treeview
     self.treeview_list.delete(selected_iid)
 
-    # Atualiza os limites do gráfico
-    if not self.composite_figure.components:
-      self.x_min, self.x_max = -5 + self.system_origin.x, 5 + self.system_origin.x
-      self.y_min, self.y_max = -5 + self.system_origin.y, 5 + self.system_origin.y
-    else:
-      self.x_min = self.y_min = float('inf')
-      self.x_max = self.y_max = float('-inf')
-      for fig in self.composite_figure.components:
-        self.get_min_max_point_figures(fig)
+    # Atualizar os limites do gráfico
+    self.update_plot_limits()
 
     self.auto_resize_matplotlib()
 
@@ -1249,6 +1230,15 @@ class Application(Validate):
       self.coordinate_x_entry.place(relx=0.23, rely=0.58, relwidth=0.3, relheight=0.04)
       self.coordinate_y_entry.place(relx=0.55, rely=0.58, relwidth=0.3, relheight=0.04)
   
+  def update_plot_limits(self):
+    self.x_min = self.y_min = float('inf')
+    self.x_max = self.y_max = float('-inf')
+    for fig in self.composite_figure.components:
+        self.get_min_max_point_figures(fig)
+    if not self.composite_figure.components:
+        self.x_min, self.x_max = -5 + self.system_origin.x, 5 + self.system_origin.x
+        self.y_min, self.y_max = -5 + self.system_origin.y, 5 + self.system_origin.y
+
   def auto_resize_matplotlib(self):
     # Configurar eixos
     self.ax.spines['bottom'].set_position(('data', self.system_origin.y))  # Eixo X na coordenada Y da origem
