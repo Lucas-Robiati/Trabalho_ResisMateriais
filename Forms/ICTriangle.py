@@ -13,7 +13,7 @@ class ICTriangle(ICForm):
     self.height = 0.0
     self.orientation = 0
     self.__c_orientation_and_cathetus() 
-    super().__init__(self.__c_centroid(), virtual_form)
+    super().__init__(self.__c_centroid(), system_origin, virtual_form)
     self.area = self.__c_area()
     self.Ix, self.Iy = self.__c_moment_of_inertia()
     self.Jo = self._c_polar_moment()
