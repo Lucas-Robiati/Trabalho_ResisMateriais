@@ -3,6 +3,8 @@ from Forms import ICPoint2D
 from Forms import ICCircle
 from Forms import ICRectangle
 from Forms import ICTriangle
+from Forms import ICSemicircle
+from Forms import ICQuadrant
 
 
 
@@ -75,7 +77,7 @@ class ICCompositeFigure(ICForm):
     return ixy
     
   def append(self, other) -> None:
-    if((isinstance(other, ICCircle) or (isinstance(other, ICRectangle) or isinstance(other, ICTriangle))) ):
+    if(isinstance(other, ICCircle) or isinstance(other, ICRectangle) or isinstance(other, ICTriangle) or isinstance(other, ICSemicircle) or isinstance(other, ICQuadrant)):
       self.components.append(other)
       self.update()
       return 

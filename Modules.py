@@ -21,14 +21,15 @@ from Forms import ICQuadrant
 from Forms import ICRectangle
 from Forms import ICTriangle
 
+# Hexadecimal para as cores utilizadas na MainWindow
 class Color(Enum):
-  gray = "#5e5c64"
-  light_gray = "#868687"
-  dark_blue = "#18304a"
-  light_blue = "#0251a1"
-  aqua_blue = "#033f70"
-  white = "#e8e8ed"
-  black = "#000000"
+  gray = "#5e5c64"          # Cor Cinza
+  light_gray = "#868687"    # Cor Cinza Claro
+  dark_blue = "#18304a"     # Cor Azul Escuro
+  light_blue = "#0251a1"    # Cor Azul Claro
+  aqua_blue = "#033f70"     # Cor Verde Agua
+  white = "#e8e8ed"         # Cor White
+  black = "#000000"         # Cor Preto
 
 # Classe base para validar as entradas, restringe e trata entradas
 class Validate:
@@ -54,5 +55,5 @@ class Validate:
     try:
       value == float(text)
     except ValueError:
-      return False                                # Não passou na validação
+      return False                                  # Não passou na validação
     return (0 <= value) or (0 >= value)             # Retorna o valor valido
